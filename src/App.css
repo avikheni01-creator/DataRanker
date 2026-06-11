@@ -1,38 +1,11 @@
-.App {
-  text-align: center;
-}
+/* App.css — global helpers shared across Matrix pages.
+   Component-specific styling lives in each component's own <style> block or
+   CSS file. Keep this lean. */
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
+.app-root { min-height: 100%; }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Generic focus-visible ring for keyboard users */
+:focus-visible {
+  outline: 2px solid #7C6CFF;
+  outline-offset: 2px;
 }
