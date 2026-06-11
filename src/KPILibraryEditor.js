@@ -211,7 +211,6 @@ function KPIRow({ row, onWeightChange, onDirectionToggle, onRemove }) {
 function AddKPIRow({ usedKPIs, onAdd, AVAILABLE_KPI_KEYS, COLUMN_MAPPING }) {
   const [selected, setSelected] = useState("");
   const available = AVAILABLE_KPI_KEYS.filter((k) => !usedKPIs.includes(k));
-  console.log("Available KPIs in template:", AVAILABLE_KPI_KEYS);
 
   if (available.length === 0) return (
     <p style={{ fontSize: 12, color: "#9ca3af", marginTop: 8, textAlign: "center" }}>
@@ -355,7 +354,7 @@ export default function KPILibraryEditor() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://100.103.219.73:8000/column-mapping')
+    fetch('http://localhost:8000/column-mapping')
       .then(res => res.json())
       .then(data => {
         setCOLUMN_MAPPING(data);
@@ -364,11 +363,9 @@ export default function KPILibraryEditor() {
   }, []);
 
   const IDENTIFIER_COLUMNS = ["Symbol", "Description", "Sector", "Industry"];
-  console.log("COLUMN_MAPPING:", COLUMN_MAPPING);
   const AVAILABLE_KPI_KEYS = Object.keys(COLUMN_MAPPING).filter(
     key => !IDENTIFIER_COLUMNS.includes(key)
   );
-  console.log("Available KPI keys for mapping:", AVAILABLE_KPI_KEYS);
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -412,7 +409,6 @@ export default function KPILibraryEditor() {
         return;
       }
       const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-      console.log("Parsed Excel data:", json);
 
       // find actual data rows (skip title/header rows)
       const rows = json
@@ -488,7 +484,7 @@ export default function KPILibraryEditor() {
       <div style={{
         background: "#fff", borderBottom: "1px solid #e5e7eb", padding: "0 24px",
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        height: 56, position: "sticky", top: 0, zIndex: 10,
+        height: 56, position: "sticky", top: 52, zIndex: 10,
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{

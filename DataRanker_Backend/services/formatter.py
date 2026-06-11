@@ -12,8 +12,6 @@ def run_format(query_path: str, out_path: str, dynamic_mapping: dict) -> None:
     """
     df_source = pd.read_csv(query_path)
     df_output = pd.DataFrame()
-    print("Source columns:", df_source.columns.tolist())
-    print("Dynamic mapping:", dynamic_mapping)
 
     # Use the mapping provided by the user/frontend instead of core.config
     for output_col, source_col in dynamic_mapping.items():

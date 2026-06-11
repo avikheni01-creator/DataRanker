@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from fastapi.responses import Response
-from flask import json
+import json
 
 from core.config import COLUMN_MAPPING
 from services.formatter import run_format
@@ -26,11 +26,11 @@ async def run_pipeline(
     mapping_json: str = File(...),
 ) -> Response:
     
-    list_of_mappings = json.loads(mapping_json)
-    dynamic_mapping = {k: v for d in list_of_mappings for k, v in d.items()}
-
     with temp_workspace() as tmpdir:
         try:
+            list_of_mappings = json.loads(mapping_json)
+            dynamic_mapping = {k: v for d in list_of_mappings for k, v in d.items()}
+
             # ── Save uploads ──────────────────────────────────────────────────
             query_path   = workspace_path(tmpdir, "query-results.csv")
             mapping_path = workspace_path(tmpdir, "industry-mapping.xlsx")

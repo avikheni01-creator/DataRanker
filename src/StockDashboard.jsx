@@ -373,7 +373,7 @@ export default function StockDashboard({ resultFile }) {
   const allInTemplate  = sheets[activeTemplate] || [];
   const allKpiKeys     = extractKpiKeys(allInTemplate);          // all possible KPI cols for this template
   const visibleKpiKeys = visibleKpiMap[activeTemplate] || [];    // currently shown KPI cols
-  const maxScore       = Math.max(...allInTemplate.map(c => parseFloat(c.Total_Final_Score) || 0));
+  const maxScore       = allInTemplate.length ? Math.max(...allInTemplate.map(c => parseFloat(c.Total_Final_Score) || 0)) : 0;
   const templates      = Object.keys(sheets);
 
   const rows = allInTemplate
@@ -440,7 +440,7 @@ export default function StockDashboard({ resultFile }) {
         .th-sortable:hover { color: #a78bfa !important; }
       `}</style>
 
-      <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
+      <div style={{ display: "flex", height: "calc(100vh - 52px)", overflow: "hidden" }}>
 
         {/* ── Sidebar ── */}
         <div style={{

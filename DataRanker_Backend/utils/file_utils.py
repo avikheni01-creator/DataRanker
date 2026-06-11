@@ -11,8 +11,11 @@ from fastapi import UploadFile
 
 def save_upload(upload: UploadFile, dest: str) -> None:
     """Write an UploadFile to *dest* on disk."""
-    with open(dest, "wb") as f:
-        shutil.copyfileobj(upload.file, f)
+    try:
+        with open(dest, "wb") as f:
+            shutil.copyfileobj(upload.file, f)
+    finally:
+        upload.file.close()
 
 
 @contextmanager
