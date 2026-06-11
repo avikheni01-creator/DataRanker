@@ -4,20 +4,18 @@ import Dashboard from "./Dashboard";
 import StockDashboard from "./StockDashboard";
 import KPILibraryEditor from "./KPILibraryEditor";
 import ColumnMapper from "./components/ColumnMapper";
+import NavBar from "./components/NavBar";
 
 export default function App() {
   const [outputFile, setOutputFile] = useState(null);
   const [backendConfig, setBackendConfig] = useState({}); // Backend COLUMN_MAPPING config
   const [COLUMN_MAPPING, setCOLUMN_MAPPING] = useState({});
-  
-  console.log("Column mapping in App:", COLUMN_MAPPING);
 
   // Fetch backend config on mount
   useEffect(() => {
-    fetch('http://100.103.219.73:8000/column-mapping')
+    fetch('http://localhost:8000/column-mapping')
       .then(res => res.json())
       .then(data => {
-        console.log("Backend config loaded:", data);
         setBackendConfig(data);
       })
       .catch(err => console.error("Failed to load backend config:", err));
@@ -25,6 +23,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      <NavBar />
       <Routes>
         <Route 
           path="/" 

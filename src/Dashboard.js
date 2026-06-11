@@ -334,7 +334,7 @@ function SetupNote() {
                 <span className="comment"># 3. Start the API server</span>{"\n"}
                 <span className="cmd">uvicorn main:app --reload --port 8000</span>{"\n\n"}
                 <span className="comment"># 4. Run this React app</span>{"\n"}
-                <span className="cmd">npm run dev</span>
+                <span className="cmd">npm start</span>
             </pre>
         </div>
     );
@@ -366,7 +366,7 @@ function usePipeline(columnMapping = {}) {
 
         setError(null);
         setRunning(true);
-        setDownloadUrl(null);
+        setDownloadUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return null; });
         setLog([]);
         setSteps(["idle", "idle", "idle"]);
 
@@ -393,7 +393,7 @@ function usePipeline(columnMapping = {}) {
             setStep(2, "running");
             appendLog("Step 3: Scoring & ranking by KPI templates...");
 
-            const res = await fetch("http://100.103.219.73:8000/run-pipeline", {
+            const res = await fetch("http://localhost:8000/run-pipeline", {
                 method: "POST",
                 body: formData,
             });
@@ -405,7 +405,7 @@ function usePipeline(columnMapping = {}) {
 
             const blob = await res.blob();
             setResultFile(blob);
-            setDownloadUrl(URL.createObjectURL(blob));
+            setDownloadUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return URL.createObjectURL(blob); });
             setStep(2, "done");
             appendLog("Pipeline complete! Final_Ranked_Report.xlsx is ready.", "success");
         } catch (err) {

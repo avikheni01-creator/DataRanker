@@ -13,7 +13,7 @@ import { useNavigate } from 'react-router-dom';
  * 5. Send final mapping to backend
  */
 
-const ColumnMapper = ({ onMappingComplete, backendConfig = {}, setCOLUMN_MAPPING }) => {
+const ColumnMapper = ({ backendConfig = {}, setCOLUMN_MAPPING }) => {
   const [uploadedFile, setUploadedFile] = useState(null);
   const [availableColumns, setAvailableColumns] = useState([]);
   const [autoMappedColumns, setAutoMappedColumns] = useState({}); // { backendMetric: csvColumn }
@@ -30,21 +30,11 @@ const ColumnMapper = ({ onMappingComplete, backendConfig = {}, setCOLUMN_MAPPING
   const performAutoMapping = useCallback((csvColumns, configMetrics) => {
     const mapped = {};
     const unmapped = [];
-    console.log("backend config for mapping:", configMetrics);
-
-    // Create a map of lowercase config metrics for quick lookup
-    const configMetricsMap = {};
-    Object.keys(configMetrics).forEach(metric => {
-      configMetricsMap[metric.toLowerCase()] = metric;
-    });
-    console.log("Config metrics map for auto-mapping:", configMetricsMap);
 
     csvColumns.forEach(csvCol => {
-      const csvLower = csvCol.toLowerCase().trim();
       const originalMetric = Object.keys(configMetrics).find(
-  key => configMetrics[key].toLowerCase().trim() === csvCol.toLowerCase().trim()
-);
-      console.log(originalMetric)
+        key => configMetrics[key].toLowerCase().trim() === csvCol.toLowerCase().trim()
+      );
 
       if (originalMetric) {
         mapped[originalMetric] = csvCol;
@@ -68,7 +58,6 @@ const ColumnMapper = ({ onMappingComplete, backendConfig = {}, setCOLUMN_MAPPING
 
     try {
       const columns = await extractColumnsFromFile(file);
-      console.log('Extracted columns:', columns);
       setUploadedFile(file);
       setAvailableColumns(columns);
 
@@ -77,9 +66,6 @@ const ColumnMapper = ({ onMappingComplete, backendConfig = {}, setCOLUMN_MAPPING
       setAutoMappedColumns(mapped);
       setUnmappedColumns(unmapped);
       setManualMappings({}); // Reset manual mappings
-
-      console.log('Auto-mapped:', mapped);
-      console.log('Unmapped:', unmapped);
 
       // Get preview data
       const preview = await getFilePreview(file);
@@ -252,11 +238,9 @@ const ColumnMapper = ({ onMappingComplete, backendConfig = {}, setCOLUMN_MAPPING
     setIsLoading(true);
     try {
       const finalMapping = buildFinalMapping();
-      console.log('Final mapping to submit:', finalMapping);
 
       // Format as array of objects for backend
       const mappingArray = [finalMapping];
-      console.log('Mapping array to send to backend:', mappingArray);
       setCOLUMN_MAPPING(mappingArray);
 
       // onMappingComplete(mappingArray);
