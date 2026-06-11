@@ -30,20 +30,24 @@ const ColumnMapper = ({ onMappingComplete, backendConfig = {}, setCOLUMN_MAPPING
   const performAutoMapping = useCallback((csvColumns, configMetrics) => {
     const mapped = {};
     const unmapped = [];
+    console.log("backend config for mapping:", configMetrics);
 
     // Create a map of lowercase config metrics for quick lookup
     const configMetricsMap = {};
     Object.keys(configMetrics).forEach(metric => {
       configMetricsMap[metric.toLowerCase()] = metric;
     });
+    console.log("Config metrics map for auto-mapping:", configMetricsMap);
 
     csvColumns.forEach(csvCol => {
       const csvLower = csvCol.toLowerCase().trim();
+      const originalMetric = Object.keys(configMetrics).find(
+  key => configMetrics[key].toLowerCase().trim() === csvCol.toLowerCase().trim()
+);
+      console.log(originalMetric)
 
-      // Check for exact match (case-insensitive)
-      if (configMetricsMap[csvLower]) {
-        const exactMetric = configMetricsMap[csvLower];
-        mapped[exactMetric] = csvCol;
+      if (originalMetric) {
+        mapped[originalMetric] = csvCol;
       } else {
         unmapped.push(csvCol);
       }
@@ -217,12 +221,12 @@ const ColumnMapper = ({ onMappingComplete, backendConfig = {}, setCOLUMN_MAPPING
     const finalMapping = {};
 
     // Add auto-mapped (reverse the key-value)
-    Object.entries(autoMappedColumns).forEach(([backendMetric, csvColumn]) => {
+    Object.entries(autoMappedColumns).forEach(([csvColumn, backendMetric]) => {
       finalMapping[csvColumn] = backendMetric;
     });
 
     // Add manual mappings
-    Object.entries(manualMappings).forEach(([csvColumn, backendMetric]) => {
+    Object.entries(manualMappings).forEach(([backendMetric, csvColumn]) => {
       finalMapping[csvColumn] = backendMetric;
     });
 
@@ -238,12 +242,12 @@ const ColumnMapper = ({ onMappingComplete, backendConfig = {}, setCOLUMN_MAPPING
       col => !manualMappings[col]
     );
 
-    if (unmappedStillPending.length > 0) {
-      setError(
-        `Please map these columns: ${unmappedStillPending.join(', ')}`
-      );
-      return;
-    }
+    // if (unmappedStillPending.length > 0) {
+    //   setError(
+    //     `Please map these columns: ${unmappedStillPending.join(', ')}`
+    //   );
+    //   return;
+    // }
 
     setIsLoading(true);
     try {
@@ -252,9 +256,10 @@ const ColumnMapper = ({ onMappingComplete, backendConfig = {}, setCOLUMN_MAPPING
 
       // Format as array of objects for backend
       const mappingArray = [finalMapping];
+      console.log('Mapping array to send to backend:', mappingArray);
       setCOLUMN_MAPPING(mappingArray);
-      
-      onMappingComplete(mappingArray);
+
+      // onMappingComplete(mappingArray);
       navigate('/'); // Redirect to dashboard
     } catch (err) {
       setError(`Error submitting mapping: ${err.message}`);
@@ -277,7 +282,7 @@ const ColumnMapper = ({ onMappingComplete, backendConfig = {}, setCOLUMN_MAPPING
   };
 
   const hasAutoMappings = Object.keys(autoMappedColumns).length > 0;
-  const allMapped = unmappedColumns.length === 0 || 
+  const allMapped = unmappedColumns.length === 0 ||
     unmappedColumns.every(col => manualMappings[col]);
 
   return (
@@ -370,9 +375,8 @@ const ColumnMapper = ({ onMappingComplete, backendConfig = {}, setCOLUMN_MAPPING
                 <select
                   value={manualMappings[csvColumn] || ''}
                   onChange={(e) => handleManualMapping(csvColumn, e.target.value)}
-                  className={`column-select ${
-                    manualMappings[csvColumn] ? 'mapped' : 'unmapped'
-                  }`}
+                  className={`column-select ${manualMappings[csvColumn] ? 'mapped' : 'unmapped'
+                    }`}
                 >
                   <option value="">-- Select Metric --</option>
                   {Object.keys(backendConfig).map(metric => (
@@ -403,7 +407,7 @@ const ColumnMapper = ({ onMappingComplete, backendConfig = {}, setCOLUMN_MAPPING
           <button
             className="btn btn-primary"
             onClick={handleSubmitMapping}
-            disabled={isLoading || !allMapped}
+            // disabled={isLoading || !allMapped}
             title={!allMapped ? 'Please map all unmapped columns' : ''}
           >
             {isLoading ? 'Processing...' : '✓ Confirm Mapping'}

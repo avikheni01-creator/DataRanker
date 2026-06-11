@@ -14,8 +14,7 @@ COLUMN_MAPPING: dict[str, str] = {
     "EBITDA Margin": "OPM",
     "ROCE": "Return on capital employed",
     "Quarter Sales" : "Sales latest quarter",
-    "test_Column": "test_Column_input",
-    
+    "test_Column": "test_Column_input",    
 }
 
 # Columns added as empty placeholders (Stage 1)
