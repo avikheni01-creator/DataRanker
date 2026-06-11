@@ -25,3 +25,6 @@ yarn-error.log*
 # Python bytecode
 __pycache__/
 *.pyc
+
+# Trade secret — never commit or push
+LOGIC.md

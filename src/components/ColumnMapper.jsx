@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import './ColumnMapper.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -244,7 +244,7 @@ const ColumnMapper = ({ backendConfig = {}, setCOLUMN_MAPPING }) => {
       setCOLUMN_MAPPING(mappingArray);
 
       // onMappingComplete(mappingArray);
-      navigate('/'); // Redirect to dashboard
+      navigate('/app'); // Redirect to pipeline
     } catch (err) {
       setError(`Error submitting mapping: ${err.message}`);
     } finally {
@@ -306,7 +306,11 @@ const ColumnMapper = ({ backendConfig = {}, setCOLUMN_MAPPING }) => {
             <table className="preview-table">
               <thead>
                 <tr>
-                  {fileDataPreview[0]?.split(',').map(col => (
+                  {/* CSV previews are raw strings; Excel previews are row objects */}
+                  {(typeof fileDataPreview[0] === 'string'
+                    ? fileDataPreview[0].split(',')
+                    : Object.keys(fileDataPreview[0] || {})
+                  ).map(col => (
                     <th key={col}>{col}</th>
                   ))}
                 </tr>

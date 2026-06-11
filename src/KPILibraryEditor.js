@@ -145,16 +145,17 @@ function WeightBar({ used, max = 100 }) {
   const over = used > max;
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-      <div style={{ flex: 1, height: 6, borderRadius: 3, background: "#e5e7eb", overflow: "hidden" }}>
+      <div style={{ flex: 1, height: 6, borderRadius: 3, background: "#232C49", overflow: "hidden" }}>
         <div style={{
           width: `${pct}%`, height: "100%", borderRadius: 3,
-          background: over ? "#ef4444" : used === max ? "#10b981" : "#3b82f6",
+          background: over ? "#EF4444" : used === max ? "#22C55E" : "#7C6CFF",
           transition: "width 0.2s",
         }} />
       </div>
       <span style={{
+        fontFamily: "'JetBrains Mono', monospace",
         fontSize: 12, fontWeight: 600,
-        color: over ? "#ef4444" : used === max ? "#10b981" : "#374151",
+        color: over ? "#EF4444" : used === max ? "#22C55E" : "#C7CEE2",
         minWidth: 60, textAlign: "right",
       }}>
         {used}/{max}%{over && " ⚠"}
@@ -164,17 +165,18 @@ function WeightBar({ used, max = 100 }) {
 }
 
 function KPIRow({ row, onWeightChange, onDirectionToggle, onRemove }) {
-  const color = CATEGORY_COLORS[row.category] || "#6b7280";
+  const color = CATEGORY_COLORS[row.category] || "#98A2BC";
   return (
     <div style={{
       display: "grid", gridTemplateColumns: "1fr 100px 90px 32px",
       alignItems: "center", gap: 10, padding: "8px 12px",
-      borderRadius: 8, background: "#f9fafb", border: "1px solid #e5e7eb", marginBottom: 6,
+      borderRadius: 8, background: "#080D1A", border: "1px solid #151D33", marginBottom: 6,
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <span style={{ width: 8, height: 8, borderRadius: "50%", background: color, flexShrink: 0 }} />
-        <span style={{ fontWeight: 600, fontSize: 13, color: "#111827" }}>{row.kpi}</span>
+        <span style={{ fontWeight: 600, fontSize: 13, color: "#F4F6FB" }}>{row.kpi}</span>
         <span style={{
+          fontFamily: "'JetBrains Mono', monospace",
           fontSize: 10, fontWeight: 600, padding: "2px 6px", borderRadius: 4,
           background: color + "20", color, textTransform: "uppercase", letterSpacing: "0.04em",
         }}>{row.category}</span>
@@ -184,24 +186,26 @@ function KPIRow({ row, onWeightChange, onDirectionToggle, onRemove }) {
           type="number" min={1} max={100} value={row.weight}
           onChange={(e) => onWeightChange(Number(e.target.value))}
           style={{
-            width: 54, padding: "4px 6px", borderRadius: 6, border: "1px solid #d1d5db",
+            width: 54, padding: "4px 6px", borderRadius: 6, border: "1px solid #232C49",
+            background: "#151D33", color: "#F4F6FB",
+            fontFamily: "'JetBrains Mono', monospace",
             fontSize: 13, fontWeight: 600, textAlign: "right", outline: "none",
           }}
         />
-        <span style={{ fontSize: 12, color: "#6b7280" }}>%</span>
+        <span style={{ fontSize: 12, color: "#98A2BC" }}>%</span>
       </div>
       <button onClick={onDirectionToggle} style={{
         padding: "4px 8px", borderRadius: 6, border: "none", cursor: "pointer",
         fontSize: 12, fontWeight: 600,
-        background: row.direction === "Higher" ? "#dcfce7" : "#fee2e2",
-        color: row.direction === "Higher" ? "#15803d" : "#dc2626",
+        background: row.direction === "Higher" ? "rgba(34,197,94,0.12)" : "rgba(239,68,68,0.12)",
+        color: row.direction === "Higher" ? "#86EFAC" : "#FCA5A5",
       }}>
         {row.direction === "Higher" ? "↑ Higher" : "↓ Lower"}
       </button>
       <button onClick={onRemove} title="Remove KPI" style={{
-        width: 28, height: 28, borderRadius: 6, border: "1px solid #fca5a5",
+        width: 28, height: 28, borderRadius: 6, border: "1px solid rgba(239,68,68,0.12)",
         background: "transparent", cursor: "pointer", display: "flex",
-        alignItems: "center", justifyContent: "center", color: "#ef4444",
+        alignItems: "center", justifyContent: "center", color: "#EF4444",
         fontSize: 14, fontWeight: 700,
       }}>×</button>
     </div>
@@ -213,15 +217,15 @@ function AddKPIRow({ usedKPIs, onAdd, AVAILABLE_KPI_KEYS, COLUMN_MAPPING }) {
   const available = AVAILABLE_KPI_KEYS.filter((k) => !usedKPIs.includes(k));
 
   if (available.length === 0) return (
-    <p style={{ fontSize: 12, color: "#9ca3af", marginTop: 8, textAlign: "center" }}>
+    <p style={{ fontSize: 12, color: "#98A2BC", marginTop: 8, textAlign: "center" }}>
       All mapped KPIs assigned to this template.
     </p>
   );
   return (
     <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
       <select value={selected} onChange={(e) => setSelected(e.target.value)} style={{
-        flex: 1, padding: "6px 10px", borderRadius: 8, border: "1px dashed #d1d5db",
-        fontSize: 13, color: selected ? "#111827" : "#9ca3af", background: "#fff", outline: "none",
+        flex: 1, padding: "6px 10px", borderRadius: 8, border: "1px dashed #232C49",
+        fontSize: 13, color: selected ? "#F4F6FB" : "#5A6480", background: "#151D33", outline: "none",
       }}>
         <option value="">Add a KPI from mapped data…</option>
         {available.map((k) => (
@@ -231,8 +235,8 @@ function AddKPIRow({ usedKPIs, onAdd, AVAILABLE_KPI_KEYS, COLUMN_MAPPING }) {
       <button disabled={!selected} onClick={() => { if (selected) { onAdd(selected); setSelected(""); } }}
         style={{
           padding: "6px 16px", borderRadius: 8, border: "none",
-          background: selected ? "#2563eb" : "#e5e7eb",
-          color: selected ? "#fff" : "#9ca3af",
+          background: selected ? "#7C6CFF" : "#151D33",
+          color: selected ? "#F4F6FB" : "#5A6480",
           fontWeight: 600, fontSize: 13, cursor: selected ? "pointer" : "not-allowed",
         }}>+ Add</button>
     </div>
@@ -248,20 +252,20 @@ function TemplateCard({ templateName, rows, onUpdate, onAddKPI, onRemoveKPI, AVA
 
   return (
     <div style={{
-      border: `1px solid ${over ? "#fca5a5" : exact ? "#bbf7d0" : "#e5e7eb"}`,
-      borderRadius: 12, overflow: "hidden", marginBottom: 12, background: "#fff",
+      border: `1px solid ${over ? "rgba(239,68,68,0.12)" : exact ? "rgba(34,197,94,0.12)" : "#232C49"}`,
+      borderRadius: 12, overflow: "hidden", marginBottom: 12, background: "#0B1120",
     }}>
       <div onClick={() => setExpanded((p) => !p)} style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: "12px 16px", cursor: "pointer",
-        background: over ? "#fff1f1" : exact ? "#f0fdf4" : "#fff", userSelect: "none",
+        background: over ? "rgba(239,68,68,0.12)" : exact ? "rgba(34,197,94,0.12)" : "#0B1120", userSelect: "none",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1 }}>
-          <span style={{ fontSize: 14, fontWeight: 700, color: "#111827" }}>{templateName}</span>
-          <span style={{ fontSize: 12, color: "#6b7280" }}>{rows.length} KPI{rows.length !== 1 ? "s" : ""}</span>
+          <span style={{ fontSize: 14, fontWeight: 700, color: "#F4F6FB" }}>{templateName}</span>
+          <span style={{ fontSize: 12, color: "#98A2BC" }}>{rows.length} KPI{rows.length !== 1 ? "s" : ""}</span>
         </div>
         <div style={{ flex: 1, maxWidth: 260 }}><WeightBar used={total} /></div>
-        <span style={{ marginLeft: 12, color: "#9ca3af", fontSize: 12 }}>{expanded ? "▲" : "▼"}</span>
+        <span style={{ marginLeft: 12, color: "#98A2BC", fontSize: 12 }}>{expanded ? "▲" : "▼"}</span>
       </div>
 
       {expanded && (
@@ -278,8 +282,8 @@ function TemplateCard({ templateName, rows, onUpdate, onAddKPI, onRemoveKPI, AVA
           {over && (
             <div style={{
               marginTop: 10, padding: "8px 12px", borderRadius: 8,
-              background: "#fef2f2", border: "1px solid #fca5a5",
-              fontSize: 12, color: "#b91c1c", fontWeight: 500,
+              background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.12)",
+              fontSize: 12, color: "#FCA5A5", fontWeight: 500,
             }}>
               ⚠ Total weight is {total}% — reduce by {total - 100}% before saving.
             </div>
@@ -295,48 +299,48 @@ function Tier2Card({ templateName, rows }) {
   const [expanded, setExpanded] = useState(false);
   const total = totalWeight(rows);
   return (
-    <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, overflow: "hidden", marginBottom: 12, background: "#fff" }}>
+    <div style={{ border: "1px solid #232C49", borderRadius: 12, overflow: "hidden", marginBottom: 12, background: "#0B1120" }}>
       <div onClick={() => setExpanded((p) => !p)} style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "12px 16px", cursor: "pointer", background: "#fff", userSelect: "none",
+        padding: "12px 16px", cursor: "pointer", background: "#0B1120", userSelect: "none",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1 }}>
-          <span style={{ fontSize: 14, fontWeight: 700, color: "#111827" }}>{templateName}</span>
-          <span style={{ fontSize: 12, color: "#6b7280" }}>{rows.length} KPIs</span>
-          <span style={{ fontSize: 10, padding: "2px 7px", borderRadius: 4, background: "#fef9c3", color: "#854d0e", fontWeight: 600 }}>
+          <span style={{ fontSize: 14, fontWeight: 700, color: "#F4F6FB" }}>{templateName}</span>
+          <span style={{ fontSize: 12, color: "#98A2BC" }}>{rows.length} KPIs</span>
+          <span style={{ fontSize: 10, padding: "2px 7px", borderRadius: 4, background: "rgba(245,158,11,0.12)", color: "#F59E0B", fontWeight: 600 }}>
             Read-only
           </span>
         </div>
         <div style={{ flex: 1, maxWidth: 260 }}><WeightBar used={total} /></div>
-        <span style={{ marginLeft: 12, color: "#9ca3af", fontSize: 12 }}>{expanded ? "▲" : "▼"}</span>
+        <span style={{ marginLeft: 12, color: "#98A2BC", fontSize: 12 }}>{expanded ? "▲" : "▼"}</span>
       </div>
       {expanded && (
         <div style={{ padding: "12px 16px 16px" }}>
           {rows.map((row) => {
-            const color = CATEGORY_COLORS[row.category] || "#6b7280";
+            const color = CATEGORY_COLORS[row.category] || "#98A2BC";
             return (
               <div key={row.kpi} style={{
                 display: "grid", gridTemplateColumns: "1fr 100px 90px",
                 alignItems: "center", gap: 10, padding: "8px 12px",
-                borderRadius: 8, background: "#f9fafb", border: "1px solid #e5e7eb", marginBottom: 6,
+                borderRadius: 8, background: "#080D1A", border: "1px solid #151D33", marginBottom: 6,
               }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <span style={{ width: 8, height: 8, borderRadius: "50%", background: color, flexShrink: 0 }} />
-                  <span style={{ fontWeight: 600, fontSize: 13, color: "#374151" }}>{row.kpi}</span>
-                  <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 6px", borderRadius: 4, background: color + "20", color, textTransform: "uppercase" }}>{row.category}</span>
+                  <span style={{ fontWeight: 600, fontSize: 13, color: "#C7CEE2" }}>{row.kpi}</span>
+                  <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, fontWeight: 600, padding: "2px 6px", borderRadius: 4, background: color + "20", color, textTransform: "uppercase" }}>{row.category}</span>
                 </div>
-                <span style={{ fontSize: 13, color: "#6b7280", textAlign: "right" }}>{row.weight}%</span>
+                <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 13, color: "#98A2BC", textAlign: "right" }}>{row.weight}%</span>
                 <span style={{
                   padding: "4px 8px", borderRadius: 6, fontSize: 12, fontWeight: 600, textAlign: "center",
-                  background: row.direction === "Higher" ? "#dcfce7" : "#fee2e2",
-                  color: row.direction === "Higher" ? "#15803d" : "#dc2626",
+                  background: row.direction === "Higher" ? "rgba(34,197,94,0.12)" : "rgba(239,68,68,0.12)",
+                  color: row.direction === "Higher" ? "#86EFAC" : "#FCA5A5",
                 }}>
                   {row.direction === "Higher" ? "↑ Higher" : "↓ Lower"}
                 </span>
               </div>
             );
           })}
-          <p style={{ fontSize: 11, color: "#9ca3af", margin: "8px 0 0", textAlign: "center" }}>
+          <p style={{ fontSize: 11, color: "#98A2BC", margin: "8px 0 0", textAlign: "center" }}>
             Tier 2 KPIs use sector-specific columns not in the current column mapping. Editing will be enabled once those columns are mapped.
           </p>
         </div>
@@ -359,6 +363,11 @@ export default function KPILibraryEditor() {
       .then(data => {
         setCOLUMN_MAPPING(data);
         setLoading(false);
+      })
+      .catch(() => {
+        setLoading(false);
+        setToast({ msg: "Backend not reachable at localhost:8000 — mapped columns unavailable", type: "error" });
+        setTimeout(() => setToast(null), 4000);
       });
   }, []);
 
@@ -478,29 +487,29 @@ export default function KPILibraryEditor() {
   };
 
   return (
-    <div style={{ fontFamily: "'Inter', system-ui, sans-serif", minHeight: "100vh", background: "#f3f4f6" }}>
+    <div style={{ fontFamily: "'Inter', system-ui, sans-serif", minHeight: "100vh" }}>
 
       {/* Top bar */}
       <div style={{
-        background: "#fff", borderBottom: "1px solid #e5e7eb", padding: "0 24px",
+        background: "#0B1120", borderBottom: "1px solid #232C49", padding: "0 24px",
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        height: 56, position: "sticky", top: 52, zIndex: 10,
+        height: 56, position: "sticky", top: 0, zIndex: 10,
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{
-            width: 28, height: 28, borderRadius: 6, background: "#2563eb",
+            width: 28, height: 28, borderRadius: 6, background: "linear-gradient(135deg, #7C6CFF, #4F46E5)",
             display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14,
           }}>📊</div>
-          <span style={{ fontWeight: 700, fontSize: 15, color: "#111827" }}>KPI Library Editor</span>
+          <span style={{ fontWeight: 700, fontSize: 15, color: "#F4F6FB" }}>KPI Library Editor</span>
           {!allValid
-            ? <span style={{ fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 10, background: "#fef2f2", color: "#dc2626", border: "1px solid #fca5a5" }}>Weight errors</span>
-            : <span style={{ fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 10, background: "#f0fdf4", color: "#15803d", border: "1px solid #bbf7d0" }}>All valid</span>
+            ? <span style={{ fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 10, background: "rgba(239,68,68,0.12)", color: "#FCA5A5", border: "1px solid rgba(239,68,68,0.12)" }}>Weight errors</span>
+            : <span style={{ fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 10, background: "rgba(34,197,94,0.12)", color: "#86EFAC", border: "1px solid rgba(34,197,94,0.12)" }}>All valid</span>
           }
         </div>
         <div style={{ display: "flex", gap: 8 }}>
           <button onClick={handleDownloadXlsx} style={{
-            padding: "7px 14px", borderRadius: 8, border: "1px solid #d1d5db",
-            background: "#fff", color: "#374151", fontWeight: 600, fontSize: 13, cursor: "pointer",
+            padding: "7px 14px", borderRadius: 8, border: "1px solid #232C49",
+            background: "#151D33", color: "#C7CEE2", fontWeight: 600, fontSize: 13, cursor: "pointer",
             display: "flex", alignItems: "center", gap: 6,
           }}>
             ⬇ Download .xlsx
@@ -508,8 +517,9 @@ export default function KPILibraryEditor() {
           <label style={{
             padding: "7px 14px",
             borderRadius: 8,
-            border: "1px solid #d1d5db",
-            background: "#fff",
+            border: "1px solid #232C49",
+            background: "#151D33",
+            color: "#C7CEE2",
             fontWeight: 600,
             fontSize: 13,
             cursor: "pointer",
@@ -527,8 +537,8 @@ export default function KPILibraryEditor() {
           </label>
           <button onClick={handleSave} disabled={!allValid} style={{
             padding: "7px 16px", borderRadius: 8, border: "none",
-            background: allValid ? "#2563eb" : "#e5e7eb",
-            color: allValid ? "#fff" : "#9ca3af",
+            background: allValid ? "#7C6CFF" : "#151D33",
+            color: allValid ? "#F4F6FB" : "#5A6480",
             fontWeight: 700, fontSize: 13, cursor: allValid ? "pointer" : "not-allowed",
           }}>
             Save & Run Pipeline
@@ -538,31 +548,31 @@ export default function KPILibraryEditor() {
 
       {/* Mapping legend */}
       <div style={{
-        background: "#eff6ff", borderBottom: "1px solid #bfdbfe",
+        background: "rgba(124,108,255,0.12)", borderBottom: "1px solid #232C49",
         padding: "9px 24px", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap",
       }}>
-        <span style={{ fontSize: 11, fontWeight: 700, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: "0.06em", flexShrink: 0 }}>
+        <span style={{ fontSize: 11, fontWeight: 700, color: "#9D90FF", textTransform: "uppercase", letterSpacing: "0.06em", flexShrink: 0 }}>
           Mapped columns
         </span>
         {AVAILABLE_KPI_KEYS.map((k) => (
-          <span key={k} style={{ fontSize: 11, color: "#1e40af", background: "#dbeafe", borderRadius: 4, padding: "2px 7px", whiteSpace: "nowrap" }}>
+          <span key={k} style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "#C7CEE2", background: "rgba(124,108,255,0.12)", borderRadius: 4, padding: "2px 7px", whiteSpace: "nowrap" }}>
             <strong>{k}</strong> → {COLUMN_MAPPING[k]}
           </span>
         ))}
       </div>
 
       {/* Tabs */}
-      <div style={{ display: "flex", borderBottom: "1px solid #e5e7eb", background: "#fff", padding: "0 24px" }}>
+      <div style={{ display: "flex", borderBottom: "1px solid #232C49", background: "#0B1120", padding: "0 24px" }}>
         {[
           { id: "tier1", label: "Tier 1 — Screening" },
           { id: "tier2", label: "Tier 2 — Deep Research" },
         ].map((t) => (
           <button key={t.id} onClick={() => setActiveTab(t.id)} style={{
             padding: "12px 18px",
-            borderBottom: activeTab === t.id ? "2px solid #2563eb" : "2px solid transparent",
+            borderBottom: activeTab === t.id ? "2px solid #7C6CFF" : "2px solid transparent",
             background: "transparent", border: "none",
             fontWeight: activeTab === t.id ? 700 : 500, fontSize: 14,
-            color: activeTab === t.id ? "#2563eb" : "#6b7280", cursor: "pointer",
+            color: activeTab === t.id ? "#9D90FF" : "#98A2BC", cursor: "pointer",
           }}>{t.label}</button>
         ))}
       </div>
@@ -572,10 +582,10 @@ export default function KPILibraryEditor() {
         {activeTab === "tier1" ? (
           <>
             <div style={{ marginBottom: 16, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <p style={{ fontSize: 13, color: "#6b7280", margin: 0 }}>
+              <p style={{ fontSize: 13, color: "#98A2BC", margin: 0 }}>
                 Edit weights, toggle Higher/Lower Better, add or remove KPIs. Each template must total exactly 100%.
               </p>
-              <span style={{ fontSize: 12, color: "#9ca3af" }}>
+              <span style={{ fontSize: 12, color: "#98A2BC" }}>
                 {Object.keys(templates).length} templates · {tier1Rows.length} KPIs
               </span>
             </div>
@@ -589,7 +599,7 @@ export default function KPILibraryEditor() {
         ) : (
           <>
             <div style={{ marginBottom: 16 }}>
-              <p style={{ fontSize: 13, color: "#6b7280", margin: 0 }}>
+              <p style={{ fontSize: 13, color: "#98A2BC", margin: 0 }}>
                 Tier 2 templates use sector-specific KPIs (NIM, GNPA, AUM Growth, etc.) that require additional column mapping in the backend config before they can be edited here.
               </p>
             </div>
@@ -604,10 +614,10 @@ export default function KPILibraryEditor() {
       {toast && (
         <div style={{
           position: "fixed", bottom: 24, right: 24, padding: "12px 18px", borderRadius: 10,
-          background: toast.type === "error" ? "#fef2f2" : "#f0fdf4",
-          border: `1px solid ${toast.type === "error" ? "#fca5a5" : "#bbf7d0"}`,
-          color: toast.type === "error" ? "#b91c1c" : "#15803d",
-          fontWeight: 600, fontSize: 13, boxShadow: "0 4px 16px rgba(0,0,0,0.1)", zIndex: 100,
+          background: toast.type === "error" ? "rgba(239,68,68,0.12)" : "rgba(34,197,94,0.12)",
+          border: `1px solid ${toast.type === "error" ? "rgba(239,68,68,0.12)" : "rgba(34,197,94,0.12)"}`,
+          color: toast.type === "error" ? "#FCA5A5" : "#86EFAC",
+          fontWeight: 600, fontSize: 13, boxShadow: "0 4px 16px rgba(0,0,0,0.4)", zIndex: 100,
         }}>
           {toast.msg}
         </div>
