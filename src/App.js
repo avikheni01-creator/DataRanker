@@ -13,22 +13,12 @@ import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 
-// Gates the KPI Editor: only reachable once a KPI library has been uploaded.
-function KpiGate({ kpiFile, notify, children }) {
-  useEffect(() => {
-    if (!kpiFile) notify("Upload your KPI library first.");
-  }, [kpiFile, notify]);
-
-  if (!kpiFile) return <Navigate to="/app" replace />;
-  return children;
-}
-
 export default function App() {
   const [outputFile, setOutputFile] = useState(null);
   const [backendConfig, setBackendConfig] = useState({}); // Backend COLUMN_MAPPING config
   const [COLUMN_MAPPING, setCOLUMN_MAPPING] = useState({});
   // Pipeline upload files are lifted here so they persist across route changes
-  // (e.g. visiting Column Mapper and returning). kpiFile also gates the KPI editor.
+  // (e.g. visiting Column Mapper and returning).
   const [queryFile, setQueryFile] = useState(null);
   const [mappingFile, setMappingFile] = useState(null);
   const [kpiFile, setKpiFile] = useState(null);
@@ -72,7 +62,7 @@ export default function App() {
           path="/app"
           element={
             <ProtectedRoute>
-              <AppShell kpiFile={kpiFile} />
+              <AppShell />
             </ProtectedRoute>
           }
         >
@@ -101,14 +91,7 @@ export default function App() {
             }
           />
           <Route path="results" element={<StockDashboard resultFile={outputFile} />} />
-          <Route
-            path="kpi-editor"
-            element={
-              <KpiGate kpiFile={kpiFile} notify={notify}>
-                <KPILibraryEditor />
-              </KpiGate>
-            }
-          />
+          <Route path="kpi-editor" element={<KPILibraryEditor />} />
         </Route>
 
         {/* Fallback */}

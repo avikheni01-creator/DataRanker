@@ -40,11 +40,11 @@ Routes (defined in `App.js`):
 /app/               Dashboard.js — the pipeline page
 /app/column-mapper  ColumnMapper
 /app/results        StockDashboard
-/app/kpi-editor     KPILibraryEditor (gated: only reachable once a KPI file is uploaded)
+/app/kpi-editor     KPILibraryEditor (always accessible)
 ```
 
 Key files:
-- `App.js` — root router; fetches `GET /column-mapping` on mount (with retry + toast on failure) to seed `backendConfig`; owns `outputFile`, `COLUMN_MAPPING`, and the three pipeline upload files (`queryFile`/`mappingFile`/`kpiFile` are lifted here so they survive route changes; `kpiFile` also gates the KPI editor)
+- `App.js` — root router; fetches `GET /column-mapping` on mount (with retry + toast on failure) to seed `backendConfig`; owns `outputFile`, `COLUMN_MAPPING`, and the three pipeline upload files (`queryFile`/`mappingFile`/`kpiFile` are lifted here so they survive route changes)
 - `Dashboard.js` — pipeline page; collects 3 file uploads (query CSV, industry-mapping XLSX, KPI library XLSX) and a `mapping_json` param, then POSTs to `/run-pipeline` and receives the ranked XLSX back (`usePipeline` hook)
 - `components/ColumnMapper.jsx` — lets users upload a CSV/XLSX, auto-maps columns (exact case-insensitive match) against `backendConfig`, and lets users manually map the rest; calls `setCOLUMN_MAPPING` so `Dashboard.js` knows the final mapping
 - `StockDashboard.jsx` — reads the downloaded output XLSX (via `xlsx`) and renders charts/tables; shows an empty state until a pipeline run produces `outputFile`

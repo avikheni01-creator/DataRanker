@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import Logo from "./Logo";
 import { signOut, getUser } from "../auth";
 import { colors, gradients, fonts, radius } from "../theme";
@@ -19,12 +19,15 @@ const NAV = [
 
 const KPI_NAV = { to: "/app/kpi-editor", label: "KPI Editor", icon: <Icon paths={["M12 20h9", "M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"]} /> };
 
-// `kpiFile` is lifted to App.js; the KPI Editor link only appears once a KPI
-// library has been uploaded in the pipeline.
-export default function AppShell({ kpiFile }) {
+// KPI Editor is always reachable (no longer gated on a KPI upload). The Results
+// page renders the nav as a top bar instead of the left sidebar so the output
+// dashboard gets the full page width.
+export default function AppShell() {
   const navigate = useNavigate();
+  const location = useLocation();
   const user = getUser();
-  const items = kpiFile ? [...NAV, KPI_NAV] : NAV;
+  const items = [...NAV, KPI_NAV];
+  const topNav = location.pathname === "/app/results";
 
   const handleSignOut = () => {
     signOut();
@@ -34,7 +37,7 @@ export default function AppShell({ kpiFile }) {
   const initial = (user.name || user.email || "M").trim().charAt(0).toUpperCase();
 
   return (
-    <div className="shell">
+    <div className={`shell${topNav ? " topbar" : ""}`}>
       <style>{SHELL_CSS}</style>
 
       <aside className="shell-side">
@@ -100,6 +103,21 @@ const SHELL_CSS = `
   .shell-signout:hover { color: ${colors.negative}; background: ${colors.negativeSoft}; }
 
   .shell-main { min-width: 0; }
+
+  /* Results page: horizontal top bar instead of the left sidebar. */
+  .shell.topbar { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+  .shell.topbar .shell-side {
+    position: sticky; top: 0; z-index: 20; height: auto; flex-direction: row;
+    align-items: center; gap: 8px; padding: 12px 18px; overflow-x: auto;
+    border-right: none; border-bottom: 1px solid ${colors.glassBorder};
+  }
+  .shell.topbar .shell-brand { padding: 0 8px 0 4px; }
+  .shell.topbar .shell-section { display: none; }
+  .shell.topbar .shell-nav { flex-direction: row; flex: 1; }
+  .shell.topbar .shell-link { white-space: nowrap; }
+  .shell.topbar .shell-link.active::before { display: none; }
+  .shell.topbar .shell-user { border-top: none; margin-top: 0; padding: 0; }
+  .shell.topbar .shell-user-meta { display: none; }
 
   @media (max-width: 760px) {
     .shell { grid-template-columns: 1fr; }
