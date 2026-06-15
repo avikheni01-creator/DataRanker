@@ -1,0 +1,148 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* ─── Theme tokens ──────────────────────────────────────────────────────────
+   Concrete values for the design-system tokens consumed via var(--x) in
+   theme/index.js. Flip <html data-theme="light|dark"> to re-theme everything.
+   Brand (accent*) and semantic colors are shared by both modes. */
+
+:root,
+:root[data-theme="dark"] {
+  --canvas: #050810;
+  --card: #0B1120;
+  --elevated: #151D33;
+  --inset: #080D1A;
+  --border: #232C49;
+  --border-subtle: #141B30;
+
+  --glass: rgba(255,255,255,0.03);
+  --glass-strong: rgba(255,255,255,0.05);
+  --glass-border: rgba(255,255,255,0.08);
+  --glass-edge: rgba(255,255,255,0.14);
+
+  --text: #F4F6FB;
+  --text-secondary: #98A2BC;
+  --text-muted: #5A6480;
+
+  --shadow-card: 0 1px 2px rgba(0,0,0,0.4), 0 8px 24px rgba(0,0,0,0.25);
+  --shadow-elevated: 0 16px 48px rgba(0,0,0,0.55);
+
+  /* Ambient backdrop layers */
+  --bd-glow-1: rgba(124,108,255,0.13);
+  --bd-glow-2: rgba(79,70,229,0.10);
+  --bd-grid: rgba(255,255,255,0.018);
+
+  --scrollbar-thumb: #232C49;
+  --scrollbar-thumb-hover: #38437A;
+  --scrollbar-border: #050810;
+  --autofill-bg: #151D33;
+}
+
+:root[data-theme="light"] {
+  --canvas: #F5F7FC;
+  --card: #FFFFFF;
+  --elevated: #FFFFFF;
+  --inset: #EEF2F9;
+  --border: #DCE3F0;
+  --border-subtle: #E8EDF6;
+
+  --glass: rgba(255,255,255,0.55);
+  --glass-strong: rgba(255,255,255,0.80);
+  --glass-border: rgba(15,23,55,0.08);
+  --glass-edge: rgba(255,255,255,0.95);
+
+  --text: #0B1430;
+  --text-secondary: #45506E;
+  --text-muted: #7B8499;
+
+  --shadow-card: 0 1px 2px rgba(16,24,64,0.06), 0 8px 24px rgba(16,24,64,0.08);
+  --shadow-elevated: 0 16px 48px rgba(16,24,64,0.16);
+
+  --bd-glow-1: rgba(124,108,255,0.10);
+  --bd-glow-2: rgba(79,70,229,0.07);
+  --bd-grid: rgba(15,23,55,0.035);
+
+  --scrollbar-thumb: #C7D0E2;
+  --scrollbar-thumb-hover: #A9B5CE;
+  --scrollbar-border: #F5F7FC;
+  --autofill-bg: #EEF2F9;
+
+  /* Accent used as TEXT/links needs more contrast on a light canvas than the
+     dark-mode lilac (#9D90FF). Buttons keep the shared --accent/--accent-deep. */
+  --accent-hover: #5B4FCF;
+  --accent-soft: rgba(124,108,255,0.10);
+}
+
+/* Brand + semantic — shared by both modes */
+:root {
+  --accent: #7C6CFF;
+  --accent-deep: #4F46E5;
+  --accent-hover: #9D90FF;
+  --accent-soft: rgba(124,108,255,0.12);
+  --focus-glow: rgba(124,108,255,0.22);
+
+  --positive: #22C55E;
+  --positive-soft: rgba(34,197,94,0.12);
+  --negative: #EF4444;
+  --negative-soft: rgba(239,68,68,0.12);
+  --warning: #F59E0B;
+  --warning-soft: rgba(245,158,11,0.12);
+  --info: #22D3EE;
+  --info-soft: rgba(34,211,238,0.12);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--canvas);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Ambient backdrop — soft violet glow + faint engineering grid, fixed behind
+   every page so glass surfaces have something to refract. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(55% 40% at 50% -5%, var(--bd-glow-1), transparent 70%),
+    radial-gradient(40% 35% at 90% 105%, var(--bd-glow-2), transparent 70%),
+    linear-gradient(var(--bd-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--bd-grid) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 56px 56px, 56px 56px;
+}
+
+code, pre, .mono {
+  font-family: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+}
+
+/* Numeric columns get tabular figures everywhere */
+.tnum { font-feature-settings: "tnum" 1; }
+
+a { color: inherit; text-decoration: none; }
+
+/* Scrollbars */
+* { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) transparent; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 999px; border: 2px solid var(--scrollbar-border); }
+*::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
+
+::selection { background: rgba(124,108,255,0.4); color: #fff; }
+
+/* Autofill fix for themed inputs */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text);
+  -webkit-box-shadow: 0 0 0 1000px var(--autofill-bg) inset;
+  caret-color: var(--text);
+}
