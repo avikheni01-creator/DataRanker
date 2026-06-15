@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Next.js
+frontend/.next/
+frontend/out/
+frontend/build/
+
+# Production
+build/
+dist/
+
+# Env
+.env*.local
+.env
+
+# Misc
+.DS_Store
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Trade secret — never commit or push (must never be copied into this repo)
+LOGIC.md
+
+# Runtime upload/temp workspaces
+backend/tmp/
+backend/uploads/
