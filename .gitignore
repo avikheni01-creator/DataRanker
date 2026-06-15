@@ -1,18 +1,19 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
-/node_modules
+# dependencies (client/ and server/)
+node_modules/
 /.pnp
 .pnp.js
 
 # testing
-/coverage
+coverage/
 
-# production
-/build
+# production builds
+build/
+/client/build
 
-# misc
-.DS_Store
+# env / secrets — never commit. .env.example IS committed.
+.env
 .env.local
 .env.development.local
 .env.test.local
@@ -28,3 +29,6 @@ __pycache__/
 
 # Trade secret — never commit or push
 LOGIC.md
+
+# Nested Next.js + Express rewrite (its own git repo, kept as reference)
+/dataranker
