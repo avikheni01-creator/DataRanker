@@ -63,11 +63,21 @@ function readXlsxWithHeader(buffer, sheet, headerRow) {
     throw new Error(`Worksheet named '${sheet}' not found`);
   }
   const ws = wb.Sheets[name];
+  // pandas read_excel(header=N) counts PHYSICAL rows from row 1 (index 0),
+  // including blanks. SheetJS, by contrast, reads from the sheet's used range
+  // (!ref), which here is "A2:..." because physical row 1 is empty — that would
+  // shift every index up by one and pick a data row as the header. So we (a)
+  // force the range origin to A1 and (b) keep blankrows:true, so aoa[headerRow]
+  // lands on the exact same physical row pandas would use.
+  const range = XLSX.utils.decode_range(ws["!ref"]);
+  range.s.r = 0;
+  range.s.c = 0;
   const aoa = XLSX.utils.sheet_to_json(ws, {
     header: 1,
-    blankrows: false,
+    blankrows: true,
     defval: null,
     raw: true,
+    range,
   });
   // header is on aoa[headerRow]; data follows.
   const headerArr = aoa[headerRow] || [];

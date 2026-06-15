@@ -354,12 +354,11 @@ function SetupNote() {
             <div className="setup-note-title">Backend Setup (one-time)</div>
             <pre>
                 <span className="comment"># 1. Install dependencies</span>{"\n"}
-                <span className="cmd">pip install fastapi uvicorn python-multipart pandas openpyxl</span>{"\n\n"}
-                <span className="comment"># 2. Place Format.py, mapper.py, ranking.py in /backend</span>{"\n"}
-                <span className="comment"># 3. Start the API server</span>{"\n"}
-                <span className="cmd">uvicorn main:app --reload --port 8000</span>{"\n\n"}
-                <span className="comment"># 4. Run this React app</span>{"\n"}
-                <span className="cmd">npm start</span>
+                <span className="cmd">cd backend && npm install</span>{"\n\n"}
+                <span className="comment"># 2. Start the Express API server (port 8000)</span>{"\n"}
+                <span className="cmd">npm run dev</span>{"\n\n"}
+                <span className="comment"># 3. Run this Next.js app</span>{"\n"}
+                <span className="cmd">cd ../frontend && npm run dev</span>
             </pre>
         </div>
     );
