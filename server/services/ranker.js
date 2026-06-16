@@ -55,19 +55,24 @@ function scoreKpi(subset, columns, kpi, weight, direction) {
   return scoreCol;
 }
 
-// mapped: { columns, rows } from Stage 2.
-async function runRanking(mapped, kpiBuffer) {
-  // Read KPI library, header on 0-indexed row KPI_HEADER_ROW; strip col names.
+// Parse a KPI library xlsx buffer into the row shape runRanking expects
+// (keys: Template, KPI, "Weight %", "Higher/Lower Better"). Kept for the
+// legacy / import path; the live pipeline now passes DB rows directly.
+function parseKpiBuffer(kpiBuffer) {
   const kpiTable = readXlsxWithHeader(kpiBuffer, KPI_SHEET_NAME, KPI_HEADER_ROW);
   const kpiStripped = kpiTable.columns.map((c) => String(c).trim());
-  const kpiRows = kpiTable.rows.map((r) => {
+  return kpiTable.rows.map((r) => {
     const obj = {};
     for (let i = 0; i < kpiTable.columns.length; i++) {
       obj[kpiStripped[i]] = r[kpiTable.columns[i]];
     }
     return obj;
   });
+}
 
+// mapped: { columns, rows } from Stage 2.
+// kpiRows: array of { Template, KPI, "Weight %", "Higher/Lower Better" }.
+async function runRanking(mapped, kpiRows) {
   // Distinct non-null KPI_Template values in first-appearance order.
   const seen = new Set();
   const templates = [];
@@ -148,4 +153,9 @@ function buildTemplateSheet(mapped, kpiRows, template) {
   return { name: sheetName, columns, rows: subset, fills };
 }
 
-module.exports = { runRanking };
+// Legacy path: rank from an uploaded KPI library xlsx buffer.
+async function runRankingFromBuffer(mapped, kpiBuffer) {
+  return runRanking(mapped, parseKpiBuffer(kpiBuffer));
+}
+
+module.exports = { runRanking, runRankingFromBuffer, parseKpiBuffer };

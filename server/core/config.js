@@ -2,20 +2,25 @@
 
 // Column mapping from query CSV → output Excel (Stage 1).
 // Insertion order matters — it defines Stage 1 output column order.
+//
+// Each value is an ARRAY of accepted source-column names (aliases). A column
+// auto-maps if the uploaded file contains ANY of the listed names. List the
+// preferred/canonical name first; add alternatives the file might use. A plain
+// string is still accepted (treated as a single-alias array) for compatibility.
 const COLUMN_MAPPING = {
-  Symbol: "NSE Code",
-  Description: "Name",
-  Sector: "Industry Group",
-  Industry: "Industry",
-  ROA: "Return on assets",
-  ROE: "Return on equity",
-  "PAT Growth": "Profit growth",
-  "Debt/Equity": "Debt to equity",
-  "Revenue Growth": "Sales growth",
-  "EBITDA Margin": "OPM",
-  ROCE: "Return on capital employed",
-  "Quarter Sales": "Sales latest quarter",
-  test_Column: "test_Column_input",
+  Symbol: ["NSE Code"],
+  Description: ["Name"],
+  Sector: ["Industry Group"],
+  Industry: ["Industry"],
+  ROA: ["Return on assets"],
+  ROE: ["Return on equity"],
+  "PAT Growth": ["Profit growth" , "Net profit growth"],
+  "Debt/Equity": ["Debt to equity"],
+  "Revenue Growth": ["Sales growth"],
+  "EBITDA Margin": ["OPM"],
+  ROCE: ["Return on capital employed"],
+  "Quarter Sales": ["Sales latest quarter"],
+  test_Column: ["test_Column_input"],
 };
 
 // Columns added as empty placeholders (Stage 1).

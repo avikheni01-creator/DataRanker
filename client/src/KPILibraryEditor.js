@@ -108,7 +108,10 @@ function downloadAsXlsx(tier1Rows, tier2Rows, columnMapping) {
     ["Column Mapping — re-upload this file to restore your configuration"],
     [],
     ["KPI Name", "Source Column"],
-    ...Object.entries(columnMapping).map(([kpi, col]) => [kpi, col]),
+    ...Object.entries(columnMapping).map(([kpi, col]) => [
+      kpi,
+      Array.isArray(col) ? col.join(", ") : col,
+    ]),
   ];
   const ws3 = XLSX.utils.aoa_to_sheet(mappingData);
   ws3["!cols"] = [{ wch: 22 }, { wch: 30 }];
@@ -372,6 +375,21 @@ export default function KPILibraryEditor() {
       });
   }, []);
 
+  // Load this user's saved KPI library (server seeds defaults on first call).
+  useEffect(() => {
+    fetch(apiUrl('/kpi-library'), { credentials: "include" })
+      .then(res => (res.ok ? res.json() : Promise.reject(res)))
+      .then(data => {
+        if (data && Array.isArray(data.rows) && data.rows.length) {
+          setTier1Rows(data.rows);
+        }
+      })
+      .catch(() => {
+        setToast({ msg: "Could not load your KPI library — showing defaults", type: "error" });
+        setTimeout(() => setToast(null), 4000);
+      });
+  }, []);
+
   const IDENTIFIER_COLUMNS = ["Symbol", "Description", "Sector", "Industry"];
   const AVAILABLE_KPI_KEYS = Object.keys(COLUMN_MAPPING).filter(
     key => !IDENTIFIER_COLUMNS.includes(key)
@@ -481,10 +499,23 @@ export default function KPILibraryEditor() {
     showToast("KPI_Library.xlsx downloaded");
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!allValid) { showToast("Fix weight totals (must be 100%) before saving", "error"); return; }
-    // Replace with: await fetch('/api/kpi-library', { method: 'POST', body: JSON.stringify(tier1Rows) })
-    showToast("Saved — ready to run pipeline");
+    try {
+      const res = await fetch(apiUrl('/kpi-library'), {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rows: tier1Rows }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || `Save failed (${res.status})`);
+      }
+      showToast("KPI library saved");
+    } catch (err) {
+      showToast(err.message || "Save failed", "error");
+    }
   };
 
   return (
@@ -557,7 +588,7 @@ export default function KPILibraryEditor() {
         </span>
         {AVAILABLE_KPI_KEYS.map((k) => (
           <span key={k} style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "var(--text-secondary)", background: "rgba(124,108,255,0.12)", borderRadius: 4, padding: "2px 7px", whiteSpace: "nowrap" }}>
-            <strong>{k}</strong> → {COLUMN_MAPPING[k]}
+            <strong>{k}</strong> → {Array.isArray(COLUMN_MAPPING[k]) ? COLUMN_MAPPING[k].join(", ") : COLUMN_MAPPING[k]}
           </span>
         ))}
       </div>

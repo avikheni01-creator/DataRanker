@@ -24,7 +24,6 @@ export default function App() {
   // (e.g. visiting Column Mapper and returning).
   const [queryFile, setQueryFile] = useState(null);
   const [mappingFile, setMappingFile] = useState(null);
-  const [kpiFile, setKpiFile] = useState(null);
   const [toast, setToast] = useState("");
 
   const notify = useCallback((msg) => setToast(msg), []);
@@ -81,8 +80,6 @@ export default function App() {
                 setQueryFile={setQueryFile}
                 mappingFile={mappingFile}
                 setMappingFile={setMappingFile}
-                kpiFile={kpiFile}
-                setKpiFile={setKpiFile}
               />
             }
           />

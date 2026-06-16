@@ -25,15 +25,21 @@ const ColumnMapper = ({ backendConfig = {}, setCOLUMN_MAPPING }) => {
   const navigate = useNavigate();
 
   /**
-   * Auto-map columns using EXACT MATCH (case-insensitive) against backend config
+   * Auto-map columns using EXACT MATCH (case-insensitive) against backend config.
+   * Each config value may be a single alias (string) or a list of accepted
+   * aliases (array of strings); a CSV column matches if it equals ANY alias.
    */
   const performAutoMapping = useCallback((csvColumns, configMetrics) => {
     const mapped = {};
     const unmapped = [];
 
+    const normalize = (s) => String(s).toLowerCase().trim();
+    const aliasesOf = (value) => (Array.isArray(value) ? value : [value]);
+
     csvColumns.forEach(csvCol => {
-      const originalMetric = Object.keys(configMetrics).find(
-        key => configMetrics[key].toLowerCase().trim() === csvCol.toLowerCase().trim()
+      const target = normalize(csvCol);
+      const originalMetric = Object.keys(configMetrics).find(key =>
+        aliasesOf(configMetrics[key]).some(alias => normalize(alias) === target)
       );
 
       if (originalMetric) {

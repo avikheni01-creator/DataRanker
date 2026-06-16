@@ -40,6 +40,8 @@ const STYLES = `
   .app { max-width: 880px; margin: 0 auto; padding: 52px 32px 80px; color: var(--text); }
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 22px; }
   .grid-full { grid-column: 1 / -1; }
+  .kpi-source-note { font-size: 13px; color: var(--text-secondary); background: var(--elevated); border: 1px dashed var(--border); border-radius: 10px; padding: 12px 14px; }
+  .kpi-source-note strong { color: var(--text); }
   @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } .grid-full { grid-column: 1; } }
 
   /* Header */
@@ -251,7 +253,7 @@ function UploadZone({ label, accept, file, onChange, required }) {
     );
 }
 
-function FileUploadGrid({ queryFile, mappingFile, kpiFile, onQueryChange, onMappingChange, onKpiChange }) {
+function FileUploadGrid({ queryFile, mappingFile, onQueryChange, onMappingChange }) {
     return (
         <div className="grid">
             <div className="grid-full">
@@ -263,20 +265,18 @@ function FileUploadGrid({ queryFile, mappingFile, kpiFile, onQueryChange, onMapp
                     required
                 />
             </div>
-            <UploadZone
-                label="Industry Mapping File"
-                accept=".xlsx"
-                file={mappingFile}
-                onChange={onMappingChange}
-                required
-            />
-            <UploadZone
-                label="KPI Library"
-                accept=".xlsx"
-                file={kpiFile}
-                onChange={onKpiChange}
-                required
-            />
+            <div className="grid-full">
+                <UploadZone
+                    label="Industry Mapping File"
+                    accept=".xlsx"
+                    file={mappingFile}
+                    onChange={onMappingChange}
+                    required
+                />
+            </div>
+            <div className="grid-full kpi-source-note">
+                Scoring uses your saved <strong>KPI Library</strong> — edit it in the KPI Editor. No file upload needed.
+            </div>
         </div>
     );
 }
@@ -380,9 +380,9 @@ function usePipeline(columnMapping = {}) {
 
     const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
-    const run = async (queryFile, mappingFile, kpiFile) => {
-        if (!queryFile || !mappingFile || !kpiFile) {
-            setError("Please upload all three required files.");
+    const run = async (queryFile, mappingFile) => {
+        if (!queryFile || !mappingFile) {
+            setError("Please upload both required files.");
             return;
         }
 
@@ -395,7 +395,6 @@ function usePipeline(columnMapping = {}) {
         const formData = new FormData();
         formData.append("query_results", queryFile);
         formData.append("industry_mapping", mappingFile);
-        formData.append("kpi_library", kpiFile);
 
         formData.append('mapping_json', JSON.stringify(columnMapping));
 
@@ -453,8 +452,6 @@ export default function Dashboard({
     setQueryFile,
     mappingFile,
     setMappingFile,
-    kpiFile,
-    setKpiFile,
 }) {
     const navigate = useNavigate();
 
@@ -464,7 +461,7 @@ export default function Dashboard({
             setOutputFile(resultFile);
         }
     }, [resultFile,setOutputFile]);
-    const canRun = queryFile && mappingFile && kpiFile && !running;
+    const canRun = queryFile && mappingFile && !running;
     const showDashboard = resultFile !== null;
 
     return (
@@ -476,10 +473,8 @@ export default function Dashboard({
                 <FileUploadGrid
                     queryFile={queryFile}
                     mappingFile={mappingFile}
-                    kpiFile={kpiFile}
                     onQueryChange={setQueryFile}
                     onMappingChange={setMappingFile}
-                    onKpiChange={setKpiFile}
                 />
 
                 <PipelineSteps statuses={steps} />
@@ -490,7 +485,7 @@ export default function Dashboard({
                 <RunButton
                     running={running}
                     disabled={!canRun}
-                    onClick={() => run(queryFile, mappingFile, kpiFile)}
+                    onClick={() => run(queryFile, mappingFile)}
                 />
 
                 <DownloadButton url={downloadUrl} />

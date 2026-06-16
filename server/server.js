@@ -12,6 +12,7 @@ const connectDB = require("./config/db");
 const authRouter = require("./routes/auth");
 const plansRouter = require("./routes/plans");
 const pipelineRouter = require("./routes/pipeline");
+const kpiLibraryRouter = require("./routes/kpiLibrary");
 
 const app = express();
 
@@ -41,6 +42,7 @@ app.get("/health", (req, res) => res.json({ ok: true }));
 app.use("/auth", authRouter);
 app.use(plansRouter); // GET /plans
 app.use(pipelineRouter); // GET /column-mapping, POST /run-pipeline
+app.use(kpiLibraryRouter); // GET/PUT /kpi-library
 
 const PORT = process.env.PORT || 8000;
 

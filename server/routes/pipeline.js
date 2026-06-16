@@ -7,6 +7,7 @@ const { COLUMN_MAPPING } = require("../core/config");
 const { runFormat } = require("../services/formatter");
 const { runMapper } = require("../services/mapper");
 const { runRanking } = require("../services/ranker");
+const { getOrSeedLibrary, toRankerRows } = require("../services/kpiLibrary");
 const { requireAuth } = require("../middleware/auth");
 
 const router = express.Router();
@@ -26,18 +27,21 @@ router.post(
   upload.fields([
     { name: "query_results", maxCount: 1 },
     { name: "industry_mapping", maxCount: 1 },
-    { name: "kpi_library", maxCount: 1 },
   ]),
   async (req, res) => {
     try {
       const files = req.files || {};
       const queryFile = files.query_results && files.query_results[0];
       const mappingFile = files.industry_mapping && files.industry_mapping[0];
-      const kpiFile = files.kpi_library && files.kpi_library[0];
 
-      if (!queryFile || !mappingFile || !kpiFile) {
+      if (!queryFile || !mappingFile) {
         throw new Error("Missing one or more required files");
       }
+
+      // KPI library now comes from the signed-in user's saved set (seeded with
+      // defaults on first use), replacing the uploaded KPI Excel sheet.
+      const lib = await getOrSeedLibrary(req.user._id);
+      const kpiRows = toRankerRows(lib.rows);
 
       // Parse mapping_json exactly like the Python: JSON array of single-key
       // objects merged into one dynamic_mapping object.
@@ -50,7 +54,7 @@ router.post(
       // Stage 1 → Stage 2 → Stage 3 (in-memory).
       const formatted = runFormat(queryFile.buffer, dynamicMapping);
       const mapped = runMapper(formatted, mappingFile.buffer);
-      const fileBytes = await runRanking(mapped, kpiFile.buffer);
+      const fileBytes = await runRanking(mapped, kpiRows);
 
       res.status(200);
       res.setHeader("Content-Type", XLSX_MEDIA_TYPE);
