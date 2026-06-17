@@ -2,6 +2,7 @@ import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import Logo from "./Logo";
 import ThemeToggle from "./ThemeToggle";
 import { logOut, getUser } from "../auth";
+import Seo from "../seo";
 import { colors, gradients, fonts, radius } from "../theme";
 
 // Icons kept as tiny inline SVGs so we don't add an icon dependency.
@@ -14,7 +15,6 @@ const Icon = ({ d, paths }) => (
 
 const NAV = [
   { to: "/app", end: true, label: "Pipeline", icon: <Icon paths={["M3 3v18h18", "M7 14l4-4 3 3 5-6"]} /> },
-  { to: "/app/column-mapper", label: "Column Mapper", icon: <Icon paths={["M4 6h16", "M4 12h10", "M4 18h7", "M16 15l4 3-4 3"]} /> },
   { to: "/app/results", label: "Results", icon: <Icon paths={["M4 19V9", "M10 19V5", "M16 19v-7", "M22 19H2"]} /> },
 ];
 
@@ -39,6 +39,7 @@ export default function AppShell() {
 
   return (
     <div className={`shell${topNav ? " topbar" : ""}`}>
+      <Seo title="Workspace" noindex description="Matrix workspace — the signed-in ranking pipeline, column mapper, results dashboard and KPI editor." />
       <style>{SHELL_CSS}</style>
 
       <aside className="shell-side">

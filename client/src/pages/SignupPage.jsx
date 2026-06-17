@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthLayout from "./AuthLayout";
+import Seo from "../seo";
 import { signUp } from "../auth";
 
 export default function SignupPage() {
@@ -39,6 +40,7 @@ export default function SignupPage() {
       subtitle="Start ranking in under a minute."
       footer={<>Already have an account? <Link to="/login">Sign in</Link></>}
     >
+      <Seo title="Sign up" path="/signup" description="Create a free Matrix account and rank your first equity universe with industry-specific KPI templates — no credit card required." />
       <form onSubmit={handleSubmit}>
         {error && <div className="auth-error">{error}</div>}
         <div className="auth-field">

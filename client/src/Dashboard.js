@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiUrl } from "./api";
 import { saveResult } from "./lib/resultStore";
+import ColumnMapper from "./components/ColumnMapper";
 
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -423,19 +424,31 @@ function usePipeline(columnMapping = {}) {
 
 export default function Dashboard({
     setOutputFile,
-    columnMapping,
+    backendConfig,
     queryFile,
     setQueryFile,
 }) {
     const navigate = useNavigate();
 
-    const { steps, log, running, resultFile, downloadUrl, error, run } = usePipeline(columnMapping);
+    // Column mapping is now an inline step. ColumnMapper reports the built
+    // mapping + readiness up here; the pipeline reads it at run time.
+    const [mapping, setMapping] = useState([{}]);
+    const [mappingReady, setMappingReady] = useState(false);
+    const handleMappingChange = useCallback(({ mapping, ready }) => {
+        setMapping(mapping);
+        setMappingReady(ready);
+    }, []);
+
+    // A new/cleared file invalidates the previous mapping until it's reparsed.
+    useEffect(() => { setMappingReady(false); }, [queryFile]);
+
+    const { steps, log, running, resultFile, downloadUrl, error, run } = usePipeline(mapping);
     useEffect(() => {
         if (resultFile) {
             setOutputFile(resultFile);
         }
     }, [resultFile,setOutputFile]);
-    const canRun = queryFile && !running;
+    const canRun = queryFile && mappingReady && !running;
     const showDashboard = resultFile !== null;
 
     return (
@@ -448,6 +461,14 @@ export default function Dashboard({
                     queryFile={queryFile}
                     onQueryChange={setQueryFile}
                 />
+
+                {queryFile && (
+                    <ColumnMapper
+                        backendConfig={backendConfig}
+                        queryFile={queryFile}
+                        onMappingChange={handleMappingChange}
+                    />
+                )}
 
                 <PipelineSteps statuses={steps} />
 

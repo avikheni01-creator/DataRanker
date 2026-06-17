@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import MarketingNav from "../components/MarketingNav";
 import MarketingFooter from "../components/MarketingFooter";
+import Seo from "../seo";
 import { colors, gradients, fonts, radius, glassCss } from "../theme";
 
 const WORKFLOW = [
@@ -49,6 +50,10 @@ export default function LandingPage() {
 
   return (
     <div style={{ color: colors.text, fontFamily: fonts.sans, minHeight: "100vh", overflowX: "hidden" }}>
+      <Seo
+        path="/"
+        description="Matrix turns raw equity fundamentals into a defensible, weighted ranking — mapped to your sectors and scored against your KPI templates. Export, map, rank, done."
+      />
       <style>{LANDING_CSS}</style>
 
       <MarketingNav />

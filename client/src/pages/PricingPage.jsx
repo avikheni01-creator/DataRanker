@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import MarketingNav from "../components/MarketingNav";
 import MarketingFooter from "../components/MarketingFooter";
+import Seo from "../seo";
 import { apiUrl } from "../api";
 import { colors, gradients, fonts, radius, glassCss } from "../theme";
 
@@ -33,6 +34,11 @@ export default function PricingPage() {
 
   return (
     <div style={{ color: colors.text, fontFamily: fonts.sans, minHeight: "100vh", overflowX: "hidden" }}>
+      <Seo
+        title="Pricing"
+        path="/pricing"
+        description="Start free with the full Matrix ranking pipeline — column mapper, KPI editor, results dashboard and Excel export. Premium and Enterprise tiers coming soon."
+      />
       <style>{PRICING_CSS}</style>
       <MarketingNav />
 

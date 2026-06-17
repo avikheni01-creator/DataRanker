@@ -5,7 +5,6 @@ import "./App.css";
 import Dashboard from "./Dashboard";
 import StockDashboard from "./StockDashboard";
 import KPILibraryEditor from "./KPILibraryEditor";
-import ColumnMapper from "./components/ColumnMapper";
 import AppShell from "./components/AppShell";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Toast from "./components/Toast";
@@ -19,9 +18,8 @@ import { apiUrl } from "./api";
 export default function App() {
   const [outputFile, setOutputFile] = useState(null);
   const [backendConfig, setBackendConfig] = useState({}); // Backend COLUMN_MAPPING config
-  const [COLUMN_MAPPING, setCOLUMN_MAPPING] = useState({});
-  // Pipeline upload files are lifted here so they persist across route changes
-  // (e.g. visiting Column Mapper and returning).
+  // The pipeline upload is lifted here so it persists across route changes
+  // (e.g. visiting Results and returning).
   const [queryFile, setQueryFile] = useState(null);
   const [toast, setToast] = useState("");
 
@@ -74,21 +72,14 @@ export default function App() {
             element={
               <Dashboard
                 setOutputFile={setOutputFile}
-                columnMapping={COLUMN_MAPPING}
+                backendConfig={backendConfig}
                 queryFile={queryFile}
                 setQueryFile={setQueryFile}
               />
             }
           />
-          <Route
-            path="column-mapper"
-            element={
-              <ColumnMapper
-                backendConfig={backendConfig}
-                setCOLUMN_MAPPING={setCOLUMN_MAPPING}
-              />
-            }
-          />
+          {/* Column mapping is now part of the pipeline page; keep the old path as a redirect. */}
+          <Route path="column-mapper" element={<Navigate to="/app" replace />} />
           <Route path="results" element={<StockDashboard resultFile={outputFile} />} />
           <Route path="kpi-editor" element={<KPILibraryEditor />} />
         </Route>

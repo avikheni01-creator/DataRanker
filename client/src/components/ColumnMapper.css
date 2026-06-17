@@ -293,3 +293,30 @@
   .auto-mapped-grid, .manual-mapping-grid { grid-template-columns: 1fr; }
   .mapper-actions { flex-direction: column; }
 }
+
+/* Collapsible mapping sections (native <details>) to keep the page short */
+.mapper-collapse { padding: 0; overflow: hidden; }
+.mapper-collapse-head {
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 26px;
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  transition: color 0.15s ease;
+}
+.mapper-collapse-head::-webkit-details-marker { display: none; }
+.mapper-collapse-head:hover { color: var(--accent-hover); }
+.mapper-collapse-chevron {
+  color: var(--text-secondary);
+  font-size: 13px;
+  transition: transform 0.18s ease;
+}
+.mapper-collapse[open] .mapper-collapse-chevron { transform: rotate(90deg); }
+.mapper-collapse-body { padding: 0 26px 26px; }

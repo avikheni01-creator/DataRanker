@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import MarketingNav from "../components/MarketingNav";
 import MarketingFooter from "../components/MarketingFooter";
+import Seo from "../seo";
 import { colors, gradients, fonts, radius, glassCss } from "../theme";
 
 // Dummy About page — placeholder copy, fully themed.
@@ -20,6 +21,11 @@ const STATS = [
 export default function AboutPage() {
   return (
     <div style={{ color: colors.text, fontFamily: fonts.sans, minHeight: "100vh", overflowX: "hidden" }}>
+      <Seo
+        title="About"
+        path="/about"
+        description="Matrix turns fundamentals into defensible equity rankings — built around the real research workflow: export, map, rank, export again. Your methodology, made fast and repeatable."
+      />
       <style>{ABOUT_CSS}</style>
       <MarketingNav />
 

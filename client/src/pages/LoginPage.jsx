@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import AuthLayout from "./AuthLayout";
+import Seo from "../seo";
 import { logIn } from "../auth";
 
 export default function LoginPage() {
@@ -32,6 +33,7 @@ export default function LoginPage() {
       subtitle="Sign in to run your rankings."
       footer={<>Don&apos;t have an account? <Link to="/signup">Sign up</Link></>}
     >
+      <Seo title="Log in" path="/login" description="Log in to Matrix to rank and score your equity universe by industry-specific KPI templates." />
       <form onSubmit={handleSubmit}>
         {error && <div className="auth-error">{error}</div>}
         <div className="auth-field">

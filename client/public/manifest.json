@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Matrix",
+  "name": "Matrix — Equity Ranking & Scoring",
+  "description": "Turn raw equity fundamentals into a defensible, weighted ranking — mapped to your sectors and scored against your KPI templates.",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +21,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#4F46E5",
+  "background_color": "#050810"
 }
