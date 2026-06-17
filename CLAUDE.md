@@ -36,7 +36,9 @@ The backend URL is configured once via `client/.env` → `REACT_APP_API_URL` (co
 - **Column-mapping aliases** — `COLUMN_MAPPING` values are arrays of accepted source-column names; the frontend auto-mapper matches any alias.
 - **Tier-1 deployment-readiness pass (2026-06-17)** — production build now passes under `CI=true` (was failing on lint-as-error); server fail-fasts without `JWT_SECRET` and warns when `NODE_ENV!=production`; security headers + auth rate-limiting (`middleware/rateLimit.js`, dependency-free) + 15 MB upload cap; real HTML `<title>`/description + `noindex` (prototype) + `robots.txt` disallow; `npm test` fixed. Hosting decision: **separate domains, accept third-party-cookie risk** (Safari/strict-Chrome may block the cross-site auth cookie) — documented in `server/.env.example`. **Not deployed yet** — only made deploy-ready.
 - **Results persistence** — the ranked XLSX is saved to IndexedDB (`client/src/lib/resultStore.js`) on each run; `StockDashboard` hydrates it on refresh/deep-link and it's cleared on logout. **Company comparison chart** — the Results company drawer now has a recharts **radar overlay** (company vs template average across KPI metric-scores).
-- Branch: **`feat/mern-stack-auth-theme`**. Nothing committed for this session's work yet.
+- Branch: **`feat/mern-stack-auth-theme`**, merged to **`main`** (origin only; not pushed to `upstream`). Latest work committed.
+- **Single pipeline page** — Column Mapper is no longer a separate route. It's an inline, collapsible step on the pipeline page (`/app`): upload once → review/auto-map columns (collapsible auto-mapped & unmapped `<details>` sections) → Run. The `/app/column-mapper` route now redirects to `/app`. Run is gated on a built mapping (fixes a prior empty-mapping 500).
+- **SEO** — site is publicly indexable. Per-route metadata via React 19 native hoisting (`client/src/seo.js`); Open Graph/Twitter/JSON-LD + real title/description in `index.html`; `robots.txt` allows crawl (only `/app` disallowed) + `sitemap.xml`. Set `REACT_APP_SITE_URL` and replace the `matrix.example.com` placeholder in `robots.txt`/`sitemap.xml` at deploy.
 - Three known core-logic bugs remain frozen pending team approval (carried over from the Python pipeline; see Claude's memory notes). Do not touch without Romit's approval.
 - **Pending: UI deployment-readiness fixes** — a 4-agent UI audit (2026-06-17) found ~40 issues (3 blockers, ~12 high) spanning stale marketing copy, `$`→₹ pricing, light-mode contrast (hardcoded hex vs tokens), mobile nav/breakpoints, keyboard a11y, FOUC, real 404, ColumnMapper manual-mapping inversion + disabled validation, faked pipeline progress. See memory `ui-deploy-audit`. Awaiting go-ahead to implement (all frontend, no core logic).
 
@@ -54,7 +56,7 @@ Routes (in `client/src/App.js`):
 /login, /signup     Login/Signup (public; real JWT auth)
 /app                ProtectedRoute + AppShell wrap all routes below
 /app/               Dashboard.js — the pipeline page
-/app/column-mapper  ColumnMapper
+/app/column-mapper  → redirects to /app (mapping is now inline on the pipeline page)
 /app/results        StockDashboard
 /app/kpi-editor     KPILibraryEditor (always accessible)
 ```

@@ -32,3 +32,6 @@ LOGIC.md
 
 # Nested Next.js + Express rewrite (its own git repo, kept as reference)
 /dataranker
+
+# Large sample Screener export — kept locally as test input, not in the repo
+/files/query-results.csv
