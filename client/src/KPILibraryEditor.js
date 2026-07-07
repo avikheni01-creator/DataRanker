@@ -172,9 +172,9 @@ function KPIRow({ row, onWeightChange, onDirectionToggle, onRemove }) {
   const color = CATEGORY_COLORS[row.category] || "var(--text-secondary)";
   return (
     <div style={{
-      display: "grid", gridTemplateColumns: "1fr 100px 90px 32px",
-      alignItems: "center", gap: 10, padding: "8px 12px",
-      borderRadius: 8, background: "var(--inset)", border: "1px solid var(--elevated)", marginBottom: 6,
+      display: "grid", gridTemplateColumns: "1fr 110px 100px 36px",
+      alignItems: "center", gap: 10, padding: "10px 12px",
+      borderRadius: 8, background: "var(--card)", border: "1px solid var(--border)", marginBottom: 6,
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <span style={{ width: 8, height: 8, borderRadius: "50%", background: color, flexShrink: 0 }} />
@@ -247,63 +247,13 @@ function AddKPIRow({ usedKPIs, onAdd, AVAILABLE_KPI_KEYS, COLUMN_MAPPING }) {
   );
 }
 
-function TemplateCard({ templateName, rows, onUpdate, onAddKPI, onRemoveKPI, AVAILABLE_KPI_KEYS, COLUMN_MAPPING }) {
-  const [expanded, setExpanded] = useState(true);
-  const total = totalWeight(rows);
-  const over = total > 100;
-  const exact = total === 100;
-  const usedKPIs = rows.map((r) => r.kpi);
-
-  return (
-    <div style={{
-      border: `1px solid ${over ? "rgba(239,68,68,0.12)" : exact ? "rgba(34,197,94,0.12)" : "var(--border)"}`,
-      borderRadius: 12, overflow: "hidden", marginBottom: 12, background: "var(--card)",
-    }}>
-      <div onClick={() => setExpanded((p) => !p)} style={{
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "12px 16px", cursor: "pointer",
-        background: over ? "rgba(239,68,68,0.12)" : exact ? "rgba(34,197,94,0.12)" : "var(--card)", userSelect: "none",
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1 }}>
-          <span style={{ fontSize: 14, fontWeight: 700, color: "var(--text)" }}>{templateName}</span>
-          <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>{rows.length} KPI{rows.length !== 1 ? "s" : ""}</span>
-        </div>
-        <div style={{ flex: 1, maxWidth: 260 }}><WeightBar used={total} /></div>
-        <span style={{ marginLeft: 12, color: "var(--text-secondary)", fontSize: 12 }}>{expanded ? "▲" : "▼"}</span>
-      </div>
-
-      {expanded && (
-        <div style={{ padding: "12px 16px 16px" }}>
-          {rows.map((row) => (
-            <KPIRow
-              key={row.kpi} row={row}
-              onWeightChange={(val) => onUpdate(row._idx, "weight", val)}
-              onDirectionToggle={() => onUpdate(row._idx, "direction", row.direction === "Higher" ? "Lower" : "Higher")}
-              onRemove={() => onRemoveKPI(row._idx)}
-            />
-          ))}
-          <AddKPIRow usedKPIs={usedKPIs} onAdd={(kpi) => onAddKPI(templateName, kpi)} AVAILABLE_KPI_KEYS={AVAILABLE_KPI_KEYS} COLUMN_MAPPING={COLUMN_MAPPING} />
-          {over && (
-            <div style={{
-              marginTop: 10, padding: "8px 12px", borderRadius: 8,
-              background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.12)",
-              fontSize: 12, color: "var(--negative)", fontWeight: 500,
-            }}>
-              ⚠ Total weight is {total}% — reduce by {total - 100}% before saving.
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
 // ── Main component ────────────────────────────────────────────────────────────
 export default function KPILibraryEditor() {
-  const [activeTab, setActiveTab] = useState("tier1");
-  const [tier1Rows, setTier1Rows] = useState(INITIAL_TIER1);
-  const [toast, setToast] = useState(null);
+  const [activeTab, setActiveTab]       = useState("tier1");
+  const [tier1Rows, setTier1Rows]       = useState(INITIAL_TIER1);
+  const [toast, setToast]               = useState(null);
   const [COLUMN_MAPPING, setCOLUMN_MAPPING] = useState({});
+  const [activeTemplate, setActiveTemplate] = useState("");
 
   useEffect(() => {
     fetch(apiUrl('/column-mapping'), { credentials: "include" })
@@ -431,12 +381,16 @@ export default function KPILibraryEditor() {
     ]);
   }, []);
 
-  const templates = groupByTemplate(tier1Rows);
-  // const tier2Groups = groupByTemplate(TIER2_ROWS);
-  const allValid = Object.values(templates).every((rows) => totalWeight(rows) === 100);
+  const templates    = groupByTemplate(tier1Rows);
+  const templateNames = Object.keys(templates);
+
+  // Resolve: if activeTemplate is not in the list (e.g. first load), fall back to first.
+  const resolvedTemplate  = templateNames.includes(activeTemplate) ? activeTemplate : (templateNames[0] || "");
+  const activeTemplateRows = templates[resolvedTemplate] || [];
+  const activeTotalWeight  = totalWeight(activeTemplateRows);
+  const allValid = templateNames.every((n) => totalWeight(templates[n]) === 100);
 
   const handleDownloadXlsx = () => {
-    // Pass COLUMN_MAPPING so it's saved into the ColumnMapping sheet
     downloadAsXlsx(tier1Rows, TIER2_ROWS, COLUMN_MAPPING);
     showToast("KPI_Library.xlsx downloaded");
   };
@@ -460,128 +414,192 @@ export default function KPILibraryEditor() {
     }
   };
 
-  return (
-    <div style={{ fontFamily: "'Inter', system-ui, sans-serif", minHeight: "100vh" }}>
+  const pgBtn = {
+    background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8,
+    color: "var(--text-secondary)", padding: "7px 12px", cursor: "pointer",
+    fontWeight: 600, fontSize: 13, display: "flex", alignItems: "center", gap: 6,
+  };
 
-      {/* Top bar */}
-      <div style={{
-        background: "var(--card)", borderBottom: "1px solid var(--border)", padding: "0 24px",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        height: 56, position: "sticky", top: 0, zIndex: 10,
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{
-            width: 28, height: 28, borderRadius: 6, background: "linear-gradient(135deg, #7C6CFF, #4F46E5)",
-            display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14,
-          }}>📊</div>
-          <span style={{ fontWeight: 700, fontSize: 15, color: "var(--text)" }}>KPI Library Editor</span>
+  return (
+    <>
+      <style>{`
+        *, *::before, *::after { box-sizing: border-box; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .kpi-tmpl-btn { transition: background .12s, color .12s; }
+        .kpi-tmpl-btn:hover { background: var(--elevated) !important; }
+        button:disabled { opacity: .38 !important; cursor: default !important; }
+      `}</style>
+
+      <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden", fontFamily: "'Inter', system-ui, sans-serif" }}>
+
+        {/* ── Top bar (full width) ── */}
+        <div style={{
+          padding: "0 24px", borderBottom: "1px solid var(--border)",
+          display: "flex", alignItems: "center", gap: 12,
+          background: "var(--card)", flexShrink: 0, height: 56,
+        }}>
+          <div style={{ flex: 1 }}>
+            <span style={{ fontSize: 15, fontWeight: 700, color: "var(--text)" }}>KPI Library Editor</span>
+          </div>
+
           {!allValid
-            ? <span style={{ fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 10, background: "rgba(239,68,68,0.12)", color: "var(--negative)", border: "1px solid rgba(239,68,68,0.12)" }}>Weight errors</span>
-            : <span style={{ fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 10, background: "rgba(34,197,94,0.12)", color: "var(--positive)", border: "1px solid rgba(34,197,94,0.12)" }}>All valid</span>
+            ? <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 9px", borderRadius: 10, background: "rgba(239,68,68,0.12)", color: "var(--negative)", border: "1px solid rgba(239,68,68,0.12)", whiteSpace: "nowrap" }}>Weight errors</span>
+            : <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 9px", borderRadius: 10, background: "rgba(34,197,94,0.12)", color: "var(--positive)", border: "1px solid rgba(34,197,94,0.12)", whiteSpace: "nowrap" }}>All valid</span>
           }
-        </div>
-        <div style={{ display: "flex", gap: 8 }}>
-          <button onClick={handleDownloadXlsx} style={{
-            padding: "7px 14px", borderRadius: 8, border: "1px solid var(--border)",
-            background: "var(--elevated)", color: "var(--text-secondary)", fontWeight: 600, fontSize: 13, cursor: "pointer",
-            display: "flex", alignItems: "center", gap: 6,
-          }}>
-            ⬇ Download .xlsx
-          </button>
-          <label style={{
-            padding: "7px 14px",
-            borderRadius: 8,
-            border: "1px solid var(--border)",
-            background: "var(--elevated)",
-            color: "var(--text-secondary)",
-            fontWeight: 600,
-            fontSize: 13,
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-          }}>
-            📂 Upload .xlsx
-            <input
-              type="file"
-              accept=".xlsx,.xls"
-              onChange={handleFileUpload}
-              style={{ display: "none" }}
-            />
+
+          <button onClick={handleDownloadXlsx} style={pgBtn}>⬇ Download</button>
+          <label style={{ ...pgBtn, cursor: "pointer" }}>
+            📂 Upload
+            <input type="file" accept=".xlsx,.xls" onChange={handleFileUpload} style={{ display: "none" }} />
           </label>
           <button onClick={handleSave} disabled={!allValid} style={{
-            padding: "7px 16px", borderRadius: 8, border: "none",
+            ...pgBtn,
             background: allValid ? "#7C6CFF" : "var(--elevated)",
-            color: allValid ? "var(--text)" : "var(--text-muted)",
-            fontWeight: 700, fontSize: 13, cursor: allValid ? "pointer" : "not-allowed",
-          }}>
-            Save & Run Pipeline
-          </button>
+            color: allValid ? "#fff" : "var(--text-muted)",
+            border: "none", fontWeight: 700,
+          }}>Save</button>
         </div>
-      </div>
 
-      {/* Mapping legend */}
-      <div style={{
-        background: "rgba(124,108,255,0.12)", borderBottom: "1px solid var(--border)",
-        padding: "9px 24px", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap",
-      }}>
-        <span style={{ fontSize: 11, fontWeight: 700, color: "var(--accent-hover)", textTransform: "uppercase", letterSpacing: "0.06em", flexShrink: 0 }}>
-          Mapped columns
-        </span>
-        {AVAILABLE_KPI_KEYS.map((k) => (
-          <span key={k} style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "var(--text-secondary)", background: "rgba(124,108,255,0.12)", borderRadius: 4, padding: "2px 7px", whiteSpace: "nowrap" }}>
-            <strong>{k}</strong> → {Array.isArray(COLUMN_MAPPING[k]) ? COLUMN_MAPPING[k].join(", ") : COLUMN_MAPPING[k]}
-          </span>
-        ))}
-      </div>
+        {/* ── Body: sidebar + content ── */}
+        <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
 
-      {/* Tabs */}
-      <div style={{ display: "flex", borderBottom: "1px solid var(--border)", background: "var(--card)", padding: "0 24px" }}>
-        {[
-          { id: "tier1", label: "Tier 1 — Screening" },
-          { id: "tier2", label: "Tier 2 — Deep Research" },
-        ].map((t) => (
-          <button key={t.id} onClick={() => setActiveTab(t.id)} style={{
-            padding: "12px 18px",
-            borderBottom: activeTab === t.id ? "2px solid #7C6CFF" : "2px solid transparent",
-            background: "transparent", border: "none",
-            fontWeight: activeTab === t.id ? 700 : 500, fontSize: 14,
-            color: activeTab === t.id ? "var(--accent-hover)" : "var(--text-secondary)", cursor: "pointer",
-          }}>{t.label}</button>
-        ))}
-      </div>
-
-      {/* Content */}
-      <div style={{ padding: "20px 24px", maxWidth: 900, margin: "0 auto" }}>
-        {activeTab === "tier1" ? (
-          <>
-            <div style={{ marginBottom: 16, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <p style={{ fontSize: 13, color: "var(--text-secondary)", margin: 0 }}>
-                Edit weights, toggle Higher/Lower Better, add or remove KPIs. Each template must total exactly 100%.
-              </p>
-              <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>
-                {Object.keys(templates).length} templates · {tier1Rows.length} KPIs
-              </span>
+          {/* ── Static template sidebar ── */}
+          <div style={{
+            width: 220, flexShrink: 0,
+            background: "var(--card)", borderRight: "1px solid var(--border)",
+            display: "flex", flexDirection: "column", overflowY: "auto",
+          }}>
+            <div style={{ padding: "16px 16px 8px" }}>
+              <div className="mono" style={{ fontSize: 9, letterSpacing: ".14em", color: "var(--text-muted)" }}>TEMPLATES</div>
             </div>
-            {Object.entries(templates).map(([name, rows]) => (
-              <TemplateCard
-                key={name} templateName={name} rows={rows}
-                onUpdate={updateRow} onAddKPI={addKPI} onRemoveKPI={removeRow} AVAILABLE_KPI_KEYS={AVAILABLE_KPI_KEYS}
-              />
-            ))}
-          </>
-        ) : (
-          <>
-            <div style={{ marginBottom: 16 }}>
-              <p style={{ fontSize: 13, color: "var(--text-secondary)", margin: 0 }}>
-                Tier 2 templates use sector-specific KPIs (NIM, GNPA, AUM Growth, etc.) that require additional column mapping in the backend config before they can be edited here.
-              </p>
+
+            {templateNames.map((name) => {
+              const rows  = templates[name];
+              const total = totalWeight(rows);
+              const over  = total > 100;
+              const exact = total === 100;
+              const isActive = name === resolvedTemplate;
+              return (
+                <button key={name} className="kpi-tmpl-btn" onClick={() => setActiveTemplate(name)} style={{
+                  display: "block", width: "100%", textAlign: "left", padding: "10px 16px",
+                  background: isActive ? "var(--elevated)" : "transparent",
+                  border: "none",
+                  borderLeft: `2px solid ${isActive ? "#7C6CFF" : "transparent"}`,
+                  cursor: "pointer",
+                }}>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: isActive ? "var(--accent-hover)" : "var(--text-secondary)", marginBottom: 2 }}>
+                    {name}
+                  </div>
+                  <div className="mono" style={{ fontSize: 9, color: over ? "var(--negative)" : exact ? "var(--positive)" : "var(--text-muted)" }}>
+                    {rows.length} KPI{rows.length !== 1 ? "s" : ""} · {total}%{over ? " ⚠" : exact ? " ✓" : ""}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* ── Main content ── */}
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+
+            {/* Tier tabs */}
+            <div style={{ display: "flex", borderBottom: "1px solid var(--border)", background: "var(--card)", padding: "0 24px", flexShrink: 0 }}>
+              {[
+                { id: "tier1", label: "Tier 1 — Screening" },
+                { id: "tier2", label: "Tier 2 — Deep Research" },
+              ].map((t) => (
+                <button key={t.id} onClick={() => setActiveTab(t.id)} style={{
+                  padding: "12px 18px", border: "none", cursor: "pointer", background: "transparent",
+                  borderBottom: activeTab === t.id ? "2px solid #7C6CFF" : "2px solid transparent",
+                  fontWeight: activeTab === t.id ? 700 : 500, fontSize: 14,
+                  color: activeTab === t.id ? "var(--accent-hover)" : "var(--text-secondary)",
+                }}>{t.label}</button>
+              ))}
             </div>
-            {/* {Object.entries(tier2Groups).map(([name, rows]) => (
-              <Tier2Card key={name} templateName={name} rows={rows} AVAILABLE_KPI_KEYS={AVAILABLE_KPI_KEYS} />
-            ))} */}
-          </>
-        )}
+
+            {/* Mapped columns strip — single scrollable line */}
+            {activeTab === "tier1" && AVAILABLE_KPI_KEYS.length > 0 && (
+              <div style={{
+                background: "rgba(124,108,255,0.06)", borderBottom: "1px solid var(--border)",
+                padding: "6px 24px", display: "flex", alignItems: "center", gap: 8,
+                flexShrink: 0, overflowX: "auto",
+              }}>
+                <span style={{ fontSize: 10, fontWeight: 700, color: "var(--accent-hover)", textTransform: "uppercase", letterSpacing: "0.06em", flexShrink: 0 }}>
+                  Mapped
+                </span>
+                {AVAILABLE_KPI_KEYS.map((k) => (
+                  <span key={k} className="mono" style={{ fontSize: 10, color: "var(--text-secondary)", background: "rgba(124,108,255,0.10)", borderRadius: 4, padding: "2px 7px", whiteSpace: "nowrap", flexShrink: 0 }}>
+                    {k}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* Content */}
+            <div style={{ flex: 1, overflowY: "auto", padding: "16px 24px 24px" }}>
+              {activeTab === "tier1" ? (
+                <div>
+                  {/* Weight summary bar */}
+                  {resolvedTemplate && (
+                    <div style={{ marginBottom: 14, padding: "12px 16px", borderRadius: 10, background: "var(--card)", border: "1px solid var(--border)" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text)" }}>{resolvedTemplate}</span>
+                        <span className="mono" style={{ fontSize: 11, color: "var(--text-muted)" }}>
+                          {activeTemplateRows.length} KPI{activeTemplateRows.length !== 1 ? "s" : ""}
+                        </span>
+                      </div>
+                      <WeightBar used={activeTotalWeight} />
+                    </div>
+                  )}
+
+                  {activeTotalWeight > 100 && (
+                    <div style={{ marginBottom: 10, padding: "8px 14px", borderRadius: 8, background: "rgba(239,68,68,0.10)", border: "1px solid rgba(239,68,68,0.18)", fontSize: 13, color: "var(--negative)", fontWeight: 500 }}>
+                      ⚠ Total weight is {activeTotalWeight}% — reduce by {activeTotalWeight - 100}% before saving.
+                    </div>
+                  )}
+                  {activeTotalWeight > 0 && activeTotalWeight < 100 && (
+                    <div style={{ marginBottom: 10, padding: "8px 14px", borderRadius: 8, background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.18)", fontSize: 13, color: "#d97706", fontWeight: 500 }}>
+                      Total is {activeTotalWeight}% — needs {100 - activeTotalWeight}% more.
+                    </div>
+                  )}
+
+                  {/* Column headers */}
+                  <div style={{
+                    display: "grid", gridTemplateColumns: "1fr 110px 100px 36px",
+                    gap: 10, padding: "0 12px 6px",
+                  }}>
+                    {["KPI / Category", "Weight", "Direction", ""].map((h, i) => (
+                      <span key={i} className="mono" style={{ fontSize: 9, letterSpacing: ".1em", color: "var(--text-muted)", textTransform: "uppercase" }}>{h}</span>
+                    ))}
+                  </div>
+
+                  {activeTemplateRows.map((row) => (
+                    <KPIRow
+                      key={row.kpi} row={row}
+                      onWeightChange={(val) => updateRow(row._idx, "weight", val)}
+                      onDirectionToggle={() => updateRow(row._idx, "direction", row.direction === "Higher" ? "Lower" : "Higher")}
+                      onRemove={() => removeRow(row._idx)}
+                    />
+                  ))}
+
+                  <div style={{ marginTop: 12 }}>
+                    <AddKPIRow
+                      usedKPIs={activeTemplateRows.map((r) => r.kpi)}
+                      onAdd={(kpi) => addKPI(resolvedTemplate, kpi)}
+                      AVAILABLE_KPI_KEYS={AVAILABLE_KPI_KEYS}
+                      COLUMN_MAPPING={COLUMN_MAPPING}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <p style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.7, maxWidth: 600 }}>
+                    Tier 2 templates use sector-specific KPIs (NIM, GNPA, AUM Growth, etc.) that require additional column mapping in the backend config before they can be edited here.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Toast */}
@@ -591,11 +609,11 @@ export default function KPILibraryEditor() {
           background: toast.type === "error" ? "rgba(239,68,68,0.12)" : "rgba(34,197,94,0.12)",
           border: `1px solid ${toast.type === "error" ? "rgba(239,68,68,0.12)" : "rgba(34,197,94,0.12)"}`,
           color: toast.type === "error" ? "var(--negative)" : "var(--positive)",
-          fontWeight: 600, fontSize: 13, boxShadow: "0 4px 16px rgba(0,0,0,0.4)", zIndex: 100,
+          fontWeight: 600, fontSize: 13, boxShadow: "0 4px 16px rgba(0,0,0,0.4)", zIndex: 300,
         }}>
           {toast.msg}
         </div>
       )}
-    </div>
+    </>
   );
 }

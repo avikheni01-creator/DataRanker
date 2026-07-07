@@ -36,7 +36,7 @@ export default function AboutPage() {
           <p className="ab-sub">
             Matrix is a proprietary equity-ranking engine. It maps company fundamentals
             to your sectors and scores them against your KPI templates — so your team
-            spends time on judgement, not spreadsheets. (This page is placeholder copy.)
+            spends time on judgement, not spreadsheets.
           </p>
         </motion.div>
       </section>

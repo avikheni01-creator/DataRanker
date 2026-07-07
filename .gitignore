@@ -35,3 +35,6 @@ LOGIC.md
 
 # Large sample Screener export — kept locally as test input, not in the repo
 /files/query-results.csv
+
+# Admin-uploaded screener snapshots stored on disk (not in repo)
+/server/uploads/

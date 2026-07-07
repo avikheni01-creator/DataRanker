@@ -49,10 +49,20 @@ async function requireAuth(req, res, next) {
   }
 }
 
+// Guard: require the signed-in user to have isAdmin:true.
+// Must be chained after requireAuth (req.user is already set).
+function requireAdmin(req, res, next) {
+  if (!req.user || !req.user.isAdmin) {
+    return res.status(403).json({ detail: "Admin access required." });
+  }
+  next();
+}
+
 module.exports = {
   COOKIE_NAME,
   signToken,
   setAuthCookie,
   clearAuthCookie,
   requireAuth,
+  requireAdmin,
 };

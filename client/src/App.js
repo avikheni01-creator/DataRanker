@@ -13,6 +13,8 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import PricingPage from "./pages/PricingPage";
 import AboutPage from "./pages/AboutPage";
+import ScreenerPage from "./pages/ScreenerPage";
+import ComparisonPage from "./pages/ComparisonPage";
 import { apiUrl } from "./api";
 
 export default function App() {
@@ -82,6 +84,8 @@ export default function App() {
           <Route path="column-mapper" element={<Navigate to="/app" replace />} />
           <Route path="results" element={<StockDashboard resultFile={outputFile} />} />
           <Route path="kpi-editor" element={<KPILibraryEditor />} />
+          <Route path="screener" element={<ScreenerPage />} />
+          <Route path="comparison" element={<ComparisonPage />} />
         </Route>
 
         {/* Fallback */}

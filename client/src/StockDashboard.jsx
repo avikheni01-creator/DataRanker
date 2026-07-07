@@ -35,6 +35,28 @@ function extractKpiKeys(rows) {
   return allKeys.filter(k => !isSystemCol(k));
 }
 
+// Columns treated as company identifiers — shown right after the fixed columns,
+// before any KPI columns. Matched by output column name after COLUMN_MAPPING.
+const IDENTIFIER_COLS = new Set(["BSE Code", "ISIN Code", "NSE Code"]);
+
+/**
+ * Split non-system keys into three ordered groups:
+ *   identifiers — BSE Code, ISIN Code, NSE Code (shown first, before KPIs)
+ *   scored      — columns with a _Metric_Score sibling (template KPIs)
+ *   other       — all remaining pass-through data columns
+ * Returns { identifiers: [], scored: [], other: [] }
+ */
+function partitionKpiKeys(rows) {
+  if (!rows?.length) return { identifiers: [], scored: [], other: [] };
+  const keySet = new Set(Object.keys(rows[0]));
+  const kpiKeys = Object.keys(rows[0]).filter(k => !isSystemCol(k));
+  const identifiers = kpiKeys.filter(k => IDENTIFIER_COLS.has(k));
+  const identifierSet = new Set(identifiers);
+  const scored = kpiKeys.filter(k => !identifierSet.has(k) && keySet.has(`${k}_Metric_Score`));
+  const other = kpiKeys.filter(k => !identifierSet.has(k) && !keySet.has(`${k}_Metric_Score`));
+  return { identifiers, scored, other };
+}
+
 function medal(rank) {
   if (rank === 1) return "🥇";
   if (rank === 2) return "🥈";
@@ -44,9 +66,9 @@ function medal(rank) {
 
 function rankColor(rank, total) {
   const pct = rank / total;
-  if (pct <= 0.1)  return "#22C55E";
+  if (pct <= 0.1) return "#22C55E";
   if (pct <= 0.25) return "#4ADE80";
-  if (pct <= 0.5)  return "#F59E0B";
+  if (pct <= 0.5) return "#F59E0B";
   if (pct <= 0.75) return "#FB923C";
   return "#EF4444";
 }
@@ -65,9 +87,11 @@ function fmt(val, key) {
 
 // ── Column Picker ─────────────────────────────────────────────────────────────
 
-function ColumnPicker({ allKpiKeys, visibleKpiKeys, onChange }) {
+function ColumnPicker({ allKpiKeys, visibleKpiKeys, onChange, identifierKeys = [], scoredKeys = [] }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
+  const identifierSet = new Set(identifierKeys);
+  const scoredSet = new Set(scoredKeys);
 
   // Close on outside click
   useEffect(() => {
@@ -86,8 +110,8 @@ function ColumnPicker({ allKpiKeys, visibleKpiKeys, onChange }) {
     }
   };
 
-  const selectAll   = () => onChange([...allKpiKeys]);
-  const clearAll    = () => onChange([]);
+  const selectAll = () => onChange([...allKpiKeys]);
+  const clearAll = () => onChange([]);
 
   return (
     <div ref={ref} style={{ position: "relative" }}>
@@ -126,41 +150,70 @@ function ColumnPicker({ allKpiKeys, visibleKpiKeys, onChange }) {
             borderBottom: "1px solid var(--elevated)",
           }}>
             <button onClick={selectAll} style={quickBtnStyle("#22C55E")}>All</button>
-            <button onClick={clearAll}  style={quickBtnStyle("#EF4444")}>None</button>
+            <button onClick={clearAll} style={quickBtnStyle("#EF4444")}>None</button>
           </div>
 
-          {/* Checkboxes */}
-          {allKpiKeys.map(key => {
-            const checked = visibleKpiKeys.includes(key);
-            return (
-              <label key={key} style={{
-                display: "flex", alignItems: "center", gap: 10,
-                padding: "7px 14px", cursor: "pointer",
-                transition: "background .1s",
-                background: checked ? "var(--elevated)" : "transparent",
-              }}
-                onMouseEnter={e => e.currentTarget.style.background = "var(--elevated)"}
-                onMouseLeave={e => e.currentTarget.style.background = checked ? "var(--elevated)" : "transparent"}
-              >
-                <span style={{
-                  width: 14, height: 14, borderRadius: 3, flexShrink: 0,
-                  border: `1.5px solid ${checked ? "var(--accent-hover)" : "var(--border)"}`,
-                  background: checked ? "#7C6CFF" : "transparent",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  transition: "all .15s",
-                }}>
-                  {checked && <span style={{ color: "#fff", fontSize: 9, lineHeight: 1 }}>✓</span>}
-                </span>
-                <input type="checkbox" checked={checked} onChange={() => toggle(key)} style={{ display: "none" }} />
-                <span style={{
-                  fontSize: 11, fontFamily: "'JetBrains Mono',monospace",
-                  color: checked ? "var(--accent-hover)" : "var(--text-secondary)",
-                }}>
-                  {key}
-                </span>
-              </label>
+          {/* Grouped checkboxes — identifiers → scored KPIs → other data */}
+          {(() => {
+            const identifiers = allKpiKeys.filter(k => identifierSet.has(k));
+            const scored = allKpiKeys.filter(k => scoredSet.has(k));
+            const other = allKpiKeys.filter(k => !identifierSet.has(k) && !scoredSet.has(k));
+
+            const renderKey = (key) => {
+              const checked = visibleKpiKeys.includes(key);
+              return (
+                <label key={key} style={{
+                  display: "flex", alignItems: "center", gap: 10,
+                  padding: "7px 14px", cursor: "pointer",
+                  transition: "background .1s",
+                  background: checked ? "var(--elevated)" : "transparent",
+                }}
+                  onMouseEnter={e => e.currentTarget.style.background = "var(--elevated)"}
+                  onMouseLeave={e => e.currentTarget.style.background = checked ? "var(--elevated)" : "transparent"}
+                >
+                  <span style={{
+                    width: 14, height: 14, borderRadius: 3, flexShrink: 0,
+                    border: `1.5px solid ${checked ? "var(--accent-hover)" : "var(--border)"}`,
+                    background: checked ? "#7C6CFF" : "transparent",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    transition: "all .15s",
+                  }}>
+                    {checked && <span style={{ color: "#fff", fontSize: 9, lineHeight: 1 }}>✓</span>}
+                  </span>
+                  <input type="checkbox" checked={checked} onChange={() => toggle(key)} style={{ display: "none" }} />
+                  <span style={{
+                    fontSize: 11, fontFamily: "'JetBrains Mono',monospace",
+                    color: checked ? "var(--accent-hover)" : "var(--text-secondary)",
+                  }}>
+                    {key}
+                  </span>
+                </label>
+              );
+            };
+
+            const sectionLabel = (text) => (
+              <div style={{
+                padding: "6px 14px 4px",
+                fontSize: 9, fontFamily: "'JetBrains Mono',monospace",
+                letterSpacing: ".12em", color: "var(--text-muted)",
+                borderTop: "1px solid var(--elevated)",
+                marginTop: 4,
+              }}>
+                {text}
+              </div>
             );
-          })}
+
+            return (
+              <>
+                {identifiers.length > 0 && sectionLabel("IDENTIFIERS")}
+                {identifiers.map(renderKey)}
+                {scored.length > 0 && sectionLabel("TEMPLATE KPIs")}
+                {scored.map(renderKey)}
+                {other.length > 0 && sectionLabel("OTHER DATA")}
+                {other.map(renderKey)}
+              </>
+            );
+          })()}
         </div>
       )}
     </div>
@@ -232,7 +285,7 @@ function CompanyDrawer({ company, allCompanies, onClose }) {
             <div style={{ fontSize: 26, fontWeight: 800, color: "var(--text)", letterSpacing: "-.02em" }}>
               {company.Symbol}
             </div>
-            <div style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 4 }}>{company.Description}</div>
+            <div style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 4 }}>{company.Description || company.Name || ""}</div>
           </div>
           <button onClick={onClose} style={{
             background: "var(--elevated)", border: "none", color: "var(--text-secondary)",
@@ -245,7 +298,7 @@ function CompanyDrawer({ company, allCompanies, onClose }) {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           {[
             { label: "Company Rank", value: `#${Math.round(company.Company_Rank)}`, color: rankColor(company.Company_Rank, allCompanies.length) },
-            { label: "Total Score",  value: parseFloat(company.Total_Final_Score).toFixed(1), color: "var(--accent-hover)" },
+            { label: "Total Score", value: parseFloat(company.Total_Final_Score).toFixed(1), color: "var(--accent-hover)" },
           ].map(({ label, value, color }) => (
             <div key={label} style={{
               background: "var(--elevated)", borderRadius: 10, padding: "14px 16px", border: "1px solid var(--border)",
@@ -350,7 +403,7 @@ function CompanyDrawer({ company, allCompanies, onClose }) {
                 <div>
                   <span style={{ fontSize: 12, fontWeight: 700, color: "var(--text-secondary)" }}>{p.Symbol}</span>
                   <span style={{ fontSize: 10, color: "var(--text-muted)", marginLeft: 8, fontFamily: "'JetBrains Mono',monospace" }}>
-                    {p.Description?.slice(0, 22)}
+                    {(p.Description || p.Name || "").slice(0, 22)}
                   </span>
                 </div>
                 <span style={{ fontSize: 12, fontFamily: "'JetBrains Mono',monospace", color: rankColor(p.Company_Rank, allCompanies.length) }}>
@@ -368,16 +421,21 @@ function CompanyDrawer({ company, allCompanies, onClose }) {
 // ── Main Dashboard ────────────────────────────────────────────────────────────
 
 export default function StockDashboard({ resultFile }) {
-  const [error, setError]                     = useState(null);
-  const [sheets, setSheets]                   = useState({});
-  const [activeTemplate, setActiveTemplate]   = useState(null);
-  const [search, setSearch]                   = useState("");
-  const [sortKey, setSortKey]                 = useState("Company_Rank");
-  const [sortDir, setSortDir]                 = useState("asc");
+  const [error, setError] = useState(null);
+  const [sheets, setSheets] = useState({});
+  const [activeTemplate, setActiveTemplate] = useState(null);
+  const [search, setSearch] = useState("");
+  const [sortKey, setSortKey] = useState("Company_Rank");
+  const [sortDir, setSortDir] = useState("asc");
   const [selectedCompany, setSelectedCompany] = useState(null);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(50);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   // visibleKpiKeys: per-template map { templateName: [key, ...] }
   const [visibleKpiMap, setVisibleKpiMap] = useState({});
+  // kpiOrderMap: { templateName: { scored: [], other: [] } } — set once at parse time, never mutated
+  const [kpiOrderMap, setKpiOrderMap] = useState({});
 
   // Persisted result: if we arrived without an in-memory result (page refresh or
   // deep-link), hydrate the last run from IndexedDB.
@@ -411,12 +469,17 @@ export default function StockDashboard({ resultFile }) {
         setSheets(parsed);
         setActiveTemplate(Object.keys(parsed)[0]);
 
-        // Initialise visibleKpiMap with ALL kpi keys per template
-        const initMap = {};
+        // Partition keys into scored (template KPIs) and other (pass-through data)
+        // and initialise both maps with scored-first order.
+        const initVisible = {};
+        const initOrder = {};
         Object.entries(parsed).forEach(([name, rows]) => {
-          initMap[name] = extractKpiKeys(rows);
+          const { identifiers, scored, other } = partitionKpiKeys(rows);
+          initOrder[name] = { identifiers, scored, other };
+          initVisible[name] = [...identifiers, ...scored, ...other];
         });
-        setVisibleKpiMap(initMap);
+        setKpiOrderMap(initOrder);
+        setVisibleKpiMap(initVisible);
       } catch (e) {
         setError(e.message);
       }
@@ -425,23 +488,29 @@ export default function StockDashboard({ resultFile }) {
   }, [effectiveFile]);
 
   // ── Derived ──
-  const allInTemplate  = sheets[activeTemplate] || [];
-  const allKpiKeys     = extractKpiKeys(allInTemplate);          // all possible KPI cols for this template
+  const allInTemplate = sheets[activeTemplate] || [];
+  const { identifiers: identifierKpiKeys = [], scored: scoredKpiKeys = [], other: otherKpiKeys = [] } = kpiOrderMap[activeTemplate] || {};
+  const allKpiKeys = [...identifierKpiKeys, ...scoredKpiKeys, ...otherKpiKeys]; // identifiers → scored KPIs → other data
   const visibleKpiKeys = visibleKpiMap[activeTemplate] || [];    // currently shown KPI cols
-  const maxScore       = allInTemplate.length ? Math.max(...allInTemplate.map(c => parseFloat(c.Total_Final_Score) || 0)) : 0;
-  const templates      = Object.keys(sheets);
+  const maxScore = allInTemplate.length ? Math.max(...allInTemplate.map(c => parseFloat(c.Total_Final_Score) || 0)) : 0;
+  const templates = Object.keys(sheets);
+
 
   const rows = allInTemplate
     .filter(r =>
       !search ||
       r.Symbol?.toLowerCase().includes(search.toLowerCase()) ||
-      r.Description?.toLowerCase().includes(search.toLowerCase())
+      r.Description?.toLowerCase().includes(search.toLowerCase()) ||
+      r.Name?.toLowerCase().includes(search.toLowerCase())
     )
     .sort((a, b) => {
       const av = parseFloat(a[sortKey]) || 0;
       const bv = parseFloat(b[sortKey]) || 0;
       return sortDir === "asc" ? av - bv : bv - av;
     });
+  
+  const totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
+  const pagedRows = rows.slice((page - 1) * pageSize, page * pageSize);
 
   const templateSummary = templates.map(t => ({
     name: t,
@@ -449,11 +518,15 @@ export default function StockDashboard({ resultFile }) {
     top: sheets[t].find(r => r.Company_Rank === 1)?.Symbol || "—",
   }));
 
+  // Reset to page 1 on any filter/sort/template change
+  useEffect(() => { setPage(1); }, [activeTemplate, search, sortKey, sortDir, pageSize]);
+
   const handleTemplateChange = (name) => {
     setActiveTemplate(name);
     setSearch("");
     setSelectedCompany(null);
     setSortKey("Company_Rank");
+    setDrawerOpen(false);
   };
 
   const handleVisibleKpiChange = (keys) => {
@@ -531,21 +604,56 @@ export default function StockDashboard({ resultFile }) {
         th { user-select: none; }
         .th-sortable { cursor: pointer; }
         .th-sortable:hover { color: var(--accent-hover) !important; }
+        button:disabled { opacity: .35 !important; cursor: default !important; }
+        button:not(:disabled):hover { background: var(--card) !important; color: var(--text) !important; }
+
+        .tmpl-drawer {
+          position: fixed; top: 0; left: 0; height: 100vh; width: 240px; z-index: 200;
+          background: var(--card); border-right: 1px solid var(--border);
+          display: flex; flex-direction: column; overflow-y: auto;
+          transform: translateX(-100%); transition: transform .22s cubic-bezier(.4,0,.2,1);
+          box-shadow: 4px 0 24px rgba(0,0,0,.35);
+        }
+        .tmpl-drawer.open { transform: translateX(0); }
+        .tmpl-backdrop {
+          position: fixed; inset: 0; z-index: 199;
+          background: rgba(0,0,0,.45);
+          opacity: 0; pointer-events: none;
+          transition: opacity .22s ease;
+        }
+        .tmpl-backdrop.open { opacity: 1; pointer-events: all; }
+        .tmpl-toggle {
+          display: flex; align-items: center; justify-content: center;
+          width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0;
+          background: var(--card); border: 1px solid var(--border);
+          color: var(--text-secondary); cursor: pointer; transition: all .15s;
+        }
+        .tmpl-toggle:hover { background: var(--elevated) !important; color: var(--text) !important; border-color: var(--accent) !important; }
       `}</style>
 
-      <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
+      <div style={{ display: "flex", height: "100%", overflow: "hidden" }}>
 
-        {/* ── Sidebar ── */}
-        <div style={{
-          width: 220, flexShrink: 0, background: "var(--card)",
-          borderRight: "1px solid var(--border)", overflowY: "auto",
-          display: "flex", flexDirection: "column",
-        }}>
-          <div style={{ padding: "20px 16px 12px" }}>
-            <div className="mono" style={{ fontSize: 9, letterSpacing: ".16em", color: "var(--text-muted)", marginBottom: 4 }}>STOCK RANKER</div>
-            <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text)" }}>Dashboard</div>
+        {/* ── Template drawer backdrop ── */}
+        <div className={`tmpl-backdrop${drawerOpen ? " open" : ""}`} onClick={() => setDrawerOpen(false)} />
+
+        {/* ── Template drawer ── */}
+        <div className={`tmpl-drawer${drawerOpen ? " open" : ""}`}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 16px 12px" }}>
+            <div>
+              <div className="mono" style={{ fontSize: 9, letterSpacing: ".16em", color: "var(--text-muted)", marginBottom: 4 }}>STOCK RANKER</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text)" }}>Templates</div>
+            </div>
+            <button className="tmpl-toggle" onClick={() => setDrawerOpen(false)} title="Close">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
           </div>
-          <div className="mono" style={{ fontSize: 9, letterSpacing: ".14em", color: "var(--text-muted)", padding: "0 16px 8px" }}>TEMPLATES</div>
+
+          <div className="mono" style={{ fontSize: 9, letterSpacing: ".14em", color: "var(--text-muted)", padding: "0 16px 8px" }}>
+            {templateSummary.length} template{templateSummary.length !== 1 ? "s" : ""}
+          </div>
+
           {templateSummary.map(t => (
             <button key={t.name} onClick={() => handleTemplateChange(t.name)} style={{
               display: "block", width: "100%", textAlign: "left", padding: "10px 16px",
@@ -564,7 +672,7 @@ export default function StockDashboard({ resultFile }) {
           ))}
         </div>
 
-        {/* ── Main ── */}
+        {/* ── Main (full width now that sidebar is a drawer) ── */}
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
 
           {/* Top bar */}
@@ -573,6 +681,15 @@ export default function StockDashboard({ resultFile }) {
             display: "flex", alignItems: "center", gap: 12,
             background: "var(--card)", flexShrink: 0, flexWrap: "wrap",
           }}>
+            {/* Template drawer toggle */}
+            <button className="tmpl-toggle" onClick={() => setDrawerOpen(true)} title="Switch template">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            </button>
+
             <div style={{ flex: 1, minWidth: 140 }}>
               <div style={{ fontSize: 16, fontWeight: 700, color: "var(--text)" }}>{activeTemplate}</div>
               <div className="mono" style={{ fontSize: 10, color: "var(--text-muted)" }}>{allInTemplate.length} companies ranked</div>
@@ -603,13 +720,15 @@ export default function StockDashboard({ resultFile }) {
               allKpiKeys={allKpiKeys}
               visibleKpiKeys={visibleKpiKeys}
               onChange={handleVisibleKpiChange}
+              identifierKeys={identifierKpiKeys}
+              scoredKeys={scoredKpiKeys}
             />
           </div>
 
           {/* Stats strip */}
           <div style={{ display: "flex", gap: 0, borderBottom: "1px solid var(--border)", flexShrink: 0 }}>
             {[
-              { label: "Companies",  value: allInTemplate.length },
+              { label: "Companies", value: allInTemplate.length },
               { label: "Top Ranked", value: allInTemplate.find(r => r.Company_Rank === 1)?.Symbol || "—" },
               {
                 label: "Avg Score",
@@ -617,8 +736,8 @@ export default function StockDashboard({ resultFile }) {
                   ? (allInTemplate.reduce((s, r) => s + (parseFloat(r.Total_Final_Score) || 0), 0) / allInTemplate.length).toFixed(1)
                   : "—",
               },
-              { label: "Max Score",  value: maxScore.toFixed(1) },
-              { label: "KPI Cols",   value: `${visibleKpiKeys.length} / ${allKpiKeys.length}` },
+              { label: "Max Score", value: maxScore.toFixed(1) },
+              { label: "KPI Cols", value: `${visibleKpiKeys.length} / ${allKpiKeys.length}` },
             ].map(({ label, value }, i) => (
               <div key={i} style={{ flex: 1, padding: "10px 20px", borderRight: i < 4 ? "1px solid var(--border)" : "none" }}>
                 <div className="mono" style={{ fontSize: 9, color: "var(--text-muted)", letterSpacing: ".12em", marginBottom: 3 }}>{label}</div>
@@ -635,7 +754,7 @@ export default function StockDashboard({ resultFile }) {
           )}
 
           {/* ── Table ── */}
-          <div style={{ flex: 1, overflowY: "auto", overflowX: "auto" }}>
+          <div style={{ flex: 1, overflowY: "auto", overflowX: "auto", minHeight: 0 }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 600 }}>
               <thead>
                 <tr style={{ background: "var(--card)", position: "sticky", top: 0, zIndex: 10 }}>
@@ -647,7 +766,7 @@ export default function StockDashboard({ resultFile }) {
                       style={thStyle}>
                       {col.toUpperCase()}
                       {col === "Score" && <> {sortArrow("Total_Final_Score")}</>}
-                      {col === "Rank"  && <> {sortArrow("Company_Rank")}</>}
+                      {col === "Rank" && <> {sortArrow("Company_Rank")}</>}
                     </th>
                   ))}
 
@@ -660,10 +779,10 @@ export default function StockDashboard({ resultFile }) {
                 </tr>
               </thead>
               <tbody>
-                {rows.map((r, idx) => {
-                  const rank  = Math.round(r.Company_Rank);
+                {pagedRows.map((r, idx) => {
+                  const rank = Math.round(r.Company_Rank);
                   const score = parseFloat(r.Total_Final_Score) || 0;
-                  const pct   = scoreBarPct(score, maxScore);
+                  const pct = scoreBarPct(score, maxScore);
 
                   return (
                     <tr key={r.Symbol || idx}
@@ -685,7 +804,7 @@ export default function StockDashboard({ resultFile }) {
                         </div>
                         <div style={{ fontSize: 10, color: "var(--text-secondary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginTop: 1, fontFamily: "'JetBrains Mono',monospace" }}>
                           {r.Symbol}
-                          
+
                         </div>
                       </td>
 
@@ -717,7 +836,7 @@ export default function StockDashboard({ resultFile }) {
                       {/* Dynamic KPI cols */}
                       {visibleKpiKeys.map(key => {
                         const raw = r[key];
-                        const v   = parseFloat(raw);
+                        const v = parseFloat(raw);
                         const isGood = !isNaN(v) && v > 0;
                         return (
                           <td key={key} style={tdStyle}>
@@ -734,7 +853,7 @@ export default function StockDashboard({ resultFile }) {
                   );
                 })}
 
-                {rows.length === 0 && (
+                {pagedRows.length === 0 && (
                   <tr>
                     <td colSpan={FIXED_COLS.length + visibleKpiKeys.length} style={{
                       padding: 48, textAlign: "center",
@@ -747,6 +866,45 @@ export default function StockDashboard({ resultFile }) {
               </tbody>
             </table>
           </div>
+
+          {/* ── Pagination bar ── */}
+          {rows.length > 0 && (
+            <div style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+              gap: 12, flexWrap: "wrap",
+              padding: "10px 20px", borderTop: "1px solid var(--border)",
+              background: "var(--card)", flexShrink: 0,
+            }}>
+              <span className="mono" style={{ fontSize: 10, color: "var(--text-muted)", whiteSpace: "nowrap" }}>
+                {`${(page - 1) * pageSize + 1}–${Math.min(page * pageSize, rows.length)} of ${rows.length}`}
+              </span>
+
+              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <button onClick={() => setPage(1)} disabled={page === 1} style={pgBtn}>«</button>
+                <button onClick={() => setPage(p => p - 1)} disabled={page === 1} style={pgBtn}>‹</button>
+                <span className="mono" style={{ fontSize: 10, color: "var(--text-muted)", padding: "0 8px", whiteSpace: "nowrap" }}>
+                  {page} / {totalPages}
+                </span>
+                <button onClick={() => setPage(p => p + 1)} disabled={page === totalPages} style={pgBtn}>›</button>
+                <button onClick={() => setPage(totalPages)} disabled={page === totalPages} style={pgBtn}>»</button>
+              </div>
+
+              <select
+                value={pageSize}
+                onChange={e => setPageSize(Number(e.target.value))}
+                style={{
+                  padding: "4px 8px", borderRadius: 7,
+                  border: "1px solid var(--border)", background: "var(--elevated)",
+                  color: "var(--text-secondary)", fontSize: 11,
+                  fontFamily: "'JetBrains Mono',monospace", cursor: "pointer", outline: "none",
+                }}
+              >
+                {[25, 50, 100, 200].map(n => (
+                  <option key={n} value={n}>{n} / page</option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
       </div>
 
@@ -771,4 +929,13 @@ const thStyle = {
 
 const tdStyle = {
   padding: "11px 14px", whiteSpace: "nowrap",
+};
+
+const pgBtn = {
+  width: 28, height: 28, borderRadius: 6,
+  border: "1px solid var(--border)", background: "var(--elevated)",
+  color: "var(--text-secondary)", fontSize: 13, cursor: "pointer",
+  display: "inline-flex", alignItems: "center", justifyContent: "center",
+  transition: "all .12s", lineHeight: 1,
+  opacity: 1,
 };

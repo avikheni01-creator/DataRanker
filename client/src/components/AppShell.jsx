@@ -15,7 +15,9 @@ const Icon = ({ d, paths }) => (
 
 const NAV = [
   { to: "/app", end: true, label: "Pipeline", icon: <Icon paths={["M3 3v18h18", "M7 14l4-4 3 3 5-6"]} /> },
+  { to: "/app/screener", label: "Screener", icon: <Icon paths={["M3 6h18", "M3 12h18", "M3 18h18"]} /> },
   { to: "/app/results", label: "Results", icon: <Icon paths={["M4 19V9", "M10 19V5", "M16 19v-7", "M22 19H2"]} /> },
+  { to: "/app/comparison", label: "Compare", icon: <Icon paths={["M18 20V10", "M12 20V4", "M6 20v-6"]} /> },
 ];
 
 const KPI_NAV = { to: "/app/kpi-editor", label: "KPI Editor", icon: <Icon paths={["M12 20h9", "M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"]} /> };
@@ -28,7 +30,7 @@ export default function AppShell() {
   const location = useLocation();
   const user = getUser();
   const items = [...NAV, KPI_NAV];
-  const topNav = location.pathname === "/app/results";
+  const topNav = ["/app", "/app/results", "/app/kpi-editor", "/app/screener", "/app/comparison"].includes(location.pathname);
 
   const handleSignOut = async () => {
     await logOut();
@@ -107,8 +109,9 @@ const SHELL_CSS = `
 
   .shell-main { min-width: 0; }
 
-  /* Results page: horizontal top bar instead of the left sidebar. */
-  .shell.topbar { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+  /* Results / KPI-editor page: horizontal top bar, full-height content. */
+  .shell.topbar { grid-template-columns: 1fr; grid-template-rows: auto 1fr; height: 100vh; overflow: hidden; }
+  .shell.topbar .shell-main { min-height: 0; overflow-y: auto; }
   .shell.topbar .shell-side {
     position: sticky; top: 0; z-index: 20; height: auto; flex-direction: row;
     align-items: center; gap: 8px; padding: 12px 18px; overflow-x: auto;

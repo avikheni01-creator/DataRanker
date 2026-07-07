@@ -101,9 +101,7 @@ Secrets live in gitignored `.env` files (commit only the `.env.example` template
    mapping (a column matches any of its configured aliases), save.
 2. **Set up KPIs** — `/app/kpi-editor`: every account starts with a default Tier 1 KPI library
    (seeded from the canonical set); edit and **Save** it. No KPI file upload needed.
-3. **Run the pipeline** — `/app`: upload Query Results (`.csv`) and Industry Mapping (`.xlsx` with an
-   `Industry Mapping` sheet), then **Run Full Pipeline** and download the report. Scoring uses your
-   saved KPI library.
+3. **Run the pipeline** — `/app`: upload Query Results (`.csv`), then **Run Full Pipeline** and download the report. The industry-mapping workbook is bundled with the backend — no second upload needed. Scoring uses your saved KPI library.
 4. **Explore** — `/app/results` for the interactive dashboard.
 
 ## KPI scoring logic

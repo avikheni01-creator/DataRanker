@@ -66,9 +66,21 @@ router.post(
       const lib = await getOrSeedLibrary(req.user._id);
       const kpiRows = toRankerRows(lib.rows);
 
+      if (!req.body.mapping_json) {
+        return res.status(400).json({ detail: "Missing required field: mapping_json" });
+      }
+      let listOfMappings;
+      try {
+        listOfMappings = JSON.parse(req.body.mapping_json);
+      } catch {
+        return res.status(400).json({ detail: "mapping_json must be valid JSON" });
+      }
+      if (!Array.isArray(listOfMappings)) {
+        return res.status(400).json({ detail: "mapping_json must be a JSON array" });
+      }
+
       // Parse mapping_json exactly like the Python: JSON array of single-key
       // objects merged into one dynamic_mapping object.
-      const listOfMappings = JSON.parse(req.body.mapping_json);
       const dynamicMapping = listOfMappings.reduce(
         (acc, d) => Object.assign(acc, d),
         {}

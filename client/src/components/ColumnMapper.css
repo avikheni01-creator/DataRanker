@@ -2,43 +2,28 @@
    Class names match ColumnMapper.jsx exactly; only styling changed. */
 
 .column-mapper {
-  max-width: 920px;
-  margin: 0 auto;
-  padding: 52px 32px 80px;
   color: var(--text);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-.column-mapper h2 {
-  font-family: 'Space Grotesk', 'Inter', sans-serif;
-  font-size: clamp(30px, 4vw, 44px);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin: 0 0 8px;
-  background: linear-gradient(120deg, var(--text) 30%, var(--accent-hover) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
+/* Title is provided by the pl-card-head wrapper in Dashboard */
+.column-mapper h2 { display: none; }
 
 .mapper-subtitle {
-  color: var(--text-secondary);
-  font-size: 15px;
-  margin: 0 0 32px;
-  line-height: 1.6;
+  color: var(--text-muted);
+  font-size: 12px;
+  margin: 0;
+  padding: 10px 18px 0;
+  line-height: 1.5;
 }
 
-/* Glass cards */
+/* Section cards — sit inside the pl-card wrapper */
 .mapper-section {
-  background: linear-gradient(180deg, var(--glass-strong), var(--glass));
-  border: 1px solid var(--glass-border);
-  border-top-color: var(--glass-edge);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  box-shadow: 0 1px 2px rgba(0,0,0,0.4), 0 8px 24px rgba(0,0,0,0.25);
-  border-radius: 16px;
-  padding: 26px;
-  margin-bottom: 18px;
+  background: var(--inset);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin: 12px 18px;
   transition: border-color 0.15s ease;
 }
 
@@ -92,21 +77,21 @@
   border: 1px solid rgba(239,68,68,0.5);
   border-left: 3px solid #EF4444;
   color: var(--negative);
-  padding: 14px 16px;
-  border-radius: 12px;
-  font-size: 13px;
-  margin-bottom: 18px;
+  padding: 11px 14px;
+  border-radius: 9px;
+  font-size: 12px;
+  margin: 10px 18px;
 }
 .success-message {
   background: rgba(34,197,94,0.08);
-  border: 1px solid rgba(34,197,94,0.5);
+  border: 1px solid rgba(34,197,94,0.45);
   border-left: 3px solid #22C55E;
   color: var(--positive);
-  padding: 14px 16px;
-  border-radius: 12px;
-  font-size: 14px;
+  padding: 11px 14px;
+  border-radius: 9px;
+  font-size: 13px;
   font-weight: 500;
-  margin-bottom: 18px;
+  margin: 10px 18px 16px;
 }
 
 /* Preview table */
@@ -146,9 +131,8 @@
 
 /* Auto-mapped section */
 .auto-mapped-section {
-  background: linear-gradient(165deg, rgba(34,197,94,0.07), var(--glass) 60%);
-  border-color: rgba(34,197,94,0.35);
-  border-top-color: rgba(34,197,94,0.45);
+  background: rgba(34,197,94,0.05);
+  border-color: rgba(34,197,94,0.3);
 }
 .auto-mapped-grid {
   display: grid;
@@ -193,9 +177,8 @@
 
 /* Manual mapping section */
 .manual-mapping-section {
-  background: linear-gradient(165deg, rgba(245,158,11,0.07), var(--glass) 60%);
-  border-color: rgba(245,158,11,0.35);
-  border-top-color: rgba(245,158,11,0.45);
+  background: rgba(245,158,11,0.05);
+  border-color: rgba(245,158,11,0.3);
 }
 .manual-mapping-grid {
   display: grid;
@@ -289,7 +272,6 @@
 }
 
 @media (max-width: 768px) {
-  .column-mapper { padding: 36px 20px 60px; }
   .auto-mapped-grid, .manual-mapping-grid { grid-template-columns: 1fr; }
   .mapper-actions { flex-direction: column; }
 }
@@ -304,10 +286,10 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 20px 26px;
-  font-family: 'Space Grotesk', 'Inter', sans-serif;
-  font-size: 16px;
-  font-weight: 700;
+  padding: 14px 18px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
   color: var(--text);
   transition: color 0.15s ease;
 }
@@ -319,4 +301,4 @@
   transition: transform 0.18s ease;
 }
 .mapper-collapse[open] .mapper-collapse-chevron { transform: rotate(90deg); }
-.mapper-collapse-body { padding: 0 26px 26px; }
+.mapper-collapse-body { padding: 0 18px 16px; }

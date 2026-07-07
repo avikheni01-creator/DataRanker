@@ -31,6 +31,7 @@ const authRouter = require("./routes/auth");
 const plansRouter = require("./routes/plans");
 const pipelineRouter = require("./routes/pipeline");
 const kpiLibraryRouter = require("./routes/kpiLibrary");
+const screenerRouter = require("./routes/screener");
 
 const app = express();
 
@@ -38,7 +39,7 @@ const app = express();
 // requires an explicit origin (not "*"). CLIENT_ORIGIN is a comma-separated list.
 const allowedOrigins = (process.env.CLIENT_ORIGIN || "http://localhost:3000")
   .split(",")
-  .map((s) => s.trim())
+  .map((s) => s.trim().replace(/\/$/, ""))
   .filter(Boolean);
 
 app.use(
@@ -52,7 +53,7 @@ app.use(
   })
 );
 
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
 app.use(cookieParser());
 
 // Minimal, dependency-free security headers on every response.
@@ -69,6 +70,7 @@ app.use("/auth", authRouter);
 app.use(plansRouter); // GET /plans
 app.use(pipelineRouter); // GET /column-mapping, POST /run-pipeline
 app.use(kpiLibraryRouter); // GET/PUT /kpi-library
+app.use(screenerRouter);  // GET/POST /screener, POST /admin/screener
 
 const PORT = process.env.PORT || 8000;
 

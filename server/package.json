@@ -4,6 +4,9 @@
   "private": true,
   "description": "Express + MongoDB backend for Matrix: JWT auth, subscription plans, and the Stock Ranking Pipeline API (format → map → rank).",
   "main": "server.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js"

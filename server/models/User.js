@@ -16,6 +16,7 @@ const userSchema = new mongoose.Schema(
     },
     passwordHash: { type: String, required: true },
     plan: { type: String, enum: PLAN_IDS, default: "free" },
+    isAdmin: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
@@ -36,6 +37,7 @@ userSchema.methods.toSafeJSON = function toSafeJSON() {
     name: this.name,
     email: this.email,
     plan: this.plan,
+    isAdmin: this.isAdmin || false,
     createdAt: this.createdAt,
   };
 };
