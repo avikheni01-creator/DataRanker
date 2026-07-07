@@ -7,7 +7,7 @@ const screenerSnapshotSchema = new mongoose.Schema({
   uploadedAt: { type: Date, default: Date.now },
   uploadedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   fileName: { type: String, required: true },
-  filePath: { type: String, required: true },   // absolute path on server disk
+  fileBuffer: { type: Buffer, required: true }, // raw file stored in MongoDB (no disk needed)
   rawMimeType: { type: String, default: "text/csv" },
   columns: [String],
   rows: [mongoose.Schema.Types.Mixed],

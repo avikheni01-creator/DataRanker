@@ -8,10 +8,6 @@
 const express = require("express");
 const multer = require("multer");
 const XLSX = require("xlsx");
-const fs = require("fs");
-const path = require("path");
-
-const UPLOADS_DIR = path.join(__dirname, "../uploads");
 
 const { requireAuth, requireAdmin } = require("../middleware/auth");
 const ScreenerSnapshot = require("../models/ScreenerSnapshot");
@@ -142,23 +138,12 @@ router.post(
         if (!allNull) rows.push(obj);
       }
 
-      // Delete the old snapshot file from disk (if any) before replacing.
-      const old = await ScreenerSnapshot.findOne({}, "filePath").lean();
-      if (old?.filePath) {
-        try { fs.unlinkSync(old.filePath); } catch (_) { /* already gone */ }
-      }
-
-      // Write the new file to disk with a stable filename.
-      const ext = path.extname(file.originalname) || ".csv";
-      const filePath = path.join(UPLOADS_DIR, `screener-snapshot${ext}`);
-      fs.writeFileSync(filePath, file.buffer);
-
-      // Only one snapshot at a time.
+      // Only one snapshot at a time; store raw buffer in MongoDB (no disk).
       await ScreenerSnapshot.deleteMany({});
       const snap = await ScreenerSnapshot.create({
         uploadedBy: req.user._id,
         fileName: file.originalname,
-        filePath,
+        fileBuffer: file.buffer,
         rawMimeType: file.mimetype,
         columns,
         rows,
@@ -183,7 +168,7 @@ router.post(
 
 router.get("/screener", requireAuth, async (req, res) => {
   try {
-    const snap = await ScreenerSnapshot.findOne({}, "-rawBuffer").lean();
+    const snap = await ScreenerSnapshot.findOne({}, "-fileBuffer").lean();
     if (!snap) return res.json({ snapshot: null });
     res.json({
       snapshot: {
@@ -204,17 +189,14 @@ router.get("/screener/download", requireAuth, async (req, res) => {
   try {
     const snap = await ScreenerSnapshot.findOne(
       {},
-      "filePath rawMimeType fileName"
+      "fileBuffer rawMimeType fileName"
     ).lean();
     if (!snap) {
       return res.status(404).json({ detail: "No screener data uploaded yet." });
     }
-    if (!fs.existsSync(snap.filePath)) {
-      return res.status(404).json({ detail: "Snapshot file missing from server disk." });
-    }
     res.setHeader("Content-Type", snap.rawMimeType || "text/csv");
     res.setHeader("Content-Disposition", `attachment; filename="${snap.fileName}"`);
-    fs.createReadStream(snap.filePath).pipe(res);
+    res.send(snap.fileBuffer);
   } catch (err) {
     res.status(500).json({ detail: err.message });
   }
