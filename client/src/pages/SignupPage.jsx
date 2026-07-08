@@ -6,13 +6,13 @@ import { signUp, isAuthed } from "../auth";
 
 export default function SignupPage() {
   const navigate = useNavigate();
+  const [form, setForm] = useState({ name: "", email: "", password: "", confirm: "" });
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
 
   if (isAuthed()) {
     return <Navigate to="/app" replace />;
   }
-  const [form, setForm] = useState({ name: "", email: "", password: "", confirm: "" });
-  const [error, setError] = useState("");
-  const [busy, setBusy] = useState(false);
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 

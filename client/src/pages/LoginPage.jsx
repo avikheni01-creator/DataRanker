@@ -7,14 +7,14 @@ import { logIn, isAuthed } from "../auth";
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-
-  if (isAuthed()) {
-    return <Navigate to="/app" replace />;
-  }
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+
+  if (isAuthed()) {
+    return <Navigate to="/app" replace />;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
