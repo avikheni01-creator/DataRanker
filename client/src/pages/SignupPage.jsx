@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate, Navigate } from "react-router-dom";
+import { useGoogleLogin } from "@react-oauth/google";
 import AuthLayout from "./AuthLayout";
 import Seo from "../seo";
-import { signUp, isAuthed } from "../auth";
+import { signUp, googleLogin, isAuthed } from "../auth";
+import GoogleButton, { AuthDivider } from "../components/GoogleButton";
 
 export default function SignupPage() {
   const navigate = useNavigate();
@@ -10,11 +12,27 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
+  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  const handleGoogle = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      setError("");
+      setBusy(true);
+      try {
+        await googleLogin(tokenResponse.access_token);
+        navigate("/app", { replace: true });
+      } catch (err) {
+        setError(err.message || "Google sign-in failed");
+      } finally {
+        setBusy(false);
+      }
+    },
+    onError: () => setError("Google sign-in was cancelled or failed"),
+  });
+
   if (isAuthed()) {
     return <Navigate to="/app" replace />;
   }
-
-  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -45,8 +63,10 @@ export default function SignupPage() {
       footer={<>Already have an account? <Link to="/login">Sign in</Link></>}
     >
       <Seo title="Sign up" path="/signup" description="Create a free Matrix account and rank your first equity universe with industry-specific KPI templates — no credit card required." />
+      {error && <div className="auth-error">{error}</div>}
+      <GoogleButton onClick={handleGoogle} disabled={busy} label="Sign up with Google" />
+      <AuthDivider />
       <form onSubmit={handleSubmit}>
-        {error && <div className="auth-error">{error}</div>}
         <div className="auth-field">
           <label className="auth-label" htmlFor="name">Full Name</label>
           <input id="name" className="auth-input" placeholder="Jane Analyst"

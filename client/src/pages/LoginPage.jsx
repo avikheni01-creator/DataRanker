@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation, Navigate } from "react-router-dom";
+import { useGoogleLogin } from "@react-oauth/google";
 import AuthLayout from "./AuthLayout";
 import Seo from "../seo";
-import { logIn, isAuthed } from "../auth";
+import { logIn, googleLogin, isAuthed } from "../auth";
+import GoogleButton, { AuthDivider } from "../components/GoogleButton";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -11,6 +13,24 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+
+  const dest = location.state?.from || "/app";
+
+  const handleGoogle = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      setError("");
+      setBusy(true);
+      try {
+        await googleLogin(tokenResponse.access_token);
+        navigate(dest, { replace: true });
+      } catch (err) {
+        setError(err.message || "Google sign-in failed");
+      } finally {
+        setBusy(false);
+      }
+    },
+    onError: () => setError("Google sign-in was cancelled or failed"),
+  });
 
   if (isAuthed()) {
     return <Navigate to="/app" replace />;
@@ -22,7 +42,6 @@ export default function LoginPage() {
     setBusy(true);
     try {
       await logIn({ email, password });
-      const dest = location.state?.from || "/app";
       navigate(dest, { replace: true });
     } catch (err) {
       setError(err.message || "Sign in failed");
@@ -38,8 +57,10 @@ export default function LoginPage() {
       footer={<>Don&apos;t have an account? <Link to="/signup">Sign up</Link></>}
     >
       <Seo title="Log in" path="/login" description="Log in to Matrix to rank and score your equity universe by industry-specific KPI templates." />
+      {error && <div className="auth-error">{error}</div>}
+      <GoogleButton onClick={handleGoogle} disabled={busy} label="Continue with Google" />
+      <AuthDivider />
       <form onSubmit={handleSubmit}>
-        {error && <div className="auth-error">{error}</div>}
         <div className="auth-field">
           <label className="auth-label" htmlFor="email">Email</label>
           <input

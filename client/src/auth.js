@@ -29,6 +29,14 @@ export async function logIn({ email, password }) {
   return cacheUser(user);
 }
 
+export async function googleLogin(accessToken) {
+  const { user } = await apiFetch("/auth/google", {
+    method: "POST",
+    body: JSON.stringify({ accessToken }),
+  });
+  return cacheUser(user);
+}
+
 export async function logOut() {
   try {
     await apiFetch("/auth/logout", { method: "POST" });

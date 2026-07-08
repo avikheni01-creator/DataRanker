@@ -14,7 +14,8 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
-    passwordHash: { type: String, required: true },
+    passwordHash: { type: String, default: null },
+    googleId: { type: String, default: null, sparse: true },
     plan: { type: String, enum: PLAN_IDS, default: "free" },
     isAdmin: { type: Boolean, default: false },
   },
@@ -27,6 +28,7 @@ userSchema.methods.setPassword = async function setPassword(plain) {
 };
 
 userSchema.methods.comparePassword = function comparePassword(plain) {
+  if (!this.passwordHash) return Promise.resolve(false);
   return bcrypt.compare(plain, this.passwordHash);
 };
 
