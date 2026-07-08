@@ -1,11 +1,15 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, Navigate } from "react-router-dom";
 import AuthLayout from "./AuthLayout";
 import Seo from "../seo";
-import { signUp } from "../auth";
+import { signUp, isAuthed } from "../auth";
 
 export default function SignupPage() {
   const navigate = useNavigate();
+
+  if (isAuthed()) {
+    return <Navigate to="/app" replace />;
+  }
   const [form, setForm] = useState({ name: "", email: "", password: "", confirm: "" });
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);

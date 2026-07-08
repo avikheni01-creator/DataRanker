@@ -1,12 +1,16 @@
 import { useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation, Navigate } from "react-router-dom";
 import AuthLayout from "./AuthLayout";
 import Seo from "../seo";
-import { logIn } from "../auth";
+import { logIn, isAuthed } from "../auth";
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  if (isAuthed()) {
+    return <Navigate to="/app" replace />;
+  }
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
