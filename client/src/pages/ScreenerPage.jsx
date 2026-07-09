@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { apiFetch, apiUrl } from "../api";
+import { apiFetch, apiUrl, getAuthHeaders } from "../api";
 import { getUser } from "../auth";
 import { saveResult } from "../lib/resultStore";
 import { colors, fonts, radius, glassCss, shadow } from "../theme";
@@ -278,6 +278,7 @@ export default function ScreenerPage() {
       const res = await fetch(apiUrl("/admin/screener"), {
         method: "POST",
         credentials: "include",
+        headers: getAuthHeaders(),
         body: fd,
       });
       const data = await res.json();
@@ -318,7 +319,7 @@ export default function ScreenerPage() {
       const res = await fetch(apiUrl("/screener/run-pipeline"), {
         method: "POST",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: getAuthHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify({ rows: searchedRows, mapping }),
       });
       if (!res.ok) {
@@ -348,7 +349,7 @@ export default function ScreenerPage() {
 
   const handleDownloadFull = async () => {
     try {
-      const res = await fetch(apiUrl("/screener/download"), { credentials: "include" });
+      const res = await fetch(apiUrl("/screener/download"), { credentials: "include", headers: getAuthHeaders() });
       if (!res.ok) throw new Error("Download failed");
       const blob = await res.blob();
       const cd = res.headers.get("Content-Disposition") || "";

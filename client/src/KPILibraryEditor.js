@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import * as XLSX from "xlsx";
-import { apiUrl } from "./api";
+import { apiUrl, getAuthHeaders } from "./api";
 
 // ── Initial data (Tier 1 from KPI_Library.xlsx) ──────────────────────────────
 const INITIAL_TIER1 = [
@@ -256,7 +256,7 @@ export default function KPILibraryEditor() {
   const [activeTemplate, setActiveTemplate] = useState("");
 
   useEffect(() => {
-    fetch(apiUrl('/column-mapping'), { credentials: "include" })
+    fetch(apiUrl('/column-mapping'), { credentials: "include", headers: getAuthHeaders() })
       .then(res => res.json())
       .then(data => {
         setCOLUMN_MAPPING(data);
@@ -269,7 +269,7 @@ export default function KPILibraryEditor() {
 
   // Load this user's saved KPI library (server seeds defaults on first call).
   useEffect(() => {
-    fetch(apiUrl('/kpi-library'), { credentials: "include" })
+    fetch(apiUrl('/kpi-library'), { credentials: "include", headers: getAuthHeaders() })
       .then(res => (res.ok ? res.json() : Promise.reject(res)))
       .then(data => {
         if (data && Array.isArray(data.rows) && data.rows.length) {
@@ -401,7 +401,7 @@ export default function KPILibraryEditor() {
       const res = await fetch(apiUrl('/kpi-library'), {
         method: "PUT",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: getAuthHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify({ rows: tier1Rows }),
       });
       if (!res.ok) {

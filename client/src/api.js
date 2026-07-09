@@ -15,6 +15,13 @@ function getToken() {
   try { return localStorage.getItem("matrix_token"); } catch { return null; }
 }
 
+// Use this in raw fetch() calls (e.g. FormData / blob uploads) that can't go
+// through apiFetch. Merges Authorization header when a token is stored.
+export function getAuthHeaders(extra = {}) {
+  const token = getToken();
+  return token ? { Authorization: `Bearer ${token}`, ...extra } : { ...extra };
+}
+
 // JSON fetch with credentials. Throws Error(detail) on non-2xx.
 export async function apiFetch(path, options = {}) {
   const token = getToken();
