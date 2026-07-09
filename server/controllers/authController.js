@@ -1,7 +1,7 @@
 // controllers/authController.js — signup / login / me / logout / google OAuth.
 
 const User = require("../models/User");
-const { setAuthCookie, clearAuthCookie } = require("../middleware/auth");
+const { signToken, setAuthCookie, clearAuthCookie } = require("../middleware/auth");
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -27,8 +27,9 @@ async function signup(req, res) {
     await user.setPassword(password);
     await user.save();
 
-    setAuthCookie(res, user._id.toString());
-    return res.status(201).json({ user: user.toSafeJSON() });
+    const userId = user._id.toString();
+    setAuthCookie(res, userId);
+    return res.status(201).json({ user: user.toSafeJSON(), token: signToken(userId) });
   } catch (err) {
     return res.status(500).json({ detail: String(err.message || err) });
   }
@@ -44,8 +45,9 @@ async function login(req, res) {
     if (!user || !(await user.comparePassword(password))) {
       return res.status(401).json({ detail: "Invalid email or password" });
     }
-    setAuthCookie(res, user._id.toString());
-    return res.json({ user: user.toSafeJSON() });
+    const userId = user._id.toString();
+    setAuthCookie(res, userId);
+    return res.json({ user: user.toSafeJSON(), token: signToken(userId) });
   } catch (err) {
     return res.status(500).json({ detail: String(err.message || err) });
   }
@@ -90,8 +92,9 @@ async function googleAuth(req, res) {
       await user.save();
     }
 
-    setAuthCookie(res, user._id.toString());
-    return res.json({ user: user.toSafeJSON() });
+    const userId = user._id.toString();
+    setAuthCookie(res, userId);
+    return res.json({ user: user.toSafeJSON(), token: signToken(userId) });
   } catch (err) {
     return res.status(500).json({ detail: String(err.message || err) });
   }

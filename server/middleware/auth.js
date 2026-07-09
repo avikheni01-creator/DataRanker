@@ -1,5 +1,7 @@
 // middleware/auth.js — JWT helpers + route guard.
-// The JWT lives in an httpOnly cookie ("token"); the browser never sees it in JS.
+// Accepts the JWT as either an httpOnly cookie OR an Authorization: Bearer header.
+// The header approach is required for cross-domain deployments (separate frontend/
+// backend origins) where browsers block third-party cookies.
 
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
@@ -12,9 +14,6 @@ function signToken(userId) {
   });
 }
 
-// Set/clear the auth cookie. SameSite=None+Secure is required for cross-site
-// cookies in production (frontend and API on different domains); lax over http
-// for local dev.
 function cookieOptions() {
   const prod = process.env.NODE_ENV === "production";
   return {
@@ -34,10 +33,20 @@ function clearAuthCookie(res) {
   res.clearCookie(COOKIE_NAME, { ...cookieOptions(), maxAge: undefined });
 }
 
+// Extract token from either the httpOnly cookie or the Authorization header.
+// Header takes priority so cross-domain clients that can't send cookies still work.
+function extractToken(req) {
+  const authHeader = req.headers && req.headers["authorization"];
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    return authHeader.slice(7);
+  }
+  return req.cookies && req.cookies[COOKIE_NAME];
+}
+
 // Guard: require a valid token and attach req.user (full document).
 async function requireAuth(req, res, next) {
   try {
-    const token = req.cookies && req.cookies[COOKIE_NAME];
+    const token = extractToken(req);
     if (!token) return res.status(401).json({ detail: "Not authenticated" });
     const payload = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(payload.sub);

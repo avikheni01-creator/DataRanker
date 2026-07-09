@@ -1,40 +1,47 @@
 // auth.js — real auth against the Express backend.
-// The JWT lives in an httpOnly cookie (not readable from JS); we cache the
-// returned user object in localStorage for instant UI and verify with the
-// server via fetchMe()/ProtectedRoute.
+// The JWT is returned in the response body and stored in localStorage so it can
+// be sent as an Authorization: Bearer header on every request. This works
+// reliably across cross-domain deployments (Vercel frontend + EC2 backend) where
+// browsers block third-party httpOnly cookies.
 
 import { apiFetch } from "./api";
 import { clearResult } from "./lib/resultStore";
 
-const USER_KEY = "matrix_user";
+const USER_KEY  = "matrix_user";
+const TOKEN_KEY = "matrix_token";
 
-function cacheUser(user) {
+function cacheUser(user, token) {
   if (user) localStorage.setItem(USER_KEY, JSON.stringify(user));
+  if (token) localStorage.setItem(TOKEN_KEY, token);
   return user;
 }
 
+export function getToken() {
+  return localStorage.getItem(TOKEN_KEY);
+}
+
 export async function signUp({ name, email, password }) {
-  const { user } = await apiFetch("/auth/signup", {
+  const { user, token } = await apiFetch("/auth/signup", {
     method: "POST",
     body: JSON.stringify({ name, email, password }),
   });
-  return cacheUser(user);
+  return cacheUser(user, token);
 }
 
 export async function logIn({ email, password }) {
-  const { user } = await apiFetch("/auth/login", {
+  const { user, token } = await apiFetch("/auth/login", {
     method: "POST",
     body: JSON.stringify({ email, password }),
   });
-  return cacheUser(user);
+  return cacheUser(user, token);
 }
 
 export async function googleLogin(accessToken) {
-  const { user } = await apiFetch("/auth/google", {
+  const { user, token } = await apiFetch("/auth/google", {
     method: "POST",
     body: JSON.stringify({ accessToken }),
   });
-  return cacheUser(user);
+  return cacheUser(user, token);
 }
 
 export async function logOut() {
@@ -42,7 +49,8 @@ export async function logOut() {
     await apiFetch("/auth/logout", { method: "POST" });
   } finally {
     localStorage.removeItem(USER_KEY);
-    clearResult(); // don't leak one user's results to the next
+    localStorage.removeItem(TOKEN_KEY);
+    clearResult();
   }
 }
 
@@ -50,9 +58,10 @@ export async function logOut() {
 export async function fetchMe() {
   try {
     const { user } = await apiFetch("/auth/me");
-    return cacheUser(user);
+    return cacheUser(user, null);
   } catch {
     localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(TOKEN_KEY);
     return null;
   }
 }
