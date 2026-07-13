@@ -1,9 +1,11 @@
+import { useEffect } from "react";
 import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import Logo from "./Logo";
 import ThemeToggle from "./ThemeToggle";
 import { logOut, getUser } from "../auth";
 import Seo from "../seo";
 import { colors, gradients, fonts, radius } from "../theme";
+import { useAppConfig, useRefreshAppConfig } from "../AppConfigContext";
 
 // Icons kept as tiny inline SVGs so we don't add an icon dependency.
 const Icon = ({ d, paths }) => (
@@ -13,24 +15,32 @@ const Icon = ({ d, paths }) => (
   </svg>
 );
 
-const NAV = [
-  { to: "/app", end: true, label: "Pipeline", icon: <Icon paths={["M3 3v18h18", "M7 14l4-4 3 3 5-6"]} /> },
-  { to: "/app/screener", label: "Screener", icon: <Icon paths={["M3 6h18", "M3 12h18", "M3 18h18"]} /> },
+const BASE_NAV = [
+  { to: "/app", end: true, label: "Pipeline", icon: <Icon paths={["M3 3v18h18", "M7 14l4-4 3 3 5-6"]} />, flag: "allowCustomUpload" },
+  { to: "/app/screener", label: "Screener", icon: <Icon paths={["M3 6h18", "M3 12h18", "M3 18h18"]} />, flag: "screenerEnabled" },
   { to: "/app/results", label: "Results", icon: <Icon paths={["M4 19V9", "M10 19V5", "M16 19v-7", "M22 19H2"]} /> },
-  { to: "/app/comparison", label: "Compare", icon: <Icon paths={["M18 20V10", "M12 20V4", "M6 20v-6"]} /> },
+  { to: "/app/comparison", label: "Compare", icon: <Icon paths={["M18 20V10", "M12 20V4", "M6 20v-6"]} />, flag: "comparisonEnabled" },
 ];
 
 const KPI_NAV = { to: "/app/kpi-editor", label: "KPI Editor", icon: <Icon paths={["M12 20h9", "M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"]} /> };
+const SETTINGS_NAV = { to: "/app/settings", label: "Settings", icon: <Icon paths={["M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z", "M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"]} /> };
 
-// KPI Editor is always reachable (no longer gated on a KPI upload). The Results
-// page renders the nav as a top bar instead of the left sidebar so the output
-// dashboard gets the full page width.
 export default function AppShell() {
   const navigate = useNavigate();
   const location = useLocation();
   const user = getUser();
-  const items = [...NAV, KPI_NAV];
-  const topNav = ["/app", "/app/results", "/app/kpi-editor", "/app/screener", "/app/comparison"].includes(location.pathname);
+  const appConfig = useAppConfig();
+  const refreshAppConfig = useRefreshAppConfig();
+
+  // Fetch live settings as soon as the authenticated shell mounts.
+  // This handles the login flow where App.js's initial fetch got a 401.
+  useEffect(() => { refreshAppConfig(); }, [refreshAppConfig]);
+
+  // Filter nav items by feature flags
+  const NAV = BASE_NAV.filter((item) => !item.flag || appConfig[item.flag] !== false);
+  const items = [...NAV, KPI_NAV, ...(user?.isAdmin ? [SETTINGS_NAV] : [])];
+
+  const topNav = ["/app", "/app/results", "/app/kpi-editor", "/app/screener", "/app/comparison", "/app/settings"].includes(location.pathname);
 
   const handleSignOut = async () => {
     await logOut();
@@ -72,6 +82,12 @@ export default function AppShell() {
       </aside>
 
       <main className="shell-main">
+        {appConfig.maintenanceBanner && (
+          <div className="shell-banner">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            {appConfig.maintenanceBanner}
+          </div>
+        )}
         <Outlet />
       </main>
     </div>
@@ -108,6 +124,13 @@ const SHELL_CSS = `
   .shell-signout:hover { color: ${colors.negative}; background: ${colors.negativeSoft}; }
 
   .shell-main { min-width: 0; }
+
+  .shell-banner {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 20px; font-size: 13px;
+    background: rgba(245,158,11,.12); color: #F59E0B;
+    border-bottom: 1px solid rgba(245,158,11,.25);
+  }
 
   /* Results / KPI-editor page: horizontal top bar, full-height content. */
   .shell.topbar { grid-template-columns: 1fr; grid-template-rows: auto 1fr; height: 100vh; overflow: hidden; }

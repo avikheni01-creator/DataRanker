@@ -16,8 +16,8 @@ const FALLBACK_PLANS = [
 
 function priceLabel(plan) {
   if (plan.price === null || plan.price === undefined) return "Custom";
-  if (plan.price === 0) return "$0";
-  return `$${plan.price}`;
+  if (plan.price === 0) return "₹0";
+  return `₹${plan.price}`;
 }
 
 export default function PricingPage() {

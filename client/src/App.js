@@ -15,11 +15,14 @@ import PricingPage from "./pages/PricingPage";
 import AboutPage from "./pages/AboutPage";
 import ScreenerPage from "./pages/ScreenerPage";
 import ComparisonPage from "./pages/ComparisonPage";
-import { apiUrl } from "./api";
+import SettingsPage from "./pages/SettingsPage";
+import { apiUrl, getAuthHeaders } from "./api";
+import { AppConfigContext, DEFAULT_APP_CONFIG } from "./AppConfigContext";
 
 export default function App() {
   const [outputFile, setOutputFile] = useState(null);
   const [backendConfig, setBackendConfig] = useState({}); // Backend COLUMN_MAPPING config
+  const [appConfig, setAppConfig] = useState(DEFAULT_APP_CONFIG);
   // The pipeline upload is lifted here so it persists across route changes
   // (e.g. visiting Results and returning).
   const [queryFile, setQueryFile] = useState(null);
@@ -50,7 +53,19 @@ export default function App() {
     return () => { cancelled = true; };
   }, [notify]);
 
+  // Re-fetch app-wide feature flags (called by AppShell after auth is confirmed).
+  const refreshAppConfig = useCallback(() => {
+    fetch(apiUrl("/app-config"), {
+      credentials: "include",
+      headers: getAuthHeaders(),
+    })
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => { if (data) setAppConfig((prev) => ({ ...prev, ...data })); })
+      .catch(() => {});
+  }, []);
+
   return (
+    <AppConfigContext.Provider value={{ config: appConfig, refresh: refreshAppConfig }}>
     <BrowserRouter>
       <Routes>
         {/* Public */}
@@ -86,6 +101,7 @@ export default function App() {
           <Route path="kpi-editor" element={<KPILibraryEditor />} />
           <Route path="screener" element={<ScreenerPage />} />
           <Route path="comparison" element={<ComparisonPage />} />
+          <Route path="settings" element={<SettingsPage />} />
         </Route>
 
         {/* Fallback */}
@@ -94,5 +110,6 @@ export default function App() {
 
       <Toast message={toast} onClose={() => setToast("")} />
     </BrowserRouter>
+    </AppConfigContext.Provider>
   );
 }

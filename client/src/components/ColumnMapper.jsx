@@ -229,12 +229,13 @@ const ColumnMapper = ({ backendConfig = {}, queryFile = null, onMappingChange = 
     unmappedColumns.every(col => manualMappings[col]);
 
   // Report the mapping + readiness up to the pipeline page whenever it changes.
-  // Ready = the file parsed and a mapping was built (so the pipeline never
-  // receives an empty mapping). Leftover unmapped columns are optional overrides.
+  // Ready requires at least one column to be mapped — prevents sending an empty
+  // mapping that would silently produce a zero-row output.
   useEffect(() => {
+    const finalMapping = buildFinalMapping();
     onMappingChange({
-      mapping: [buildFinalMapping()],
-      ready: availableColumns.length > 0,
+      mapping: [finalMapping],
+      ready: availableColumns.length > 0 && Object.keys(finalMapping).length > 0,
     });
   }, [buildFinalMapping, availableColumns.length, onMappingChange]);
 

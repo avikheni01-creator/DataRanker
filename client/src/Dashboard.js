@@ -1,8 +1,9 @@
 import { useState, useCallback, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import { apiUrl, getAuthHeaders } from "./api";
 import { saveResult } from "./lib/resultStore";
 import ColumnMapper from "./components/ColumnMapper";
+import { useAppConfig } from "./AppConfigContext";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -288,11 +289,6 @@ function usePipeline(columnMapping = {}) {
     const appendLog = (msg, type = "info") =>
         setLog((prev) => [...prev, { msg, type, ts: new Date().toLocaleTimeString() }]);
 
-    const setStep = (i, status) =>
-        setSteps((prev) => prev.map((s, idx) => (idx === i ? status : s)));
-
-    const delay = (ms) => new Promise((r) => setTimeout(r, ms));
-
     const run = async (queryFile) => {
         if (!queryFile) {
             setError("Please upload the Screener.in query results file.");
@@ -303,27 +299,15 @@ function usePipeline(columnMapping = {}) {
         setRunning(true);
         setDownloadUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return null; });
         setLog([]);
-        setSteps(["idle", "idle", "idle"]);
+        // All three stages run server-side in one request — show them all in-progress.
+        setSteps(["running", "running", "running"]);
 
         const formData = new FormData();
         formData.append("query_results", queryFile);
         formData.append("mapping_json", JSON.stringify(columnMapping));
 
         try {
-            appendLog("Sending files to pipeline...");
-
-            setStep(0, "running");
-            appendLog("Step 1: Formatting columns...");
-            await delay(600);
-
-            setStep(0, "done");
-            setStep(1, "running");
-            appendLog("Step 2: Mapping industries to SCS sectors...");
-            await delay(600);
-
-            setStep(1, "done");
-            setStep(2, "running");
-            appendLog("Step 3: Scoring & ranking by KPI templates...");
+            appendLog("Running pipeline: format → map industries → rank & score…");
 
             const res = await fetch(apiUrl("/run-pipeline"), {
                 method: "POST",
@@ -341,11 +325,10 @@ function usePipeline(columnMapping = {}) {
             setResultFile(blob);
             saveResult(blob);
             setDownloadUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return URL.createObjectURL(blob); });
-            setStep(2, "done");
+            setSteps(["done", "done", "done"]);
             appendLog("Pipeline complete! Final_Ranked_Report.xlsx is ready.", "success");
         } catch (err) {
-            const failedStep = steps.findIndex((s) => s === "running");
-            if (failedStep >= 0) setStep(failedStep, "error");
+            setSteps(["error", "error", "error"]);
             appendLog(`Error: ${err.message}`, "error");
             setError(err.message);
         } finally {
@@ -360,6 +343,7 @@ function usePipeline(columnMapping = {}) {
 
 export default function Dashboard({ setOutputFile, backendConfig, queryFile, setQueryFile }) {
     const navigate = useNavigate();
+    const { allowCustomUpload } = useAppConfig();
 
     const [mapping, setMapping] = useState([{}]);
     const [mappingReady, setMappingReady] = useState(false);
@@ -374,6 +358,8 @@ export default function Dashboard({ setOutputFile, backendConfig, queryFile, set
     useEffect(() => {
         if (resultFile) setOutputFile(resultFile);
     }, [resultFile, setOutputFile]);
+
+    if (!allowCustomUpload) return <Navigate to="/app/screener" replace />;
 
     const canRun = queryFile && mappingReady && !running;
     const showDashboard = resultFile !== null;

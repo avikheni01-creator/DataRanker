@@ -23,7 +23,7 @@ const FEATURES = [
 ];
 
 const FAQ = [
-  { q: "What do I need to get started?", a: "Three files: your Screener.in CSV export, an industry-mapping workbook, and your KPI library. Matrix handles the rest." },
+  { q: "What do I need to get started?", a: "Just your Screener.in CSV export. Industry mapping and your KPI library are managed server-side — Matrix handles everything else." },
   { q: "Is my methodology safe?", a: "Your KPI weights and ranking logic stay in your workspace. The pipeline runs your templates exactly as you define them." },
   { q: "What does the Free plan include?", a: "The full ranking pipeline, column mapper, KPI editor, results dashboard and Excel export — everything you need to rank your first universe." },
   { q: "Can I change the scoring later?", a: "Yes. Edit templates, weights and directions in the KPI editor and re-run the pipeline any time." },

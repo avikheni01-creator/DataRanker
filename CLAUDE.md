@@ -12,6 +12,7 @@ cd client
 npm install
 npm start        # dev server on localhost:3000
 npm test         # jest test runner (interactive watch)
+CI=true npm test # non-interactive single run (for CI / one-shot)
 npm run build    # production build
 ```
 
@@ -94,7 +95,7 @@ Key files:
   - "Download full data" streams the original uploaded file via `GET /screener/download`.
   - Column mapping is fully server-side via `COLUMN_MAPPING` — no mapping UI on this page.
 - `pages/ComparisonPage.jsx` — Company comparison dashboard. Sections: radar (20–100 normalized, top 8 CV metrics), leaderboard (composite rank by metric wins), multi-metric grouped bar (0–100 normalized per metric, toggle chips), single-metric bar, scatter plot (X/Y metric dropdowns, custom dot labels), percentile horizontal bars vs full dataset, raw data table. Radar uses `undefined` (not 0) for missing values so Recharts skips those spokes. Metric selection via `sortByCV` (coefficient of variation). `PALETTE` = 6 colors, `MAX_COMPANIES` = 6.
-- `src/StockDashboard.jsx` — Results viewer; parses ranked XLSX from IndexedDB, shows per-template company table with **pagination** (25/50/100/200, default 50), **ordered columns** (Identifiers → Template KPIs → Other data, via `partitionKpiKeys`), column picker with three labelled sections, sort by rank/score/any KPI, search by symbol/name, company drawer with bar chart + radar overlay vs template average. `IDENTIFIER_COLS` set at top of file controls which columns are pinned as identifiers.
+- `src/StockDashboard.jsx` — Results viewer; parses ranked XLSX from IndexedDB, shows per-template company table with **pagination** (25/50/100/200, default 50), **ordered columns** (Identifiers → Template KPIs → Other data, via `partitionKpiKeys`), column picker with three labelled sections, sort by rank/score/any KPI, search by symbol/name, company drawer with bar chart + radar overlay vs template average. `IDENTIFIER_COLS` (currently `BSE Code`, `ISIN Code`, `NSE Code`) controls which columns are pinned as identifiers — extend this set to add more.
 - `components/ProtectedRoute.jsx` — verifies the session via `GET /auth/me`, else redirects to `/login`
 - `components/AppShell.jsx` — app sidebar/topbar; NAV includes Pipeline, Screener, Results, KPI Editor
 - `components/MarketingNav.jsx` / `MarketingFooter.jsx` — shared chrome for the public pages

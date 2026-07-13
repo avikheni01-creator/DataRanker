@@ -3,27 +3,27 @@
      The auth-gated /app routes are intentionally omitted. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://matrix.example.com/</loc>
+    <loc>https://data-ranker.vercel.app/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://matrix.example.com/pricing</loc>
+    <loc>https://data-ranker.vercel.app/pricing</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://matrix.example.com/about</loc>
+    <loc>https://data-ranker.vercel.app/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://matrix.example.com/signup</loc>
+    <loc>https://data-ranker.vercel.app/signup</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://matrix.example.com/login</loc>
+    <loc>https://data-ranker.vercel.app/login</loc>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>

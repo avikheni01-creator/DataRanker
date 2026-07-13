@@ -4,6 +4,7 @@ import { apiFetch, apiUrl, getAuthHeaders } from "../api";
 import { getUser } from "../auth";
 import { saveResult } from "../lib/resultStore";
 import { colors, fonts, radius, glassCss, shadow } from "../theme";
+import { useAppConfig } from "../AppConfigContext";
 
 // ── Filter DSL ────────────────────────────────────────────────────────────────
 // Supports: "Col > 15 AND Sector = Banks AND Debt/Equity < 1"
@@ -184,6 +185,7 @@ export default function ScreenerPage() {
   const navigate = useNavigate();
   const user = getUser();
   const isAdmin = !!user.isAdmin;
+  const { screenerMaxRows } = useAppConfig();
 
   const [snapshot, setSnapshot] = useState(null);
   const [columnMapping, setColumnMapping] = useState({});
@@ -301,10 +303,12 @@ export default function ScreenerPage() {
     if (!searchedRows.length) return;
     setPipelineRunning(true);
     setPipelineError("");
+    // Apply the admin-set row cap (0 = no limit)
+    const rowsToSend = screenerMaxRows > 0 ? searchedRows.slice(0, screenerMaxRows) : searchedRows;
     try {
       // Mirror ColumnMapper's performAutoMapping: case-insensitive alias match
       const normalize = (s) => String(s).trim().toLowerCase();
-      const cols = snapshot?.columns ?? Object.keys(searchedRows[0] ?? {});
+      const cols = snapshot?.columns ?? Object.keys(rowsToSend[0] ?? {});
       const mapping = {};
       cols.forEach((col) => {
         const target = normalize(col);
@@ -320,7 +324,7 @@ export default function ScreenerPage() {
         method: "POST",
         credentials: "include",
         headers: getAuthHeaders({ "Content-Type": "application/json" }),
-        body: JSON.stringify({ rows: searchedRows, mapping }),
+        body: JSON.stringify({ rows: rowsToSend, mapping }),
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));

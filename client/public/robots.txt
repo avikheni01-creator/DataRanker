@@ -5,4 +5,4 @@ Allow: /
 Disallow: /app
 
 # Replace the host with the real domain at deploy time.
-Sitemap: https://matrix.example.com/sitemap.xml
+Sitemap: https://data-ranker.vercel.app/sitemap.xml

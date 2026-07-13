@@ -32,6 +32,7 @@ const plansRouter = require("./routes/plans");
 const pipelineRouter = require("./routes/pipeline");
 const kpiLibraryRouter = require("./routes/kpiLibrary");
 const screenerRouter = require("./routes/screener");
+const adminSettingsRouter = require("./routes/adminSettings");
 
 const app = express();
 
@@ -70,7 +71,8 @@ app.use("/auth", authRouter);
 app.use(plansRouter); // GET /plans
 app.use(pipelineRouter); // GET /column-mapping, POST /run-pipeline
 app.use(kpiLibraryRouter); // GET/PUT /kpi-library
-app.use(screenerRouter);  // GET/POST /screener, POST /admin/screener
+app.use(screenerRouter);        // GET/POST /screener, POST /admin/screener
+app.use(adminSettingsRouter);  // GET /app-config, GET/PUT /admin/settings
 
 const PORT = process.env.PORT || 8000;
 
