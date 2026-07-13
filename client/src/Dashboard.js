@@ -4,6 +4,7 @@ import { apiUrl, getAuthHeaders } from "./api";
 import { saveResult } from "./lib/resultStore";
 import ColumnMapper from "./components/ColumnMapper";
 import { useAppConfig } from "./AppConfigContext";
+import PlanGate from "./components/PlanGate";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -365,6 +366,10 @@ export default function Dashboard({ setOutputFile, backendConfig, queryFile, set
     const showDashboard = resultFile !== null;
 
     return (
+        <PlanGate
+            feature="Custom CSV Upload"
+            description="Upload your own Screener.in export and run the full ranking pipeline with your KPI weights. Available on Premium and Enterprise plans. Free users can run the pipeline via the Screener page."
+        >
         <>
             <style>{STYLES}</style>
             <div className="pl-page">
@@ -466,5 +471,6 @@ export default function Dashboard({ setOutputFile, backendConfig, queryFile, set
                 </div>
             </div>
         </>
+        </PlanGate>
     );
 }

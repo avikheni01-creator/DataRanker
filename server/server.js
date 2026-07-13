@@ -25,6 +25,7 @@ if (process.env.NODE_ENV !== "production") {
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const helmet = require("helmet");
 
 const connectDB = require("./config/db");
 const authRouter = require("./routes/auth");
@@ -57,14 +58,7 @@ app.use(
 
 app.use(express.json({ limit: "10mb" }));
 app.use(cookieParser());
-
-// Minimal, dependency-free security headers on every response.
-app.use((req, res, next) => {
-  res.setHeader("X-Content-Type-Options", "nosniff");
-  res.setHeader("X-Frame-Options", "DENY");
-  res.setHeader("Referrer-Policy", "no-referrer");
-  next();
-});
+app.use(helmet({ contentSecurityPolicy: false })); // CSP disabled — API-only server, no HTML served
 
 app.get("/health", (req, res) => res.json({ ok: true }));
 

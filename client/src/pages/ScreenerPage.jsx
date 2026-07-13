@@ -447,14 +447,31 @@ export default function ScreenerPage() {
 
       {/* Scrollable content area */}
       <div className="sp-content">
-        {loading && <div className="sp-empty">Loading…</div>}
+        {loading && (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 320, color: "var(--text-muted)", fontSize: 13 }}>
+            Loading…
+          </div>
+        )}
 
         {!loading && !snapshot && (
-          <div className="sp-empty">
-            No screener data yet.
-            {isAdmin
-              ? " Upload a CSV or Excel file above to get started."
-              : " The admin hasn't uploaded today's data yet — check back later."}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "64px 32px", gap: 16, minHeight: 360 }}>
+            <div style={{ width: 68, height: 68, borderRadius: 20, display: "flex", alignItems: "center", justifyContent: "center", background: isAdmin ? "rgba(124,108,255,.10)" : "rgba(148,163,184,.08)", border: `1px solid ${isAdmin ? "rgba(124,108,255,.22)" : "rgba(148,163,184,.2)"}`, fontSize: 30 }}>
+              {isAdmin ? "📤" : "⏳"}
+            </div>
+            <div style={{ fontFamily: "'Space Grotesk','Inter',sans-serif", fontSize: 20, fontWeight: 700, color: "var(--text)" }}>
+              {isAdmin ? "No data uploaded yet" : "Awaiting today's data"}
+            </div>
+            <div style={{ fontSize: 14, color: "var(--text-secondary)", maxWidth: 400, lineHeight: 1.65 }}>
+              {isAdmin
+                ? "Upload a daily CSV or Excel snapshot to give analysts access to the latest screener data."
+                : "The admin hasn't uploaded today's screener snapshot yet. Check back shortly."}
+            </div>
+            {isAdmin && (
+              <label style={{ marginTop: 4, padding: "11px 26px", borderRadius: 999, color: "#fff", fontSize: 14, fontWeight: 600, background: "linear-gradient(135deg,#7C6CFF,#4F46E5)", boxShadow: "0 4px 18px rgba(124,108,255,.30)", cursor: "pointer" }}>
+                Upload CSV / Excel
+                <input type="file" accept=".csv,.xlsx,.xls" onChange={handleAdminUpload} disabled={adminUploading} style={{ display: "none" }} />
+              </label>
+            )}
           </div>
         )}
 

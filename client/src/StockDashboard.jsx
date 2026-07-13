@@ -565,25 +565,35 @@ export default function StockDashboard({ resultFile }) {
     return (
       <div style={{
         minHeight: "100vh", display: "flex", flexDirection: "column",
-        alignItems: "center", justifyContent: "center", gap: 14, padding: 24, textAlign: "center",
+        alignItems: "center", justifyContent: "center", gap: 16, padding: 32, textAlign: "center",
       }}>
         <div style={{
-          width: 56, height: 56, borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center",
-          background: "rgba(124,108,255,0.12)", border: "1px solid rgba(124,108,255,0.3)", fontSize: 24,
+          width: 68, height: 68, borderRadius: 20, display: "flex", alignItems: "center", justifyContent: "center",
+          background: "rgba(124,108,255,0.10)", border: "1px solid rgba(124,108,255,0.22)", fontSize: 30,
         }}>📊</div>
         <div style={{ fontFamily: "'Space Grotesk','Inter',sans-serif", fontSize: 22, fontWeight: 700, color: "var(--text)" }}>
           No results yet
         </div>
-        <div style={{ fontSize: 14, color: "var(--text-secondary)", maxWidth: 380, lineHeight: 1.6 }}>
-          Run the ranking pipeline first — once it completes, your ranked companies will appear here.
+        <div style={{ fontSize: 14, color: "var(--text-secondary)", maxWidth: 400, lineHeight: 1.65 }}>
+          Run the ranking pipeline to score and rank your equity universe by industry-specific KPIs.
+          Results are saved automatically and will reappear here on your next visit.
         </div>
-        <Link to="/app" style={{
-          marginTop: 8, padding: "12px 24px", borderRadius: 999, color: "#fff", fontSize: 14, fontWeight: 600,
-          background: "linear-gradient(135deg, #7C6CFF, #4F46E5)",
-          boxShadow: "0 4px 18px rgba(124,108,255,0.3)",
-        }}>
-          Go to Pipeline →
-        </Link>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center", marginTop: 4 }}>
+          <Link to="/app/screener" style={{
+            padding: "11px 26px", borderRadius: 999, color: "#fff", fontSize: 14, fontWeight: 600,
+            background: "linear-gradient(135deg,#7C6CFF,#4F46E5)",
+            boxShadow: "0 4px 18px rgba(124,108,255,0.30)", textDecoration: "none",
+          }}>
+            Run from Screener
+          </Link>
+          <Link to="/app" style={{
+            padding: "11px 26px", borderRadius: 999,
+            color: "var(--text-secondary)", fontSize: 14, fontWeight: 600,
+            background: "transparent", border: "1px solid var(--border)", textDecoration: "none",
+          }}>
+            Upload CSV
+          </Link>
+        </div>
       </div>
     );
   }

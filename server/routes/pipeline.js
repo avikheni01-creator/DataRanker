@@ -9,7 +9,7 @@ const { runMapper } = require("../services/mapper");
 const { runRanking } = require("../services/ranker");
 const { getOrSeedLibrary, toRankerRows } = require("../services/kpiLibrary");
 const { getIndustryMappingBuffer } = require("../services/industryMapping");
-const { requireAuth } = require("../middleware/auth");
+const { requireAuth, requirePremium } = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -50,7 +50,8 @@ router.get("/column-mapping", (req, res) => {
 
 router.post(
   "/run-pipeline",
-  requireAuth, // free tier = any signed-in user
+  requireAuth,
+  requirePremium, // custom CSV upload is a Premium+ feature
   handleUpload,
   async (req, res) => {
     try {

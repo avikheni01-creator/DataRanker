@@ -67,6 +67,16 @@ function requireAdmin(req, res, next) {
   next();
 }
 
+// Guard: require Premium or Enterprise plan (or admin regardless of plan).
+// Must be chained after requireAuth.
+function requirePremium(req, res, next) {
+  if (!req.user) return res.status(401).json({ detail: "Not authenticated" });
+  if (req.user.plan === "free" && !req.user.isAdmin) {
+    return res.status(403).json({ detail: "This feature requires a Premium or Enterprise plan." });
+  }
+  next();
+}
+
 module.exports = {
   COOKIE_NAME,
   signToken,
@@ -74,4 +84,5 @@ module.exports = {
   clearAuthCookie,
   requireAuth,
   requireAdmin,
+  requirePremium,
 };
