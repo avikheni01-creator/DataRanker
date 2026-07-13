@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import MarketingNav from "../components/MarketingNav";
@@ -7,19 +7,19 @@ import Seo from "../seo";
 import { colors, gradients, fonts, radius, glassCss } from "../theme";
 
 const WORKFLOW = [
-  { n: "01", title: "Upload Data", desc: "Screener.in export, industry map & KPI library." },
-  { n: "02", title: "Map Columns", desc: "Auto-matched to the canonical schema in one click." },
-  { n: "03", title: "Run Pipeline", desc: "Format, sector-map and score in a single pass." },
-  { n: "04", title: "Download Rankings", desc: "A fully scored, ranked Excel report." },
+  { n: "01", title: "Upload Screener Data", desc: "Drop in your Screener.in CSV export. KPI library and sector mapping are managed server-side — nothing else to configure." },
+  { n: "02", title: "Filter Your Universe", desc: "Use the live screener to slice by any metric with a formula DSL, then run on exactly the companies you want." },
+  { n: "03", title: "Run Pipeline", desc: "One click formats, sector-maps and scores your universe in a single pass against your KPI templates." },
+  { n: "04", title: "Download Rankings", desc: "A colour-coded, multi-sheet ranked Excel report — ready to open, audit and share immediately." },
 ];
 
 const FEATURES = [
-  { icon: ["M4 6h16", "M4 12h10", "M4 18h7", "M16 15l4 3-4 3"], title: "Smart column mapping", desc: "Auto-matches your CSV headers to the canonical schema, with manual overrides when you need them." },
-  { icon: ["M3 3v18h18", "M7 14l4-4 3 3 5-6"], title: "Direction-aware scoring", desc: "Every KPI is ranked by its own higher/lower-is-better rule and weighted into one defensible score." },
-  { icon: ["M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"], title: "190 → 130 sector mapping", desc: "Industries are mapped to your SCS sectors and KPI templates automatically before ranking." },
-  { icon: ["M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z", "M14 2v6h6", "M8 13h8", "M8 17h5"], title: "Excel-native output", desc: "A colour-coded, multi-sheet ranked report you can open, audit and share immediately." },
-  { icon: ["M12 20h9", "M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"], title: "Editable KPI library", desc: "Tune templates, weights and categories in-app — no spreadsheets to wrangle by hand." },
-  { icon: ["M4 19V9", "M10 19V5", "M16 19v-7", "M22 19H2"], title: "Results dashboard", desc: "Explore rankings with charts and sortable tables before you export." },
+  { icon: ["M4 6h16", "M4 12h10", "M4 18h7", "M16 15l4 3-4 3"], title: "Smart column mapping", desc: "Auto-matches your CSV headers to the canonical schema. No manual mapping required for standard Screener.in exports." },
+  { icon: ["M3 3v18h18", "M7 14l4-4 3 3 5-6"], title: "Direction-aware scoring", desc: "Every KPI is ranked by its own higher/lower-is-better rule and weighted into one defensible, auditable score." },
+  { icon: ["M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"], title: "190 → 130 sector mapping", desc: "Industries are mapped to your SCS sectors and KPI templates automatically before ranking — no manual join required." },
+  { icon: ["M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z", "M22 6l-10 7L2 6"], title: "Live screener", desc: "Filter your daily universe with a formula DSL (ROE > 15 AND Sector = Banks), compare companies, then pipeline the results." },
+  { icon: ["M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z", "M14 2v6h6", "M8 13h8", "M8 17h5"], title: "Excel-native output", desc: "A colour-coded, multi-sheet ranked report you can open, audit and share immediately — no post-processing needed." },
+  { icon: ["M12 20h9", "M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"], title: "Editable KPI library", desc: "Tune templates, weights and directions in-app. Changes apply on the next pipeline run — no spreadsheets to wrangle." },
 ];
 
 const FAQ = [
@@ -47,6 +47,15 @@ function Glyph({ paths }) {
 
 export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState(0);
+  const [stats, setStats] = useState({ analysts: null, companies: null, templates: 14 });
+
+  useEffect(() => {
+    const base = process.env.REACT_APP_API_URL || "http://localhost:8000";
+    fetch(`${base}/stats`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) setStats(d); })
+      .catch(() => {});
+  }, []);
 
   return (
     <div style={{ color: colors.text, fontFamily: fonts.sans, minHeight: "100vh", overflowX: "hidden" }}>
@@ -96,6 +105,20 @@ export default function LandingPage() {
             </div>
           ))}
         </motion.div>
+      </section>
+
+      {/* Live stats strip */}
+      <section className="lp-stats-strip">
+        {[
+          { n: stats.analysts != null ? stats.analysts : "—", label: "Analysts signed up" },
+          { n: stats.companies != null && stats.companies > 0 ? stats.companies.toLocaleString("en-IN") : "—", label: "Companies in screener" },
+          { n: stats.templates, label: "KPI templates" },
+        ].map(({ n, label }) => (
+          <div key={label} className="lp-stat-item">
+            <div className="lp-stat-n">{n}</div>
+            <div className="lp-stat-label">{label}</div>
+          </div>
+        ))}
       </section>
 
       {/* Trusted-by strip */}
@@ -199,6 +222,14 @@ const LANDING_CSS = `
   .lp-btn-arrow { transition: transform .15s ease; }
   .lp-btn:hover .lp-btn-arrow { transform: translateX(3px); }
 
+  /* Live stats strip */
+  .lp-stats-strip { display: flex; justify-content: center; gap: 0; border-top: 1px solid ${colors.glassBorder}; border-bottom: 1px solid ${colors.glassBorder}; background: ${colors.glass}; backdrop-filter: blur(12px); padding: 0 24px; }
+  .lp-stat-item { flex: 1; max-width: 200px; text-align: center; padding: 28px 20px; border-right: 1px solid ${colors.glassBorder}; }
+  .lp-stat-item:last-child { border-right: none; }
+  .lp-stat-n { font-family: ${fonts.display}; font-size: 36px; font-weight: 700; color: ${colors.text}; letter-spacing: -0.03em; margin-bottom: 4px; }
+  .lp-stat-label { font-size: 12px; color: ${colors.textMuted}; letter-spacing: .02em; }
+  @media (max-width: 520px) { .lp-stat-n { font-size: 26px; } .lp-stat-item { padding: 20px 12px; } }
+
   .lp-hero { position: relative; text-align: center; padding: 90px 24px 80px; }
   .lp-orb { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; animation: lpFloat 14s ease-in-out infinite alternate; }
   .lp-orb-a { width: 520px; height: 520px; top: -180px; left: 50%; margin-left: -460px; background: rgba(124,108,255,0.20); }
@@ -245,6 +276,7 @@ const LANDING_CSS = `
   .lp-flow-desc { font-size: 14px; color: ${colors.textSecondary}; line-height: 1.55; }
 
   .lp-features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  @media (max-width: 860px) { .lp-features { grid-template-columns: 1fr 1fr; } }
   .lp-feature { border-radius: ${radius.md}; padding: 28px 24px; transition: transform .15s ease, box-shadow .15s ease; ${glassCss} }
   .lp-feature:hover { transform: translateY(-4px); box-shadow: 0 16px 44px rgba(0,0,0,0.25), 0 0 40px rgba(124,108,255,0.12); }
   .lp-feature-icon { display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: ${radius.sm}; background: ${colors.accentSoft}; color: ${colors.accentHover}; border: 1px solid rgba(124,108,255,0.25); margin-bottom: 18px; }
@@ -267,10 +299,10 @@ const LANDING_CSS = `
   @media (max-width: 860px) {
     .lp-flow { grid-template-columns: 1fr 1fr; }
     .lp-flow-line { display: none; }
-    .lp-features { grid-template-columns: 1fr; }
     .lp-section { padding: 56px 22px; }
     .lp-hero { padding: 70px 20px 60px; }
     .lp-teaser { padding: 32px 24px; }
   }
-  @media (max-width: 520px) { .lp-flow { grid-template-columns: 1fr; } .lp-cta { flex-direction: column; align-items: center; } }
+  @media (max-width: 520px) { .lp-features { grid-template-columns: 1fr; } }
+  @media (max-width: 520px) { .lp-flow { grid-template-columns: 1fr; } .lp-cta { flex-direction: column; align-items: center; } .lp-features { grid-template-columns: 1fr; } }
 `;

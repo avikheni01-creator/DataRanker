@@ -7,6 +7,40 @@ import Seo from "../seo";
 import { colors, gradients, fonts, radius } from "../theme";
 import { useAppConfig, useRefreshAppConfig } from "../AppConfigContext";
 
+const CHANGELOG_VERSION = "v1.3";
+const CHANGELOG = [
+  {
+    v: "v1.3", date: "Jul 2026",
+    items: [
+      "DSL filter autocomplete with suggestion history",
+      "Pipeline stage progress overlay",
+      "Filter presets — save named filters with one click",
+      "Sector breakdown chart in Results",
+      "Email results to your inbox",
+      "Live stats on landing page",
+      "Real 404 page and keyboard accessibility pass",
+    ],
+  },
+  {
+    v: "v1.2", date: "Jun 2026",
+    items: [
+      "Company comparison dashboard (radar, leaderboard, scatter)",
+      "Results column ordering — Identifiers → KPIs → Other",
+      "Results pagination (25 / 50 / 100 / 200 per page)",
+      "Admin screener snapshot upload",
+    ],
+  },
+  {
+    v: "v1.1", date: "Jun 2026",
+    items: [
+      "Live screener with formula DSL filter",
+      "Column picker with three-section grouping",
+      "MERN migration — pipeline now runs server-side",
+      "Light / dark theme toggle",
+    ],
+  },
+];
+
 // Icons kept as tiny inline SVGs so we don't add an icon dependency.
 const Icon = ({ d, paths }) => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -40,6 +74,17 @@ export default function AppShell() {
   const [verifyOtp, setVerifyOtp] = useState("");
   const [verifyStep, setVerifyStep] = useState("prompt"); // "prompt" | "otp" | "busy"
   const [verifyError, setVerifyError] = useState("");
+
+  const [showChangelog, setShowChangelog] = useState(false);
+  const [hasNew, setHasNew] = useState(false);
+  useEffect(() => {
+    setHasNew(localStorage.getItem("matrix_changelog_seen") !== CHANGELOG_VERSION);
+  }, []);
+  const openChangelog = () => {
+    setShowChangelog(true);
+    setHasNew(false);
+    localStorage.setItem("matrix_changelog_seen", CHANGELOG_VERSION);
+  };
 
   // Fetch live settings as soon as the authenticated shell mounts.
   // This handles the login flow where App.js's initial fetch got a 401.
@@ -100,6 +145,16 @@ export default function AppShell() {
               <span>{label}</span>
             </NavLink>
           ))}
+          <button
+            className={`shell-link shell-whatsnew${showChangelog ? " active" : ""}`}
+            onClick={openChangelog}
+          >
+            <span className="shell-link-icon">
+              <Icon paths={["M13 10V3L4 14h7v7l9-11h-7z"]} />
+            </span>
+            <span>What's new</span>
+            {hasNew && <span className="shell-badge" aria-label="New updates" />}
+          </button>
         </nav>
 
         <div className="shell-user">
@@ -151,6 +206,40 @@ export default function AppShell() {
         )}
         <Outlet />
       </main>
+
+      {/* Changelog modal */}
+      {showChangelog && (
+        <div className="shell-cl-overlay" onClick={() => setShowChangelog(false)}>
+          <div className="shell-cl-panel" onClick={e => e.stopPropagation()}>
+            <div className="shell-cl-head">
+              <div>
+                <div style={{ fontSize: 11, fontFamily: "monospace", letterSpacing: ".14em", color: "rgba(124,108,255,.8)", marginBottom: 4 }}>MATRIX</div>
+                <div style={{ fontSize: 18, fontWeight: 700 }}>What's New</div>
+              </div>
+              <button className="shell-cl-close" onClick={() => setShowChangelog(false)} aria-label="Close">✕</button>
+            </div>
+            <div className="shell-cl-body">
+              {CHANGELOG.map((entry, ei) => (
+                <div key={entry.v} className="shell-cl-entry">
+                  <div className="shell-cl-version">
+                    <span className="shell-cl-vtag">{entry.v}</span>
+                    <span className="shell-cl-date">{entry.date}</span>
+                    {ei === 0 && <span className="shell-cl-latest">Latest</span>}
+                  </div>
+                  <ul className="shell-cl-list">
+                    {entry.items.map(item => (
+                      <li key={item} className="shell-cl-item">
+                        <span className="shell-cl-dot" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -219,6 +308,30 @@ const SHELL_CSS = `
     background: rgba(245,158,11,.12); color: #F59E0B;
     border-bottom: 1px solid rgba(245,158,11,.25);
   }
+
+  /* What's New button — same styles as a NavLink */
+  .shell-whatsnew { background: none; border: none; cursor: pointer; font-family: ${fonts.sans}; font-size: 14px; font-weight: 500; width: 100%; display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: ${radius.sm}; color: ${colors.textSecondary}; transition: all .15s ease; }
+  .shell-whatsnew:hover { color: ${colors.text}; background: rgba(255,255,255,0.05) !important; }
+  .shell-whatsnew.active { color: ${colors.text}; background: linear-gradient(90deg, rgba(124,108,255,0.18), rgba(124,108,255,0.05)); box-shadow: inset 0 0 0 1px rgba(124,108,255,0.28); }
+
+  /* Badge dot */
+  .shell-badge { width: 7px; height: 7px; border-radius: 50%; background: #F59E0B; margin-left: auto; flex-shrink: 0; box-shadow: 0 0 6px rgba(245,158,11,.6); }
+
+  /* Changelog modal */
+  .shell-cl-overlay { position: fixed; inset: 0; z-index: 9000; background: rgba(0,0,0,.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .shell-cl-panel { background: var(--card); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 440px; max-height: 80vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 24px 64px rgba(0,0,0,.5); }
+  .shell-cl-head { display: flex; align-items: flex-start; justify-content: space-between; padding: 20px 24px 16px; border-bottom: 1px solid var(--border); }
+  .shell-cl-close { background: var(--elevated); border: none; color: var(--text-secondary); font-size: 16px; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; }
+  .shell-cl-close:hover { background: var(--negative-soft) !important; color: var(--negative) !important; }
+  .shell-cl-body { overflow-y: auto; padding: 16px 24px 24px; display: flex; flex-direction: column; gap: 24px; }
+  .shell-cl-entry { display: flex; flex-direction: column; gap: 10px; }
+  .shell-cl-version { display: flex; align-items: center; gap: 8px; }
+  .shell-cl-vtag { font-family: monospace; font-size: 12px; font-weight: 700; color: var(--accent-hover); background: var(--accent-soft); padding: 2px 8px; border-radius: 999px; }
+  .shell-cl-date { font-size: 12px; color: var(--text-muted); }
+  .shell-cl-latest { font-size: 10px; font-weight: 700; color: var(--positive); background: var(--positive-soft); padding: 2px 7px; border-radius: 999px; letter-spacing: .05em; }
+  .shell-cl-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .shell-cl-item { display: flex; align-items: baseline; gap: 10px; font-size: 13px; color: var(--text-secondary); }
+  .shell-cl-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 2px; }
 
   /* Results / KPI-editor page: horizontal top bar, full-height content. */
   .shell.topbar { grid-template-columns: 1fr; grid-template-rows: auto 1fr; height: 100vh; overflow: hidden; }

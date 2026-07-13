@@ -19,6 +19,7 @@ import SettingsPage from "./pages/SettingsPage";
 import AdminUsersPage from "./pages/AdminUsersPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import AccountPage from "./pages/AccountPage";
+import NotFoundPage from "./pages/NotFoundPage";
 import { apiUrl, getAuthHeaders } from "./api";
 import { AppConfigContext, DEFAULT_APP_CONFIG } from "./AppConfigContext";
 
@@ -110,8 +111,8 @@ export default function App() {
           <Route path="admin/users" element={<AdminUsersPage />} />
         </Route>
 
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* 404 — must be last */}
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
 
       <Toast message={toast} onClose={() => setToast("")} />

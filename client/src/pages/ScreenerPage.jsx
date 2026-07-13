@@ -5,6 +5,7 @@ import { getUser } from "../auth";
 import { saveResult } from "../lib/resultStore";
 import { colors, fonts, radius, glassCss, shadow } from "../theme";
 import { useAppConfig } from "../AppConfigContext";
+import FilterInput from "../components/FilterInput";
 
 // ── Filter DSL ────────────────────────────────────────────────────────────────
 // Supports: "Col > 15 AND Sector = Banks AND Debt/Equity < 1"
@@ -42,8 +43,8 @@ function applyFilter(rows, expr) {
       const sc = String(cell).toLowerCase();
       const sv = raw.toLowerCase();
       if (op === "contains") return sc.includes(sv);
-      if (op === "=") return sc === sv;
-      if (op === "!=") return sc !== sv;
+      if (op === "=") return sc.includes(sv);   // partial match — "Bank" matches "Banking"
+      if (op === "!=") return !sc.includes(sv); // inverse partial
       if (op === ">") return sc > sv;
       if (op === "<") return sc < sv;
       if (op === ">=") return sc >= sv;
@@ -192,11 +193,20 @@ export default function ScreenerPage() {
   const [loading, setLoading] = useState(true);
   const [filterExpr, setFilterExpr] = useState("");
   const [filterError, setFilterError] = useState("");
+  const [filterHistory, setFilterHistory] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("screener_filter_history")) || []; } catch { return []; }
+  });
+  const [presets, setPresets] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("screener_presets")) || []; } catch { return []; }
+  });
+  const [showSavePreset, setShowSavePreset] = useState(false);
+  const [presetName, setPresetName] = useState("");
   const [selectedCols, setSelectedCols] = useState(new Set());
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
   const [searchQuery, setSearchQuery] = useState("");
   const [pipelineRunning, setPipelineRunning] = useState(false);
+  const [pipelineStage, setPipelineStage] = useState(0);
   const [pipelineError, setPipelineError] = useState("");
   const [adminUploading, setAdminUploading] = useState(false);
   const [adminMsg, setAdminMsg] = useState({ text: "", isError: false });
@@ -237,6 +247,19 @@ export default function ScreenerPage() {
     return result;
   }, [snapshot, filterExpr]);
 
+  // Save successful filter expressions to history (debounced 1.5 s)
+  useEffect(() => {
+    if (!filterExpr.trim() || filterError) return;
+    const t = setTimeout(() => {
+      setFilterHistory(prev => {
+        const next = [filterExpr, ...prev.filter(h => h !== filterExpr)].slice(0, 6);
+        localStorage.setItem("screener_filter_history", JSON.stringify(next));
+        return next;
+      });
+    }, 1500);
+    return () => clearTimeout(t);
+  }, [filterExpr, filterError]);
+
   // Quick search across name/symbol columns on top of the DSL filter
   const searchedRows = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -267,6 +290,22 @@ export default function ScreenerPage() {
     () => (snapshot ? snapshot.columns.filter((c) => selectedCols.has(c)) : []),
     [snapshot, selectedCols]
   );
+
+  const savePreset = () => {
+    const name = presetName.trim();
+    if (!filterExpr.trim() || !name) return;
+    const next = [{ name, expr: filterExpr }, ...presets.filter(p => p.name !== name)].slice(0, 8);
+    setPresets(next);
+    localStorage.setItem("screener_presets", JSON.stringify(next));
+    setShowSavePreset(false);
+    setPresetName("");
+  };
+
+  const deletePreset = (name) => {
+    const next = presets.filter(p => p.name !== name);
+    setPresets(next);
+    localStorage.setItem("screener_presets", JSON.stringify(next));
+  };
 
   // ── Admin upload ────────────────────────────────────────────────────────────
   const handleAdminUpload = async (e) => {
@@ -302,11 +341,13 @@ export default function ScreenerPage() {
   const handleRunPipeline = async () => {
     if (!searchedRows.length) return;
     setPipelineRunning(true);
+    setPipelineStage(0); // Preparing data
     setPipelineError("");
     // Apply the admin-set row cap (0 = no limit)
     const rowsToSend = screenerMaxRows > 0 ? searchedRows.slice(0, screenerMaxRows) : searchedRows;
     try {
-      // Mirror ColumnMapper's performAutoMapping: case-insensitive alias match
+      // Stage 1 — map columns
+      setPipelineStage(1);
       const normalize = (s) => String(s).trim().toLowerCase();
       const cols = snapshot?.columns ?? Object.keys(rowsToSend[0] ?? {});
       const mapping = {};
@@ -314,12 +355,13 @@ export default function ScreenerPage() {
         const target = normalize(col);
         const outputKey = Object.keys(columnMapping).find((key) => {
           const aliases = Array.isArray(columnMapping[key]) ? columnMapping[key] : [columnMapping[key]];
-          // Check alias match OR direct-name match (col === output key)
           return normalize(key) === target || aliases.some((a) => normalize(a) === target);
         });
         if (outputKey && !mapping[outputKey]) mapping[outputKey] = col;
       });
 
+      // Stage 2 — server ranking
+      setPipelineStage(2);
       const res = await fetch(apiUrl("/screener/run-pipeline"), {
         method: "POST",
         credentials: "include",
@@ -330,6 +372,9 @@ export default function ScreenerPage() {
         const d = await res.json().catch(() => ({}));
         throw new Error(d.detail || "Pipeline failed");
       }
+
+      // Stage 3 — save result
+      setPipelineStage(3);
       const blob = await res.blob();
       await saveResult(blob);
       navigate("/app/results");
@@ -337,6 +382,7 @@ export default function ScreenerPage() {
       setPipelineError(err.message);
     } finally {
       setPipelineRunning(false);
+      setPipelineStage(0);
     }
   };
 
@@ -378,15 +424,42 @@ export default function ScreenerPage() {
     <div className="sp-wrap">
       <style>{CSS}</style>
 
-      {pipelineRunning && (
-        <div className="sp-pipeline-overlay">
-          <div className="sp-pipeline-overlay-box">
-            <span className="sp-spinner sp-spinner-lg" />
-            <span className="sp-pipeline-overlay-text">Running pipeline…</span>
-            <span className="sp-pipeline-overlay-sub">Ranking and scoring companies</span>
+      {pipelineRunning && (() => {
+        const STAGES = [
+          { label: "Preparing data",      sub: `${(screenerMaxRows > 0 ? Math.min(searchedRows.length, screenerMaxRows) : searchedRows.length)} companies queued` },
+          { label: "Mapping columns",     sub: "Matching schema aliases" },
+          { label: "Ranking companies",   sub: "Scoring against KPI templates" },
+          { label: "Saving results",      sub: "Writing to local storage" },
+        ];
+        const pct = Math.round(((pipelineStage + 1) / STAGES.length) * 100);
+        return (
+          <div className="sp-pipeline-overlay" role="dialog" aria-modal="true" aria-label="Pipeline running">
+            <div className="sp-pipeline-overlay-box">
+              <span className="sp-spinner sp-spinner-lg" aria-hidden="true" />
+              <span className="sp-pipeline-overlay-text">{STAGES[pipelineStage]?.label ?? "Processing…"}</span>
+              <span className="sp-pipeline-overlay-sub">{STAGES[pipelineStage]?.sub}</span>
+              <div style={{ width: "100%", height: 4, borderRadius: 2, background: "var(--border)", overflow: "hidden", marginTop: 4 }}>
+                <div style={{
+                  height: "100%", borderRadius: 2,
+                  background: "linear-gradient(90deg,var(--accent),var(--positive))",
+                  width: `${pct}%`, transition: "width .4s ease",
+                }} />
+              </div>
+              <div style={{ display: "flex", gap: 16, marginTop: 4 }}>
+                {STAGES.map((s, i) => (
+                  <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                    <div style={{
+                      width: 8, height: 8, borderRadius: "50%",
+                      background: i <= pipelineStage ? "var(--accent)" : "var(--border)",
+                      transition: "background .3s",
+                    }} />
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Page header */}
       <div className="sp-header">
@@ -479,18 +552,42 @@ export default function ScreenerPage() {
           <>
             {/* Fixed controls */}
             <div className="sp-controls">
+
+              {/* Preset chips */}
+              {presets.length > 0 && (
+                <div className="sp-presets-row">
+                  <span className="sp-presets-label">Presets</span>
+                  {presets.map(p => (
+                    <div key={p.name} className="sp-preset-chip">
+                      <button
+                        className="sp-preset-chip-label"
+                        onClick={() => { setFilterExpr(p.expr); setFilterError(""); }}
+                        title={p.expr}
+                      >{p.name}</button>
+                      <button
+                        className="sp-preset-chip-del"
+                        onClick={() => deletePreset(p.name)}
+                        aria-label={`Delete preset ${p.name}`}
+                      >×</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               <div className="sp-filter-row">
                 <div className="sp-filter-wrap">
                   <svg className="sp-filter-icon" width="16" height="16" viewBox="0 0 24 24"
                     fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
                   </svg>
-                  <input
+                  <FilterInput
                     className={`sp-filter-input${filterError ? " err" : ""}`}
-                    type="text"
                     placeholder="e.g.  Name contains Reliance  OR  ROE > 15 AND Sector = Banks"
                     value={filterExpr}
-                    onChange={(e) => setFilterExpr(e.target.value)}
+                    onChange={setFilterExpr}
+                    columns={snapshot?.columns ?? []}
+                    snapshot={snapshot}
+                    history={filterHistory}
                   />
                   {filterExpr && (
                     <button
@@ -500,7 +597,36 @@ export default function ScreenerPage() {
                     >×</button>
                   )}
                 </div>
+                {/* Save preset button */}
+                {filterExpr && !filterError && (
+                  <button
+                    className={`sp-btn secondary${showSavePreset ? " active" : ""}`}
+                    onClick={() => { setShowSavePreset(v => !v); setPresetName(""); }}
+                    style={{ marginLeft: 8, whiteSpace: "nowrap" }}
+                  >
+                    Save preset
+                  </button>
+                )}
               </div>
+
+              {/* Inline save-preset form */}
+              {showSavePreset && (
+                <div className="sp-preset-form">
+                  <input
+                    className="sp-preset-name-input"
+                    type="text"
+                    placeholder="Preset name (e.g. Large-cap profitable)"
+                    value={presetName}
+                    onChange={e => setPresetName(e.target.value)}
+                    onKeyDown={e => { if (e.key === "Enter") savePreset(); if (e.key === "Escape") setShowSavePreset(false); }}
+                    autoFocus
+                    maxLength={40}
+                  />
+                  <button className="sp-btn primary" onClick={savePreset} disabled={!presetName.trim()}>Save</button>
+                  <button className="sp-btn secondary" onClick={() => setShowSavePreset(false)}>Cancel</button>
+                </div>
+              )}
+
               {filterError && <p className="sp-filter-error">{filterError}</p>}
 
               <div className="sp-action-bar">
@@ -656,8 +782,27 @@ const CSS = `
     min-height: 0; padding: 0 32px 16px;
   }
 
-  .sp-filter-row { margin-bottom: 8px; }
-  .sp-filter-wrap { position: relative; display: flex; align-items: center; }
+  /* Preset chips */
+  .sp-presets-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .sp-presets-label { font-size: 11px; color: ${colors.textMuted}; font-family: ${fonts.mono}; letter-spacing: .1em; flex-shrink: 0; }
+  .sp-preset-chip { display: inline-flex; align-items: stretch; border-radius: 999px; overflow: hidden; border: 1px solid ${colors.border}; background: ${colors.elevated}; }
+  .sp-preset-chip-label { padding: 4px 10px; font-size: 12px; font-weight: 500; color: ${colors.text}; background: none; border: none; cursor: pointer; transition: background .12s; }
+  .sp-preset-chip-label:hover { background: ${colors.accentSoft}; color: ${colors.accent}; }
+  .sp-preset-chip-del { padding: 4px 8px; font-size: 14px; color: ${colors.textMuted}; background: none; border: none; border-left: 1px solid ${colors.border}; cursor: pointer; line-height: 1; transition: all .12s; }
+  .sp-preset-chip-del:hover { color: ${colors.negative}; background: ${colors.negativeSoft}; }
+
+  /* Preset save form */
+  .sp-preset-form { display: flex; align-items: center; gap: 8px; margin: 8px 0; flex-wrap: wrap; }
+  .sp-preset-name-input {
+    flex: 1; min-width: 200px; padding: 9px 14px;
+    border-radius: ${radius.sm}; border: 1px solid ${colors.accent};
+    background: ${colors.inset}; color: ${colors.text};
+    font-size: 13px; font-family: ${fonts.sans}; outline: none;
+    box-shadow: 0 0 0 3px ${colors.accentSoft};
+  }
+
+  .sp-filter-row { margin-bottom: 8px; display: flex; align-items: center; }
+  .sp-filter-wrap { position: relative; display: flex; align-items: center; flex: 1; }
   .sp-filter-icon { position: absolute; left: 14px; color: ${colors.textMuted}; pointer-events: none; }
   .sp-filter-input {
     width: 100%; padding: 11px 40px 11px 40px;
@@ -720,7 +865,7 @@ const CSS = `
   }
   .sp-spinner-lg {
     width: 40px; height: 40px; border-width: 3px;
-    border-color: rgba(124,108,255,0.2); border-top-color: #7C6CFF;
+    border-color: var(--accent-soft); border-top-color: var(--accent);
   }
   @keyframes sp-spin { to { transform: rotate(360deg); } }
 

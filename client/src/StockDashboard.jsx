@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import * as XLSX from "xlsx";
+import { apiUrl, getAuthHeaders } from "./api";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend
@@ -66,11 +67,11 @@ function medal(rank) {
 
 function rankColor(rank, total) {
   const pct = rank / total;
-  if (pct <= 0.1) return "#22C55E";
+  if (pct <= 0.1) return "var(--positive)";
   if (pct <= 0.25) return "#4ADE80";
-  if (pct <= 0.5) return "#F59E0B";
+  if (pct <= 0.5) return "var(--warning)";
   if (pct <= 0.75) return "#FB923C";
-  return "#EF4444";
+  return "var(--negative)";
 }
 
 function scoreBarPct(score, max) {
@@ -117,6 +118,9 @@ function ColumnPicker({ allKpiKeys, visibleKpiKeys, onChange, identifierKeys = [
     <div ref={ref} style={{ position: "relative" }}>
       <button
         onClick={() => setOpen(o => !o)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-label={`Column picker — ${visibleKpiKeys.length} of ${allKpiKeys.length} visible`}
         style={{
           display: "flex", alignItems: "center", gap: 6,
           background: open ? "var(--elevated)" : "var(--card)",
@@ -129,7 +133,7 @@ function ColumnPicker({ allKpiKeys, visibleKpiKeys, onChange, identifierKeys = [
         <span style={{ fontSize: 13 }}>⊞</span>
         Columns
         <span style={{
-          background: "rgba(124,108,255,0.12)", color: "var(--accent-hover)", fontSize: 9,
+          background: "var(--accent-soft)", color: "var(--accent-hover)", fontSize: 9,
           borderRadius: 4, padding: "1px 5px", fontWeight: 700,
         }}>
           {visibleKpiKeys.length}/{allKpiKeys.length}
@@ -138,19 +142,19 @@ function ColumnPicker({ allKpiKeys, visibleKpiKeys, onChange, identifierKeys = [
       </button>
 
       {open && (
-        <div style={{
+        <div role="listbox" aria-multiselectable="true" aria-label="Visible columns" style={{
           position: "absolute", top: "calc(100% + 8px)", right: 0, zIndex: 50,
           background: "var(--card)", border: "1px solid var(--border)", borderRadius: 12,
           padding: "12px 0", minWidth: 220, maxHeight: 360, overflowY: "auto",
-          boxShadow: "0 16px 48px rgba(0,0,0,.6)",
+          boxShadow: "var(--shadow-elevated)",
         }}>
           {/* Quick actions */}
           <div style={{
             display: "flex", gap: 6, padding: "0 12px 10px",
             borderBottom: "1px solid var(--elevated)",
           }}>
-            <button onClick={selectAll} style={quickBtnStyle("#22C55E")}>All</button>
-            <button onClick={clearAll} style={quickBtnStyle("#EF4444")}>None</button>
+            <button onClick={selectAll} style={quickBtnStyle("var(--positive)")}>All</button>
+            <button onClick={clearAll} style={quickBtnStyle("var(--negative)")}>None</button>
           </div>
 
           {/* Grouped checkboxes — identifiers → scored KPIs → other data */}
@@ -174,7 +178,7 @@ function ColumnPicker({ allKpiKeys, visibleKpiKeys, onChange, identifierKeys = [
                   <span style={{
                     width: 14, height: 14, borderRadius: 3, flexShrink: 0,
                     border: `1.5px solid ${checked ? "var(--accent-hover)" : "var(--border)"}`,
-                    background: checked ? "#7C6CFF" : "transparent",
+                    background: checked ? "var(--accent)" : "transparent",
                     display: "flex", alignItems: "center", justifyContent: "center",
                     transition: "all .15s",
                   }}>
@@ -316,7 +320,7 @@ function CompanyDrawer({ company, allCompanies, onClose }) {
             <div style={{
               height: "100%", borderRadius: 6, transition: "width .6s ease",
               width: `${scoreBarPct(company.Total_Final_Score, maxScore)}%`,
-              background: "linear-gradient(90deg,#7C6CFF,#22C55E)",
+              background: "linear-gradient(90deg,var(--accent),var(--positive))",
             }} />
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}>
@@ -361,8 +365,8 @@ function CompanyDrawer({ company, allCompanies, onClose }) {
                 <PolarGrid stroke="var(--border)" />
                 <PolarAngleAxis dataKey="kpi" tick={{ fill: "var(--text-secondary)", fontSize: 9, fontFamily: "'JetBrains Mono',monospace" }} />
                 <PolarRadiusAxis domain={[0, 10]} tick={false} axisLine={false} />
-                <Radar name={company.Symbol} dataKey="company" stroke="#7C6CFF" fill="#7C6CFF" fillOpacity={0.4} />
-                <Radar name="Template avg" dataKey="average" stroke="#22C55E" fill="#22C55E" fillOpacity={0.12} />
+                <Radar name={company.Symbol} dataKey="company" stroke="var(--accent)" fill="var(--accent)" fillOpacity={0.4} />
+                <Radar name="Template avg" dataKey="average" stroke="var(--positive)" fill="var(--positive)" fillOpacity={0.12} />
                 <Legend wrapperStyle={{ fontSize: 10, fontFamily: "'JetBrains Mono',monospace" }} />
                 <Tooltip
                   contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8, fontFamily: "'JetBrains Mono',monospace", fontSize: 11 }}
@@ -431,6 +435,9 @@ export default function StockDashboard({ resultFile }) {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [showSectorChart, setShowSectorChart] = useState(false);
+  const [emailSending, setEmailSending] = useState(false);
+  const [emailMsg, setEmailMsg] = useState("");
 
   // visibleKpiKeys: per-template map { templateName: [key, ...] }
   const [visibleKpiMap, setVisibleKpiMap] = useState({});
@@ -518,6 +525,111 @@ export default function StockDashboard({ resultFile }) {
     top: sheets[t].find(r => r.Company_Rank === 1)?.Symbol || "—",
   }));
 
+  // Sector distribution for the active template
+  const sectorData = useMemo(() => {
+    const counts = {};
+    allInTemplate.forEach(r => {
+      const s = r.Sector || r.SCS_Sector || "Unknown";
+      counts[s] = (counts[s] || 0) + 1;
+    });
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([name, count]) => ({ name, count, pct: allInTemplate.length ? Math.round((count / allInTemplate.length) * 100) : 0 }));
+  }, [allInTemplate]);
+
+  const handleEmailResults = async () => {
+    if (!Object.keys(sheets).length || emailSending) return;
+    setEmailSending(true);
+    setEmailMsg("");
+    try {
+      const templates = Object.entries(sheets).map(([template, companies]) => ({
+        template,
+        companies: [...companies]
+          .sort((a, b) => (a.Company_Rank || 0) - (b.Company_Rank || 0))
+          .slice(0, 10)
+          .map(c => ({
+            rank: Math.round(c.Company_Rank || 0),
+            symbol: c.Symbol || "",
+            name: c.Description || c.Name || c.Symbol || "",
+            sector: c.Sector || c.SCS_Sector || "—",
+            score: parseFloat(c.Total_Final_Score || 0).toFixed(1),
+          })),
+      }));
+      const res = await fetch(apiUrl("/results/email-summary"), {
+        method: "POST",
+        credentials: "include",
+        headers: getAuthHeaders({ "Content-Type": "application/json" }),
+        body: JSON.stringify({ templates }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Failed to send");
+      setEmailMsg(`Sent to ${data.sentTo}`);
+      setTimeout(() => setEmailMsg(""), 5000);
+    } catch (err) {
+      setEmailMsg(`Error: ${err.message}`);
+      setTimeout(() => setEmailMsg(""), 6000);
+    } finally {
+      setEmailSending(false);
+    }
+  };
+
+  const handleExportPDF = () => {
+    const top10 = [...allInTemplate].sort((a, b) => a.Company_Rank - b.Company_Rank).slice(0, 10);
+    const date = new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+    const rows = top10.map((r, i) => `
+      <tr>
+        <td class="rank">#${Math.round(r.Company_Rank)}</td>
+        <td class="company"><strong>${r.Description || r.Name || r.Symbol || ""}</strong><br/><span class="sym">${r.Symbol || ""}</span></td>
+        <td class="sector">${r.Sector || r.SCS_Sector || "—"}</td>
+        <td class="score">${parseFloat(r.Total_Final_Score || 0).toFixed(1)}</td>
+      </tr>`).join("");
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/>
+      <title>Matrix — ${activeTemplate} Rankings</title>
+      <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; color:#0f1117; background:#fff; padding:40px 48px; }
+        .header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:32px; border-bottom:3px solid #7C6CFF; padding-bottom:16px; }
+        .brand { font-size:24px; font-weight:800; letter-spacing:-.02em; color:#7C6CFF; }
+        .meta { font-size:11px; color:#6b7280; text-align:right; }
+        .template-name { font-size:18px; font-weight:700; margin-bottom:4px; color:#0f1117; }
+        table { width:100%; border-collapse:collapse; font-size:13px; }
+        th { text-align:left; padding:10px 14px; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:#6b7280; border-bottom:2px solid #e5e7eb; }
+        td { padding:12px 14px; border-bottom:1px solid #f3f4f6; }
+        tr:nth-child(even) td { background:#fafafa; }
+        .rank { font-weight:800; color:#7C6CFF; font-size:15px; }
+        .company strong { font-size:13px; }
+        .sym { font-size:10px; color:#6b7280; font-family:monospace; }
+        .sector { font-size:11px; color:#4F46E5; background:#EEF2FF; padding:2px 8px; border-radius:999px; display:inline-block; }
+        .score { font-weight:700; font-size:14px; color:#059669; }
+        .footer { margin-top:32px; font-size:10px; color:#9ca3af; border-top:1px solid #e5e7eb; padding-top:12px; }
+        @media print { body { padding:20px 28px; } }
+      </style>
+    </head><body>
+      <div class="header">
+        <div>
+          <div class="brand">Matrix</div>
+          <div class="template-name">${activeTemplate}</div>
+          <div style="font-size:12px;color:#6b7280;margin-top:4px;">${allInTemplate.length} companies ranked</div>
+        </div>
+        <div class="meta">
+          <div>Top 10 Rankings</div>
+          <div>${date}</div>
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>Rank</th><th>Company</th><th>Sector</th><th>Score</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div class="footer">Generated by Matrix equity ranking platform · ${date}</div>
+    </body></html>`;
+    const w = window.open("", "_blank");
+    if (!w) return;
+    w.document.write(html);
+    w.document.close();
+    w.focus();
+    setTimeout(() => w.print(), 400);
+  };
+
   // Reset to page 1 on any filter/sort/template change
   useEffect(() => { setPage(1); }, [activeTemplate, search, sortKey, sortDir, pageSize]);
 
@@ -569,7 +681,7 @@ export default function StockDashboard({ resultFile }) {
       }}>
         <div style={{
           width: 68, height: 68, borderRadius: 20, display: "flex", alignItems: "center", justifyContent: "center",
-          background: "rgba(124,108,255,0.10)", border: "1px solid rgba(124,108,255,0.22)", fontSize: 30,
+          background: "var(--accent-soft)", border: "1px solid var(--focus-glow)", fontSize: 30,
         }}>📊</div>
         <div style={{ fontFamily: "'Space Grotesk','Inter',sans-serif", fontSize: 22, fontWeight: 700, color: "var(--text)" }}>
           No results yet
@@ -581,8 +693,8 @@ export default function StockDashboard({ resultFile }) {
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center", marginTop: 4 }}>
           <Link to="/app/screener" style={{
             padding: "11px 26px", borderRadius: 999, color: "#fff", fontSize: 14, fontWeight: 600,
-            background: "linear-gradient(135deg,#7C6CFF,#4F46E5)",
-            boxShadow: "0 4px 18px rgba(124,108,255,0.30)", textDecoration: "none",
+            background: "linear-gradient(135deg,var(--accent),var(--accent-deep))",
+            boxShadow: "0 4px 18px var(--focus-glow)", textDecoration: "none",
           }}>
             Run from Screener
           </Link>
@@ -639,6 +751,12 @@ export default function StockDashboard({ resultFile }) {
           color: var(--text-secondary); cursor: pointer; transition: all .15s;
         }
         .tmpl-toggle:hover { background: var(--elevated) !important; color: var(--text) !important; border-color: var(--accent) !important; }
+
+        @media (max-width: 640px) {
+          .sd-topbar { padding: 10px 12px !important; flex-wrap: wrap; gap: 8px !important; }
+          .sd-stats  { overflow-x: auto; }
+          .sd-stat-cell { padding: 8px 12px !important; min-width: 80px; }
+        }
       `}</style>
 
       <div style={{ display: "flex", height: "100%", overflow: "hidden" }}>
@@ -669,7 +787,7 @@ export default function StockDashboard({ resultFile }) {
               display: "block", width: "100%", textAlign: "left", padding: "10px 16px",
               background: activeTemplate === t.name ? "var(--elevated)" : "transparent",
               border: "none",
-              borderLeft: `2px solid ${activeTemplate === t.name ? "#7C6CFF" : "transparent"}`,
+              borderLeft: `2px solid ${activeTemplate === t.name ? "var(--accent)" : "transparent"}`,
               cursor: "pointer", transition: "all .15s",
             }}>
               <div style={{ fontSize: 11, fontWeight: 600, color: activeTemplate === t.name ? "var(--accent-hover)" : "var(--text-secondary)", marginBottom: 2 }}>
@@ -686,7 +804,7 @@ export default function StockDashboard({ resultFile }) {
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
 
           {/* Top bar */}
-          <div style={{
+          <div className="sd-topbar" style={{
             padding: "14px 24px", borderBottom: "1px solid var(--border)",
             display: "flex", alignItems: "center", gap: 12,
             background: "var(--card)", flexShrink: 0, flexWrap: "wrap",
@@ -733,10 +851,67 @@ export default function StockDashboard({ resultFile }) {
               identifierKeys={identifierKpiKeys}
               scoredKeys={scoredKpiKeys}
             />
+
+            {/* Sector breakdown toggle */}
+            <button
+              onClick={() => setShowSectorChart(v => !v)}
+              title="Sector breakdown"
+              style={{
+                display: "flex", alignItems: "center", gap: 5,
+                background: showSectorChart ? "var(--accent-soft)" : "var(--card)",
+                border: `1px solid ${showSectorChart ? "var(--accent-hover)" : "var(--border)"}`,
+                borderRadius: 8, color: showSectorChart ? "var(--accent-hover)" : "var(--text-secondary)",
+                padding: "8px 12px", cursor: "pointer", fontSize: 11,
+                fontFamily: "'JetBrains Mono',monospace", transition: "all .15s",
+              }}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/>
+              </svg>
+              Sectors
+            </button>
+
+            {/* PDF export */}
+            <button
+              onClick={handleExportPDF}
+              title="Export PDF summary"
+              style={{
+                display: "flex", alignItems: "center", gap: 5,
+                background: "var(--card)", border: "1px solid var(--border)",
+                borderRadius: 8, color: "var(--text-secondary)",
+                padding: "8px 12px", cursor: "pointer", fontSize: 11,
+                fontFamily: "'JetBrains Mono',monospace", transition: "all .15s",
+              }}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+              PDF
+            </button>
+
+            {/* Email results */}
+            <button
+              onClick={handleEmailResults}
+              disabled={emailSending}
+              title={emailSending ? "Sending…" : "Email results to your inbox"}
+              style={{
+                display: "flex", alignItems: "center", gap: 5,
+                background: "var(--card)", border: "1px solid var(--border)",
+                borderRadius: 8, color: emailMsg.startsWith("Sent") ? "var(--positive)" : "var(--text-secondary)",
+                padding: "8px 12px", cursor: emailSending ? "wait" : "pointer", fontSize: 11,
+                fontFamily: "'JetBrains Mono',monospace", transition: "all .15s",
+                opacity: emailSending ? .6 : 1,
+              }}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+              </svg>
+              {emailSending ? "Sending…" : emailMsg ? emailMsg : "Email me"}
+            </button>
           </div>
 
           {/* Stats strip */}
-          <div style={{ display: "flex", gap: 0, borderBottom: "1px solid var(--border)", flexShrink: 0 }}>
+          <div className="sd-stats" style={{ display: "flex", gap: 0, borderBottom: "1px solid var(--border)", flexShrink: 0 }}>
             {[
               { label: "Companies", value: allInTemplate.length },
               { label: "Top Ranked", value: allInTemplate.find(r => r.Company_Rank === 1)?.Symbol || "—" },
@@ -749,16 +924,41 @@ export default function StockDashboard({ resultFile }) {
               { label: "Max Score", value: maxScore.toFixed(1) },
               { label: "KPI Cols", value: `${visibleKpiKeys.length} / ${allKpiKeys.length}` },
             ].map(({ label, value }, i) => (
-              <div key={i} style={{ flex: 1, padding: "10px 20px", borderRight: i < 4 ? "1px solid var(--border)" : "none" }}>
+              <div key={i} className="sd-stat-cell" style={{ flex: 1, padding: "10px 20px", borderRight: i < 4 ? "1px solid var(--border)" : "none" }}>
                 <div className="mono" style={{ fontSize: 9, color: "var(--text-muted)", letterSpacing: ".12em", marginBottom: 3 }}>{label}</div>
                 <div style={{ fontSize: 15, fontWeight: 700, color: "var(--accent-hover)" }}>{value}</div>
               </div>
             ))}
           </div>
 
+          {/* Sector breakdown panel */}
+          {showSectorChart && sectorData.length > 0 && (
+            <div style={{
+              padding: "14px 20px", borderBottom: "1px solid var(--border)",
+              background: "var(--card)", flexShrink: 0,
+            }}>
+              <div className="mono" style={{ fontSize: 9, letterSpacing: ".14em", color: "var(--text-muted)", marginBottom: 10 }}>SECTOR BREAKDOWN — {activeTemplate}</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {sectorData.map(({ name, count, pct }, i) => (
+                  <div key={name} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <div className="mono" style={{ fontSize: 10, color: "var(--text-secondary)", minWidth: 140, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{name}</div>
+                    <div style={{ flex: 1, height: 6, background: "var(--elevated)", borderRadius: 3, overflow: "hidden" }}>
+                      <div style={{
+                        height: "100%", width: `${pct}%`, borderRadius: 3,
+                        background: `hsl(${235 + i * 22},70%,${65 - i * 3}%)`,
+                        transition: "width .5s ease",
+                      }} />
+                    </div>
+                    <div className="mono" style={{ fontSize: 10, color: "var(--text-muted)", minWidth: 50, textAlign: "right" }}>{count} · {pct}%</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Error */}
           {error && (
-            <div style={{ padding: "12px 24px", background: "rgba(239,68,68,0.12)", borderBottom: "1px solid #EF4444", color: "var(--negative)", fontFamily: "'JetBrains Mono',monospace", fontSize: 12 }}>
+            <div style={{ padding: "12px 24px", background: "var(--negative-soft)", borderBottom: "1px solid var(--negative)", color: "var(--negative)", fontFamily: "'JetBrains Mono',monospace", fontSize: 12 }}>
               ⚠ {error}
             </div>
           )}
@@ -822,7 +1022,7 @@ export default function StockDashboard({ resultFile }) {
                       <td style={tdStyle}>
                         <span style={{
                           fontSize: 9, fontFamily: "'JetBrains Mono',monospace", padding: "2px 7px",
-                          background: "rgba(124,108,255,0.12)", color: "var(--accent-hover)", borderRadius: 4, whiteSpace: "nowrap",
+                          background: "var(--accent-soft)", color: "var(--accent-hover)", borderRadius: 4, whiteSpace: "nowrap",
                         }}>
                           {r.Sector || r.SCS_Sector || "—"}
                         </span>
@@ -834,7 +1034,7 @@ export default function StockDashboard({ resultFile }) {
                           <div style={{ flex: 1, height: 5, background: "var(--elevated)", borderRadius: 3, overflow: "hidden" }}>
                             <div style={{
                               height: "100%", width: `${pct}%`,
-                              background: "linear-gradient(90deg,#7C6CFF,#22C55E)", borderRadius: 3,
+                              background: "linear-gradient(90deg,var(--accent),var(--positive))", borderRadius: 3,
                             }} />
                           </div>
                           <span className="mono" style={{ fontSize: 11, color: "var(--accent-hover)", minWidth: 36, textAlign: "right" }}>

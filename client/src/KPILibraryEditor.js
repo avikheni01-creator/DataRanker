@@ -154,14 +154,14 @@ function WeightBar({ used, max = 100 }) {
       <div style={{ flex: 1, height: 6, borderRadius: 3, background: "var(--border)", overflow: "hidden" }}>
         <div style={{
           width: `${pct}%`, height: "100%", borderRadius: 3,
-          background: over ? "#EF4444" : used === max ? "#22C55E" : "#7C6CFF",
+          background: over ? "var(--negative)" : used === max ? "var(--positive)" : "var(--accent)",
           transition: "width 0.2s",
         }} />
       </div>
       <span style={{
         fontFamily: "'JetBrains Mono', monospace",
         fontSize: 12, fontWeight: 600,
-        color: over ? "#EF4444" : used === max ? "#22C55E" : "var(--text-secondary)",
+        color: over ? "var(--negative)" : used === max ? "var(--positive)" : "var(--text-secondary)",
         minWidth: 60, textAlign: "right",
       }}>
         {used}/{max}%{over && " ⚠"}
@@ -203,15 +203,15 @@ function KPIRow({ row, onWeightChange, onDirectionToggle, onRemove }) {
       <button onClick={onDirectionToggle} style={{
         padding: "4px 8px", borderRadius: 6, border: "none", cursor: "pointer",
         fontSize: 12, fontWeight: 600,
-        background: row.direction === "Higher" ? "rgba(34,197,94,0.12)" : "rgba(239,68,68,0.12)",
+        background: row.direction === "Higher" ? "var(--positive-soft)" : "var(--negative-soft)",
         color: row.direction === "Higher" ? "var(--positive)" : "var(--negative)",
       }}>
         {row.direction === "Higher" ? "↑ Higher" : "↓ Lower"}
       </button>
       <button onClick={onRemove} title="Remove KPI" style={{
-        width: 28, height: 28, borderRadius: 6, border: "1px solid rgba(239,68,68,0.12)",
+        width: 28, height: 28, borderRadius: 6, border: "1px solid var(--negative-soft)",
         background: "transparent", cursor: "pointer", display: "flex",
-        alignItems: "center", justifyContent: "center", color: "#EF4444",
+        alignItems: "center", justifyContent: "center", color: "var(--negative)",
         fontSize: 14, fontWeight: 700,
       }}>×</button>
     </div>
@@ -241,8 +241,8 @@ function AddKPIRow({ usedKPIs, onAdd, AVAILABLE_KPI_KEYS, COLUMN_MAPPING }) {
       <button disabled={!selected} onClick={() => { if (selected) { onAdd(selected); setSelected(""); } }}
         style={{
           padding: "6px 16px", borderRadius: 8, border: "none",
-          background: selected ? "#7C6CFF" : "var(--elevated)",
-          color: selected ? "var(--text)" : "var(--text-muted)",
+          background: selected ? "var(--accent)" : "var(--elevated)",
+          color: selected ? "#fff" : "var(--text-muted)",
           fontWeight: 600, fontSize: 13, cursor: selected ? "pointer" : "not-allowed",
         }}>+ Add</button>
     </div>
@@ -434,6 +434,11 @@ export default function KPILibraryEditor() {
         .kpi-tmpl-btn { transition: background .12s, color .12s; }
         .kpi-tmpl-btn:hover { background: var(--elevated) !important; }
         button:disabled { opacity: .38 !important; cursor: default !important; }
+        @media (max-width: 680px) {
+          .kpi-body { flex-direction: column !important; }
+          .kpi-sidebar { width: 100% !important; height: auto !important; flex-direction: row !important; overflow-x: auto !important; flex-wrap: nowrap !important; border-right: none !important; border-bottom: 1px solid var(--border) !important; }
+          .kpi-tmpl-btn { min-width: 120px !important; border-left: none !important; border-bottom: 2px solid transparent !important; }
+        }
       `}</style>
 
       <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden", fontFamily: "'Inter', system-ui, sans-serif" }}>
@@ -449,8 +454,8 @@ export default function KPILibraryEditor() {
           </div>
 
           {!allValid
-            ? <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 9px", borderRadius: 10, background: "rgba(239,68,68,0.12)", color: "var(--negative)", border: "1px solid rgba(239,68,68,0.12)", whiteSpace: "nowrap" }}>Weight errors</span>
-            : <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 9px", borderRadius: 10, background: "rgba(34,197,94,0.12)", color: "var(--positive)", border: "1px solid rgba(34,197,94,0.12)", whiteSpace: "nowrap" }}>All valid</span>
+            ? <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 9px", borderRadius: 10, background: "var(--negative-soft)", color: "var(--negative)", border: "1px solid var(--negative-soft)", whiteSpace: "nowrap" }}>Weight errors</span>
+            : <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 9px", borderRadius: 10, background: "var(--positive-soft)", color: "var(--positive)", border: "1px solid var(--positive-soft)", whiteSpace: "nowrap" }}>All valid</span>
           }
 
           <button onClick={handleDownloadXlsx} style={pgBtn}>⬇ Download</button>
@@ -460,17 +465,17 @@ export default function KPILibraryEditor() {
           </label>
           <button onClick={handleSave} disabled={!allValid || !canSave} title={!canSave ? "KPI editor is locked by the admin" : undefined} style={{
             ...pgBtn,
-            background: (allValid && canSave) ? "#7C6CFF" : "var(--elevated)",
+            background: (allValid && canSave) ? "var(--accent)" : "var(--elevated)",
             color: (allValid && canSave) ? "#fff" : "var(--text-muted)",
             border: "none", fontWeight: 700,
           }}>{canSave ? "Save" : "🔒 Locked"}</button>
         </div>
 
         {/* ── Body: sidebar + content ── */}
-        <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
+        <div className="kpi-body" style={{ flex: 1, display: "flex", overflow: "hidden" }}>
 
           {/* ── Static template sidebar ── */}
-          <div style={{
+          <div className="kpi-sidebar" style={{
             width: 220, flexShrink: 0,
             background: "var(--card)", borderRight: "1px solid var(--border)",
             display: "flex", flexDirection: "column", overflowY: "auto",
@@ -490,7 +495,7 @@ export default function KPILibraryEditor() {
                   display: "block", width: "100%", textAlign: "left", padding: "10px 16px",
                   background: isActive ? "var(--elevated)" : "transparent",
                   border: "none",
-                  borderLeft: `2px solid ${isActive ? "#7C6CFF" : "transparent"}`,
+                  borderLeft: `2px solid ${isActive ? "var(--accent)" : "transparent"}`,
                   cursor: "pointer",
                 }}>
                   <div style={{ fontSize: 11, fontWeight: 600, color: isActive ? "var(--accent-hover)" : "var(--text-secondary)", marginBottom: 2 }}>
@@ -515,7 +520,7 @@ export default function KPILibraryEditor() {
               ].map((t) => (
                 <button key={t.id} onClick={() => setActiveTab(t.id)} style={{
                   padding: "12px 18px", border: "none", cursor: "pointer", background: "transparent",
-                  borderBottom: activeTab === t.id ? "2px solid #7C6CFF" : "2px solid transparent",
+                  borderBottom: activeTab === t.id ? "2px solid var(--accent)" : "2px solid transparent",
                   fontWeight: activeTab === t.id ? 700 : 500, fontSize: 14,
                   color: activeTab === t.id ? "var(--accent-hover)" : "var(--text-secondary)",
                 }}>{t.label}</button>
@@ -525,7 +530,7 @@ export default function KPILibraryEditor() {
             {/* Mapped columns strip — single scrollable line */}
             {activeTab === "tier1" && AVAILABLE_KPI_KEYS.length > 0 && (
               <div style={{
-                background: "rgba(124,108,255,0.06)", borderBottom: "1px solid var(--border)",
+                background: "var(--accent-soft)", borderBottom: "1px solid var(--border)",
                 padding: "6px 24px", display: "flex", alignItems: "center", gap: 8,
                 flexShrink: 0, overflowX: "auto",
               }}>
@@ -533,7 +538,7 @@ export default function KPILibraryEditor() {
                   Mapped
                 </span>
                 {AVAILABLE_KPI_KEYS.map((k) => (
-                  <span key={k} className="mono" style={{ fontSize: 10, color: "var(--text-secondary)", background: "rgba(124,108,255,0.10)", borderRadius: 4, padding: "2px 7px", whiteSpace: "nowrap", flexShrink: 0 }}>
+                  <span key={k} className="mono" style={{ fontSize: 10, color: "var(--text-secondary)", background: "var(--accent-soft)", borderRadius: 4, padding: "2px 7px", whiteSpace: "nowrap", flexShrink: 0 }}>
                     {k}
                   </span>
                 ))}
@@ -558,12 +563,12 @@ export default function KPILibraryEditor() {
                   )}
 
                   {activeTotalWeight > 100 && (
-                    <div style={{ marginBottom: 10, padding: "8px 14px", borderRadius: 8, background: "rgba(239,68,68,0.10)", border: "1px solid rgba(239,68,68,0.18)", fontSize: 13, color: "var(--negative)", fontWeight: 500 }}>
+                    <div style={{ marginBottom: 10, padding: "8px 14px", borderRadius: 8, background: "var(--negative-soft)", border: "1px solid var(--negative-soft)", fontSize: 13, color: "var(--negative)", fontWeight: 500 }}>
                       ⚠ Total weight is {activeTotalWeight}% — reduce by {activeTotalWeight - 100}% before saving.
                     </div>
                   )}
                   {activeTotalWeight > 0 && activeTotalWeight < 100 && (
-                    <div style={{ marginBottom: 10, padding: "8px 14px", borderRadius: 8, background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.18)", fontSize: 13, color: "#d97706", fontWeight: 500 }}>
+                    <div style={{ marginBottom: 10, padding: "8px 14px", borderRadius: 8, background: "var(--warning-soft)", border: "1px solid var(--warning-soft)", fontSize: 13, color: "var(--warning)", fontWeight: 500 }}>
                       Total is {activeTotalWeight}% — needs {100 - activeTotalWeight}% more.
                     </div>
                   )}
@@ -612,8 +617,8 @@ export default function KPILibraryEditor() {
       {toast && (
         <div style={{
           position: "fixed", bottom: 24, right: 24, padding: "12px 18px", borderRadius: 10,
-          background: toast.type === "error" ? "rgba(239,68,68,0.12)" : "rgba(34,197,94,0.12)",
-          border: `1px solid ${toast.type === "error" ? "rgba(239,68,68,0.12)" : "rgba(34,197,94,0.12)"}`,
+          background: toast.type === "error" ? "var(--negative-soft)" : "var(--positive-soft)",
+          border: `1px solid ${toast.type === "error" ? "var(--negative-soft)" : "var(--positive-soft)"}`,
           color: toast.type === "error" ? "var(--negative)" : "var(--positive)",
           fontWeight: 600, fontSize: 13, boxShadow: "0 4px 16px rgba(0,0,0,0.4)", zIndex: 300,
         }}>
