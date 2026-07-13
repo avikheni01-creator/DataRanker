@@ -24,6 +24,7 @@ const BASE_NAV = [
 
 const KPI_NAV = { to: "/app/kpi-editor", label: "KPI Editor", icon: <Icon paths={["M12 20h9", "M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"]} /> };
 const SETTINGS_NAV = { to: "/app/settings", label: "Settings", icon: <Icon paths={["M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z", "M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"]} /> };
+const ADMIN_USERS_NAV = { to: "/app/admin/users", label: "Users", icon: <Icon paths={["M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2", "M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z", "M23 21v-2a4 4 0 0 0-3-3.87", "M16 3.13a4 4 0 0 1 0 7.75"]} /> };
 
 export default function AppShell() {
   const navigate = useNavigate();
@@ -46,9 +47,9 @@ export default function AppShell() {
 
   // Filter nav items by feature flags
   const NAV = BASE_NAV.filter((item) => !item.flag || appConfig[item.flag] !== false);
-  const items = [...NAV, KPI_NAV, ...(user?.isAdmin ? [SETTINGS_NAV] : [])];
+  const items = [...NAV, KPI_NAV, ...(user?.isAdmin ? [ADMIN_USERS_NAV, SETTINGS_NAV] : [])];
 
-  const topNav = ["/app", "/app/results", "/app/kpi-editor", "/app/screener", "/app/comparison", "/app/settings", "/app/account"].includes(location.pathname);
+  const topNav = ["/app", "/app/results", "/app/kpi-editor", "/app/screener", "/app/comparison", "/app/settings", "/app/account", "/app/admin/users"].includes(location.pathname);
 
   const handleSignOut = async () => {
     await logOut();
