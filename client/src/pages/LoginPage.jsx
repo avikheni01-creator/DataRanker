@@ -78,6 +78,11 @@ export default function LoginPage() {
         <button type="submit" className="auth-submit" disabled={busy}>
           {busy ? "Signing in…" : "Sign In"}
         </button>
+        <div style={{ textAlign: "center", marginTop: 12 }}>
+          <Link to="/forgot-password" style={{ fontSize: 13, opacity: 0.75 }}>
+            Forgot password?
+          </Link>
+        </div>
       </form>
     </AuthLayout>
   );

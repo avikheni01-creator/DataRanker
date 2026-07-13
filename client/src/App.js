@@ -16,6 +16,8 @@ import AboutPage from "./pages/AboutPage";
 import ScreenerPage from "./pages/ScreenerPage";
 import ComparisonPage from "./pages/ComparisonPage";
 import SettingsPage from "./pages/SettingsPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import AccountPage from "./pages/AccountPage";
 import { apiUrl, getAuthHeaders } from "./api";
 import { AppConfigContext, DEFAULT_APP_CONFIG } from "./AppConfigContext";
 
@@ -74,6 +76,7 @@ export default function App() {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
         {/* Protected app shell */}
         <Route
@@ -102,6 +105,7 @@ export default function App() {
           <Route path="screener" element={<ScreenerPage />} />
           <Route path="comparison" element={<ComparisonPage />} />
           <Route path="settings" element={<SettingsPage />} />
+          <Route path="account" element={<AccountPage />} />
         </Route>
 
         {/* Fallback */}

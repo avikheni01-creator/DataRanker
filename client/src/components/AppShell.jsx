@@ -40,7 +40,7 @@ export default function AppShell() {
   const NAV = BASE_NAV.filter((item) => !item.flag || appConfig[item.flag] !== false);
   const items = [...NAV, KPI_NAV, ...(user?.isAdmin ? [SETTINGS_NAV] : [])];
 
-  const topNav = ["/app", "/app/results", "/app/kpi-editor", "/app/screener", "/app/comparison", "/app/settings"].includes(location.pathname);
+  const topNav = ["/app", "/app/results", "/app/kpi-editor", "/app/screener", "/app/comparison", "/app/settings", "/app/account"].includes(location.pathname);
 
   const handleSignOut = async () => {
     await logOut();
@@ -69,7 +69,7 @@ export default function AppShell() {
         </nav>
 
         <div className="shell-user">
-          <div className="shell-avatar">{initial}</div>
+          <NavLink to="/app/account" className="shell-avatar" title="Account" aria-label="Account">{initial}</NavLink>
           <div className="shell-user-meta">
             <div className="shell-user-name">{user.name || "Analyst"}</div>
             <div className="shell-user-email">{user.email || "matrix prototype"}</div>
@@ -116,7 +116,8 @@ const SHELL_CSS = `
   .shell-link.active .shell-link-icon { color: ${colors.accentHover}; opacity: 1; }
 
   .shell-user { display: flex; align-items: center; gap: 10px; padding: 12px 10px 4px; border-top: 1px solid ${colors.glassBorder}; margin-top: 8px; }
-  .shell-avatar { width: 36px; height: 36px; border-radius: 999px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: ${gradients.brand}; color: #fff; font-weight: 700; font-size: 14px; box-shadow: 0 0 16px rgba(124,108,255,0.35); }
+  .shell-avatar { width: 36px; height: 36px; border-radius: 999px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: ${gradients.brand}; color: #fff; font-weight: 700; font-size: 14px; box-shadow: 0 0 16px rgba(124,108,255,0.35); text-decoration: none; transition: box-shadow .15s, transform .15s; }
+  .shell-avatar:hover { box-shadow: 0 0 22px rgba(124,108,255,0.55); transform: scale(1.06); }
   .shell-user-meta { flex: 1; min-width: 0; }
   .shell-user-name { font-size: 13px; font-weight: 600; color: ${colors.text}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .shell-user-email { font-size: 11px; color: ${colors.textMuted}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

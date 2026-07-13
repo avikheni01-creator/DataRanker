@@ -1,6 +1,8 @@
-// controllers/authController.js — signup / login / me / logout / google OAuth.
+// controllers/authController.js — signup / login / me / logout / google OAuth / OTP flows.
 
 const User = require("../models/User");
+const OtpToken = require("../models/OtpToken");
+const { sendOtpEmail } = require("../services/mailer");
 const { signToken, setAuthCookie, clearAuthCookie } = require("../middleware/auth");
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -100,4 +102,97 @@ async function googleAuth(req, res) {
   }
 }
 
-module.exports = { signup, login, me, logout, googleAuth };
+// ── Password reset (unauthenticated) ─────────────────────────────────────────
+
+async function forgotPassword(req, res) {
+  try {
+    const { email } = req.body || {};
+    if (!email || !EMAIL_RE.test(email)) {
+      return res.status(400).json({ detail: "Enter a valid email address" });
+    }
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (user) {
+      const otp = await OtpToken.generate(email, "reset");
+      await sendOtpEmail(email, otp, "reset");
+    }
+    // Always return 200 to prevent email enumeration.
+    return res.json({ ok: true });
+  } catch (err) {
+    return res.status(500).json({ detail: String(err.message || err) });
+  }
+}
+
+async function resetPassword(req, res) {
+  try {
+    const { email, otp, newPassword } = req.body || {};
+    if (!email || !otp || !newPassword) {
+      return res.status(400).json({ detail: "Email, code and new password are required" });
+    }
+    if (String(newPassword).length < 8) {
+      return res.status(400).json({ detail: "Password must be at least 8 characters" });
+    }
+    const valid = await OtpToken.verify(email, otp, "reset");
+    if (!valid) {
+      return res.status(400).json({ detail: "Invalid or expired verification code" });
+    }
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) return res.status(400).json({ detail: "No account found for that email" });
+    await user.setPassword(newPassword);
+    await user.save();
+    return res.json({ ok: true });
+  } catch (err) {
+    return res.status(500).json({ detail: String(err.message || err) });
+  }
+}
+
+// ── Password change + profile (authenticated) ─────────────────────────────────
+
+async function requestOtp(req, res) {
+  try {
+    const otp = await OtpToken.generate(req.user.email, "change");
+    await sendOtpEmail(req.user.email, otp, "change");
+    return res.json({ ok: true });
+  } catch (err) {
+    return res.status(500).json({ detail: String(err.message || err) });
+  }
+}
+
+async function changePassword(req, res) {
+  try {
+    const { otp, newPassword } = req.body || {};
+    if (!otp || !newPassword) {
+      return res.status(400).json({ detail: "Code and new password are required" });
+    }
+    if (String(newPassword).length < 8) {
+      return res.status(400).json({ detail: "Password must be at least 8 characters" });
+    }
+    const valid = await OtpToken.verify(req.user.email, otp, "change");
+    if (!valid) {
+      return res.status(400).json({ detail: "Invalid or expired verification code" });
+    }
+    await req.user.setPassword(newPassword);
+    await req.user.save();
+    return res.json({ ok: true });
+  } catch (err) {
+    return res.status(500).json({ detail: String(err.message || err) });
+  }
+}
+
+async function updateProfile(req, res) {
+  try {
+    const { name } = req.body || {};
+    if (!name || !String(name).trim()) {
+      return res.status(400).json({ detail: "Name is required" });
+    }
+    req.user.name = String(name).trim();
+    await req.user.save();
+    return res.json({ user: req.user.toSafeJSON() });
+  } catch (err) {
+    return res.status(500).json({ detail: String(err.message || err) });
+  }
+}
+
+module.exports = {
+  signup, login, me, logout, googleAuth,
+  forgotPassword, resetPassword, requestOtp, changePassword, updateProfile,
+};

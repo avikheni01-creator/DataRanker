@@ -78,3 +78,40 @@ export function getUser() {
     return {};
   }
 }
+
+// ── Password reset (unauthenticated) ─────────────────────────────────────────
+
+export async function forgotPassword(email) {
+  await apiFetch("/auth/forgot-password", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+export async function resetPassword(email, otp, newPassword) {
+  await apiFetch("/auth/reset-password", {
+    method: "POST",
+    body: JSON.stringify({ email, otp, newPassword }),
+  });
+}
+
+// ── Password change + profile (authenticated) ─────────────────────────────────
+
+export async function requestOtpForChange() {
+  await apiFetch("/auth/request-otp", { method: "POST" });
+}
+
+export async function changePassword(otp, newPassword) {
+  await apiFetch("/auth/change-password", {
+    method: "POST",
+    body: JSON.stringify({ otp, newPassword }),
+  });
+}
+
+export async function updateProfile(name) {
+  const { user } = await apiFetch("/auth/profile", {
+    method: "PUT",
+    body: JSON.stringify({ name }),
+  });
+  return cacheUser(user, null);
+}
