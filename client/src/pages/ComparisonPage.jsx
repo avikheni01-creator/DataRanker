@@ -10,7 +10,6 @@ import { Navigate } from "react-router-dom";
 import { apiFetch } from "../api";
 import { colors, fonts, radius } from "../theme";
 import { useAppConfig } from "../AppConfigContext";
-import PlanGate from "../components/PlanGate";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -1184,10 +1183,6 @@ export default function ComparisonPage() {
   if (comparisonEnabled === false) return <Navigate to="/app/results" replace />;
 
   return (
-    <PlanGate
-      feature="Company Comparison"
-      description="Side-by-side analytical dashboards — radar charts, percentile bars, scatter plots, and leaderboards across up to 6 companies. Available on Premium and Enterprise plans."
-    >
     <div className="cmp-page">
       <style>{CSS(colors, fonts, radius)}</style>
 
@@ -1308,6 +1303,5 @@ export default function ComparisonPage() {
         </>
       )}
     </div>
-    </PlanGate>
   );
 }
