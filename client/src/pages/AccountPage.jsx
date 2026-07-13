@@ -175,6 +175,14 @@ function ProfileCard({ user, onUpdate }) {
 const PWD_STATE = { IDLE: "idle", SENT: "sent", DONE: "done" };
 
 function SecurityCard({ hasPassword }) {
+  const [pwdState, setPwdState] = useState(PWD_STATE.IDLE);
+  const [otp, setOtp] = useState("");
+  const [newPwd, setNewPwd] = useState("");
+  const [confirmPwd, setConfirmPwd] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
   if (!hasPassword) {
     return (
       <Card title="Security">
@@ -185,13 +193,6 @@ function SecurityCard({ hasPassword }) {
       </Card>
     );
   }
-  const [pwdState, setPwdState] = useState(PWD_STATE.IDLE);
-  const [otp, setOtp] = useState("");
-  const [newPwd, setNewPwd] = useState("");
-  const [confirmPwd, setConfirmPwd] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   const handleRequestOtp = async () => {
     setError(""); setBusy(true);
