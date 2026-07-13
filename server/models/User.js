@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema(
     googleId: { type: String, default: null, sparse: true },
     plan: { type: String, enum: PLAN_IDS, default: "free" },
     isAdmin: { type: Boolean, default: false },
+    emailVerified: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
@@ -40,6 +41,8 @@ userSchema.methods.toSafeJSON = function toSafeJSON() {
     email: this.email,
     plan: this.plan,
     isAdmin: this.isAdmin || false,
+    emailVerified: this.emailVerified || false,
+    hasPassword: Boolean(this.passwordHash),
     createdAt: this.createdAt,
   };
 };

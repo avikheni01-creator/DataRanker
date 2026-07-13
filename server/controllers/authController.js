@@ -31,6 +31,10 @@ async function signup(req, res) {
 
     const userId = user._id.toString();
     setAuthCookie(res, userId);
+    // Send verification email non-blocking — don't fail signup if mail fails.
+    OtpToken.generate(email, "verify")
+      .then((otp) => sendOtpEmail(email, otp, "verify"))
+      .catch((err) => console.error("Verification email failed:", err));
     return res.status(201).json({ user: user.toSafeJSON(), token: signToken(userId) });
   } catch (err) {
     return res.status(500).json({ detail: String(err.message || err) });
@@ -84,19 +88,47 @@ async function googleAuth(req, res) {
 
     let user = await User.findOne({ $or: [{ googleId }, { email: email.toLowerCase() }] });
     if (user) {
-      // Link Google ID if this email existed without it (e.g. registered with password first).
-      if (!user.googleId) {
-        user.googleId = googleId;
-        await user.save();
-      }
+      let changed = false;
+      if (!user.googleId) { user.googleId = googleId; changed = true; }
+      // Google accounts are always email-verified.
+      if (!user.emailVerified) { user.emailVerified = true; changed = true; }
+      if (changed) await user.save();
     } else {
-      user = new User({ name, email, googleId, plan: "free" });
+      user = new User({ name, email, googleId, plan: "free", emailVerified: true });
       await user.save();
     }
 
     const userId = user._id.toString();
     setAuthCookie(res, userId);
     return res.json({ user: user.toSafeJSON(), token: signToken(userId) });
+  } catch (err) {
+    return res.status(500).json({ detail: String(err.message || err) });
+  }
+}
+
+// ── Email verification (authenticated) ────────────────────────────────────────
+
+async function verifyEmail(req, res) {
+  try {
+    if (req.user.emailVerified) return res.json({ user: req.user.toSafeJSON() });
+    const { otp } = req.body || {};
+    if (!otp) return res.status(400).json({ detail: "Code is required" });
+    const valid = await OtpToken.verify(req.user.email, otp, "verify");
+    if (!valid) return res.status(400).json({ detail: "Invalid or expired code" });
+    req.user.emailVerified = true;
+    await req.user.save();
+    return res.json({ user: req.user.toSafeJSON() });
+  } catch (err) {
+    return res.status(500).json({ detail: String(err.message || err) });
+  }
+}
+
+async function resendVerification(req, res) {
+  try {
+    if (req.user.emailVerified) return res.json({ ok: true });
+    const otp = await OtpToken.generate(req.user.email, "verify");
+    await sendOtpEmail(req.user.email, otp, "verify");
+    return res.json({ ok: true });
   } catch (err) {
     return res.status(500).json({ detail: String(err.message || err) });
   }
@@ -194,5 +226,6 @@ async function updateProfile(req, res) {
 
 module.exports = {
   signup, login, me, logout, googleAuth,
+  verifyEmail, resendVerification,
   forgotPassword, resetPassword, requestOtp, changePassword, updateProfile,
 };

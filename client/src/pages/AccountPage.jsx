@@ -174,7 +174,17 @@ function ProfileCard({ user, onUpdate }) {
 
 const PWD_STATE = { IDLE: "idle", SENT: "sent", DONE: "done" };
 
-function SecurityCard() {
+function SecurityCard({ hasPassword }) {
+  if (!hasPassword) {
+    return (
+      <Card title="Security">
+        <div style={{ padding: "20px 0", color: colors.textMuted, fontSize: 14, lineHeight: 1.6 }}>
+          Your account uses <strong style={{ color: colors.text }}>Google Sign-In</strong> — no password is set.
+          Password changes are managed through your Google account.
+        </div>
+      </Card>
+    );
+  }
   const [pwdState, setPwdState] = useState(PWD_STATE.IDLE);
   const [otp, setOtp] = useState("");
   const [newPwd, setNewPwd] = useState("");
@@ -309,7 +319,7 @@ export default function AccountPage() {
 
         <div className="ac-body">
           <ProfileCard user={user} onUpdate={(updated) => setUser((u) => ({ ...u, ...updated }))} />
-          <SecurityCard />
+          <SecurityCard hasPassword={user.hasPassword !== false} />
         </div>
       </div>
     </>

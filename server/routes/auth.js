@@ -3,6 +3,7 @@
 const express = require("express");
 const {
   signup, login, me, logout, googleAuth,
+  verifyEmail, resendVerification,
   forgotPassword, resetPassword, requestOtp, changePassword, updateProfile,
 } = require("../controllers/authController");
 const { requireAuth } = require("../middleware/auth");
@@ -28,6 +29,10 @@ router.post("/login", authLimiter, login);
 router.post("/google", authLimiter, googleAuth);
 router.get("/me", requireAuth, me);
 router.post("/logout", logout);
+
+// Email verification (authenticated)
+router.post("/verify-email", requireAuth, otpLimiter, verifyEmail);
+router.post("/resend-verification", requireAuth, otpLimiter, resendVerification);
 
 // Password reset (unauthenticated)
 router.post("/forgot-password", otpLimiter, forgotPassword);

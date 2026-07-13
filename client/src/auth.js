@@ -115,3 +115,15 @@ export async function updateProfile(name) {
   });
   return cacheUser(user, null);
 }
+
+export async function verifyEmail(otp) {
+  const { user } = await apiFetch("/auth/verify-email", {
+    method: "POST",
+    body: JSON.stringify({ otp }),
+  });
+  return cacheUser(user, null);
+}
+
+export async function resendVerification() {
+  await apiFetch("/auth/resend-verification", { method: "POST" });
+}

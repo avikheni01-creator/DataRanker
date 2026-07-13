@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import { apiFetch, apiUrl, getAuthHeaders } from "../api";
 import { getUser } from "../auth";
 import { saveResult } from "../lib/resultStore";
@@ -185,7 +185,7 @@ export default function ScreenerPage() {
   const navigate = useNavigate();
   const user = getUser();
   const isAdmin = !!user.isAdmin;
-  const { screenerMaxRows } = useAppConfig();
+  const { screenerMaxRows, screenerEnabled } = useAppConfig();
 
   const [snapshot, setSnapshot] = useState(null);
   const [columnMapping, setColumnMapping] = useState({});
@@ -371,6 +371,8 @@ export default function ScreenerPage() {
         day: "numeric", month: "short", year: "numeric",
       })
     : "";
+
+  if (screenerEnabled === false) return <Navigate to="/app/results" replace />;
 
   return (
     <div className="sp-wrap">

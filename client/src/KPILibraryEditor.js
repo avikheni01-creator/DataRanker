@@ -1,6 +1,8 @@
 import { useState, useCallback, useEffect } from "react";
 import * as XLSX from "xlsx";
 import { apiUrl, getAuthHeaders } from "./api";
+import { useAppConfig } from "./AppConfigContext";
+import { getUser } from "./auth";
 
 // ── Initial data (Tier 1 from KPI_Library.xlsx) ──────────────────────────────
 const INITIAL_TIER1 = [
@@ -249,6 +251,10 @@ function AddKPIRow({ usedKPIs, onAdd, AVAILABLE_KPI_KEYS, COLUMN_MAPPING }) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 export default function KPILibraryEditor() {
+  const { kpiEditorLocked } = useAppConfig();
+  const currentUser = getUser();
+  const canSave = !kpiEditorLocked || currentUser.isAdmin;
+
   const [activeTab, setActiveTab]       = useState("tier1");
   const [tier1Rows, setTier1Rows]       = useState(INITIAL_TIER1);
   const [toast, setToast]               = useState(null);
@@ -452,12 +458,12 @@ export default function KPILibraryEditor() {
             📂 Upload
             <input type="file" accept=".xlsx,.xls" onChange={handleFileUpload} style={{ display: "none" }} />
           </label>
-          <button onClick={handleSave} disabled={!allValid} style={{
+          <button onClick={handleSave} disabled={!allValid || !canSave} title={!canSave ? "KPI editor is locked by the admin" : undefined} style={{
             ...pgBtn,
-            background: allValid ? "#7C6CFF" : "var(--elevated)",
-            color: allValid ? "#fff" : "var(--text-muted)",
+            background: (allValid && canSave) ? "#7C6CFF" : "var(--elevated)",
+            color: (allValid && canSave) ? "#fff" : "var(--text-muted)",
             border: "none", fontWeight: 700,
-          }}>Save</button>
+          }}>{canSave ? "Save" : "🔒 Locked"}</button>
         </div>
 
         {/* ── Body: sidebar + content ── */}

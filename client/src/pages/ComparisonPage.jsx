@@ -6,8 +6,10 @@ import {
   ScatterChart, Scatter, ZAxis,
   ReferenceLine,
 } from "recharts";
+import { Navigate } from "react-router-dom";
 import { apiFetch } from "../api";
 import { colors, fonts, radius } from "../theme";
+import { useAppConfig } from "../AppConfigContext";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -1144,6 +1146,7 @@ function ComparisonTable({ companies, numericCols, nameCol }) {
 // ── Root ──────────────────────────────────────────────────────────────────────
 
 export default function ComparisonPage() {
+  const { comparisonEnabled } = useAppConfig();
   const [snapshot,     setSnapshot]     = useState(null);
   const [loading,      setLoading]      = useState(true);
   const [selected,     setSelected]     = useState([]);
@@ -1176,6 +1179,8 @@ export default function ComparisonPage() {
   }, [nameCol]);
 
   const ready = selected.length >= 2;
+
+  if (comparisonEnabled === false) return <Navigate to="/app/results" replace />;
 
   return (
     <div className="cmp-page">

@@ -12,9 +12,21 @@ const transporter = nodemailer.createTransport({
 });
 
 async function sendOtpEmail(to, otp, purpose) {
-  const isReset = purpose === "reset";
-  const subject = isReset ? "Reset your Matrix password" : "Verify your Matrix password change";
-  const action = isReset ? "reset your password" : "change your password";
+  if (!process.env.GMAIL_APP_PASSWORD) {
+    throw new Error("Email service is not configured (GMAIL_APP_PASSWORD not set)");
+  }
+  const subjects = {
+    reset:  "Reset your Matrix password",
+    change: "Verify your Matrix password change",
+    verify: "Verify your Matrix email address",
+  };
+  const actions = {
+    reset:  "reset your password",
+    change: "change your password",
+    verify: "verify your email address",
+  };
+  const subject = subjects[purpose] || "Your Matrix verification code";
+  const action  = actions[purpose]  || "continue";
 
   await transporter.sendMail({
     from: `"Matrix" <${SENDER}>`,

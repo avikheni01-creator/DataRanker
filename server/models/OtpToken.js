@@ -10,7 +10,7 @@ function hashOtp(otp) {
 const OtpTokenSchema = new mongoose.Schema({
   email: { type: String, required: true, lowercase: true, index: true },
   otpHash: { type: String, required: true },
-  purpose: { type: String, enum: ["reset", "change"], required: true },
+  purpose: { type: String, enum: ["reset", "change", "verify"], required: true },
   expiresAt: { type: Date, required: true },
 });
 

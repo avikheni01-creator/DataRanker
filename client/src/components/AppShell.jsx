@@ -1,8 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import Logo from "./Logo";
 import ThemeToggle from "./ThemeToggle";
-import { logOut, getUser } from "../auth";
+import { logOut, getUser, verifyEmail, resendVerification } from "../auth";
 import Seo from "../seo";
 import { colors, gradients, fonts, radius } from "../theme";
 import { useAppConfig, useRefreshAppConfig } from "../AppConfigContext";
@@ -32,6 +32,14 @@ export default function AppShell() {
   const appConfig = useAppConfig();
   const refreshAppConfig = useRefreshAppConfig();
 
+  // Email verification banner state
+  const [showVerifyBanner, setShowVerifyBanner] = useState(
+    user && user.emailVerified === false
+  );
+  const [verifyOtp, setVerifyOtp] = useState("");
+  const [verifyStep, setVerifyStep] = useState("prompt"); // "prompt" | "otp" | "busy"
+  const [verifyError, setVerifyError] = useState("");
+
   // Fetch live settings as soon as the authenticated shell mounts.
   // This handles the login flow where App.js's initial fetch got a 401.
   useEffect(() => { refreshAppConfig(); }, [refreshAppConfig]);
@@ -45,6 +53,31 @@ export default function AppShell() {
   const handleSignOut = async () => {
     await logOut();
     navigate("/");
+  };
+
+  const handleResendVerification = async () => {
+    setVerifyError("");
+    setVerifyStep("busy");
+    try {
+      await resendVerification();
+      setVerifyStep("otp");
+    } catch {
+      setVerifyStep("prompt");
+      setVerifyError("Failed to send code. Try again.");
+    }
+  };
+
+  const handleVerifyEmail = async () => {
+    if (verifyOtp.length < 6) return;
+    setVerifyError("");
+    setVerifyStep("busy");
+    try {
+      await verifyEmail(verifyOtp);
+      setShowVerifyBanner(false);
+    } catch (err) {
+      setVerifyError(err.message || "Invalid code");
+      setVerifyStep("otp");
+    }
   };
 
   const initial = (user.name || user.email || "M").trim().charAt(0).toUpperCase();
@@ -82,6 +115,33 @@ export default function AppShell() {
       </aside>
 
       <main className="shell-main">
+        {/* Email verification banner */}
+        {showVerifyBanner && (
+          <div className="shell-verify-banner">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span>Please verify your email address.</span>
+            {verifyStep === "prompt" && (
+              <>
+                <button className="shell-verify-btn" onClick={handleResendVerification}>Send Code</button>
+                <button className="shell-verify-dismiss" onClick={() => setShowVerifyBanner(false)} aria-label="Dismiss">×</button>
+              </>
+            )}
+            {verifyStep === "otp" && (
+              <>
+                <input
+                  className="shell-verify-input" type="text" inputMode="numeric"
+                  maxLength={6} placeholder="6-digit code"
+                  value={verifyOtp} onChange={(e) => setVerifyOtp(e.target.value.replace(/\D/g, ""))}
+                  autoFocus
+                />
+                <button className="shell-verify-btn" onClick={handleVerifyEmail} disabled={verifyOtp.length < 6}>Verify</button>
+                {verifyError && <span className="shell-verify-error">{verifyError}</span>}
+              </>
+            )}
+            {verifyStep === "busy" && <span style={{ fontSize: 12, opacity: 0.7 }}>Please wait…</span>}
+          </div>
+        )}
+
         {appConfig.maintenanceBanner && (
           <div className="shell-banner">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
@@ -125,6 +185,32 @@ const SHELL_CSS = `
   .shell-signout:hover { color: ${colors.negative}; background: ${colors.negativeSoft}; }
 
   .shell-main { min-width: 0; }
+
+  .shell-verify-banner {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    padding: 9px 20px; font-size: 13px;
+    background: rgba(59,130,246,.10); color: #60A5FA;
+    border-bottom: 1px solid rgba(59,130,246,.25);
+  }
+  .shell-verify-btn {
+    padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;
+    background: rgba(59,130,246,.2); border: 1px solid rgba(59,130,246,.4);
+    color: #93C5FD; cursor: pointer; transition: background .15s;
+  }
+  .shell-verify-btn:hover:not(:disabled) { background: rgba(59,130,246,.35); }
+  .shell-verify-btn:disabled { opacity: .45; cursor: not-allowed; }
+  .shell-verify-input {
+    padding: 4px 10px; border-radius: 6px; font-size: 13px; width: 110px;
+    background: rgba(0,0,0,.2); border: 1px solid rgba(59,130,246,.4);
+    color: #E2E8F0; letter-spacing: .15em; text-align: center;
+    outline: none;
+  }
+  .shell-verify-dismiss {
+    margin-left: auto; background: transparent; border: none; color: inherit;
+    font-size: 18px; cursor: pointer; opacity: .6; line-height: 1; padding: 0 4px;
+  }
+  .shell-verify-dismiss:hover { opacity: 1; }
+  .shell-verify-error { font-size: 12px; color: #F87171; }
 
   .shell-banner {
     display: flex; align-items: center; gap: 8px;
