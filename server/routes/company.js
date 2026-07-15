@@ -238,7 +238,7 @@ router.get("/company/:symbol/full", requireAuth, async (req, res) => {
     yf.fundamentalsTimeSeries(symbol, {
       period1: "2020-01-01",
       period2: today,
-      type: "annualTotalRevenue,annualNetIncome,quarterlyTotalRevenue,quarterlyNetIncome",
+      type: ["annualTotalRevenue", "annualNetIncome", "quarterlyTotalRevenue", "quarterlyNetIncome"],
     }),
     // Separate call so a missing module never breaks the core data above.
     yf.quoteSummary(symbol, {
@@ -379,11 +379,6 @@ router.get("/company/:symbol/full", requireAuth, async (req, res) => {
       date: typeof h.epochGradeDate === "number"
         ? new Date(h.epochGradeDate * 1000)
         : (h.epochGradeDate ?? null),
-    })),
-    annualIncome: [...(iah.incomeStatementHistory || [])].reverse().map(q => ({
-      date:      q.endDate,
-      revenue:   q.totalRevenue ?? null,
-      netIncome: q.netIncome    ?? null,
     })),
     topInstitutions: (io.ownershipList || []).slice(0, 10).map(o => ({
       name:       o.organization ?? null,
