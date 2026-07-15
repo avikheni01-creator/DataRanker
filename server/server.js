@@ -37,6 +37,7 @@ const adminSettingsRouter = require("./routes/adminSettings");
 const adminUsersRouter = require("./routes/adminUsers");
 const statsRouter = require("./routes/stats");
 const resultsRouter = require("./routes/results");
+const companyRouter = require("./routes/company");
 
 const app = express();
 
@@ -73,6 +74,7 @@ app.use(adminSettingsRouter);  // GET /app-config, GET/PUT /admin/settings
 app.use(adminUsersRouter);     // GET/PATCH/DELETE /admin/users
 app.use(statsRouter);          // GET /stats (public)
 app.use(resultsRouter);        // POST /results/email
+app.use(companyRouter);       // GET /company/:symbol, /summary, /history
 
 const PORT = process.env.PORT || 8000;
 

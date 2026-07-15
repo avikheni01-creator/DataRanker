@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
-import { apiUrl, getAuthHeaders } from "./api";
+import { apiUrl, getAuthHeaders, apiFetch } from "./api";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend
@@ -84,6 +84,21 @@ function fmt(val, key) {
   const pctKeys = ["Growth", "Margin", "ROE", "ROCE", "Return", "Yield"];
   const addPct = pctKeys.some(p => key.includes(p));
   return v.toFixed(2) + (addPct ? "%" : "");
+}
+
+function fmtPrice(val, currency) {
+  if (val == null) return "—";
+  const sym = currency === "INR" ? "₹" : (currency ? `${currency} ` : "");
+  return `${sym}${Number(val).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+function fmtMarketCap(val, currency) {
+  if (val == null) return "—";
+  const sym = currency === "INR" ? "₹" : (currency ? `${currency} ` : "");
+  if (val >= 1e12) return `${sym}${(val / 1e12).toFixed(2)}T`;
+  if (val >= 1e7)  return `${sym}${(val / 1e7).toFixed(2)} Cr`;
+  if (val >= 1e5)  return `${sym}${(val / 1e5).toFixed(2)} L`;
+  return `${sym}${val.toLocaleString("en-IN")}`;
 }
 
 // ── Column Picker ─────────────────────────────────────────────────────────────
@@ -235,6 +250,38 @@ function quickBtnStyle(color) {
 // ── Company Drawer ────────────────────────────────────────────────────────────
 
 function CompanyDrawer({ company, allCompanies, onClose }) {
+  const navigate = useNavigate();
+  const [liveQuote, setLiveQuote] = useState(null);
+  const [liveLoading, setLiveLoading] = useState(false);
+  const [liveError, setLiveError] = useState(null);
+
+  // Use ISIN as the trigger key — it's always unique even when two companies share
+  // the same rank or have an empty Symbol field.
+  const companyKey = company?.["ISIN Code"] || company?.Symbol || company?.Description;
+
+  useEffect(() => {
+    // Always clear stale data first, regardless of whether Symbol is available.
+    setLiveQuote(null);
+    setLiveError(null);
+    setLiveLoading(false);
+
+    const isin   = company?.["ISIN Code"];
+    const symbol = company?.Symbol;
+    if (!isin && !symbol) return;
+
+    // Prefer ISIN — it's always unique and doesn't depend on exchange suffix guessing.
+    const path = isin
+      ? `/company/isin/${encodeURIComponent(isin)}`
+      : `/company/${encodeURIComponent(symbol)}`;
+
+    let cancelled = false;
+    setLiveLoading(true);
+    apiFetch(path)
+      .then(data => { if (!cancelled) { setLiveQuote(data); setLiveLoading(false); } })
+      .catch(err => { if (!cancelled) { setLiveError(err.message); setLiveLoading(false); } });
+    return () => { cancelled = true; };
+  }, [companyKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
   if (!company) return null;
 
   const metricScoreKeys = Object.keys(company).filter(k => k.endsWith("_Metric_Score"));
@@ -296,6 +343,74 @@ function CompanyDrawer({ company, allCompanies, onClose }) {
             fontSize: 18, width: 36, height: 36, borderRadius: 8,
             cursor: "pointer", flexShrink: 0,
           }}>✕</button>
+        </div>
+
+        {/* Live Market Data */}
+        <div style={{ background: "var(--elevated)", borderRadius: 12, padding: "16px 18px", border: "1px solid var(--border)" }}>
+          <div style={{ fontSize: 10, fontFamily: "'JetBrains Mono',monospace", color: "var(--text-muted)", letterSpacing: ".1em", marginBottom: 12 }}>
+            LIVE MARKET DATA
+          </div>
+          {liveLoading && (
+            <div style={{ fontSize: 12, color: "var(--text-muted)" }}>Fetching…</div>
+          )}
+          {liveError && (
+            <div style={{ fontSize: 12, color: "var(--negative)" }}>Could not load live data</div>
+          )}
+          {liveQuote && (
+            <>
+              {/* Price + change */}
+              <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 14 }}>
+                <span style={{ fontSize: 28, fontWeight: 800, color: "var(--text)" }}>
+                  {fmtPrice(liveQuote.price, liveQuote.currency)}
+                </span>
+                <span style={{
+                  fontSize: 13, fontWeight: 600,
+                  color: liveQuote.change >= 0 ? "var(--positive)" : "var(--negative)",
+                }}>
+                  {liveQuote.change >= 0 ? "+" : ""}{liveQuote.change?.toFixed(2)}{" "}
+                  ({liveQuote.change >= 0 ? "+" : ""}{liveQuote.changePct?.toFixed(2)}%)
+                </span>
+                <span style={{ fontSize: 10, fontFamily: "'JetBrains Mono',monospace", color: "var(--text-muted)", marginLeft: "auto" }}>
+                  {liveQuote.marketState}
+                </span>
+              </div>
+              {/* Stats grid */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                {[
+                  { label: "Market Cap", value: fmtMarketCap(liveQuote.marketCap, liveQuote.currency) },
+                  { label: "P/E Ratio",  value: liveQuote.peRatio != null ? liveQuote.peRatio.toFixed(2) : "—" },
+                  { label: "52W High",   value: fmtPrice(liveQuote.week52High, liveQuote.currency) },
+                  { label: "52W Low",    value: fmtPrice(liveQuote.week52Low, liveQuote.currency) },
+                  { label: "Volume",     value: liveQuote.volume != null ? liveQuote.volume.toLocaleString("en-IN") : "—" },
+                  { label: "Div Yield",  value: liveQuote.dividendYield != null ? `${(liveQuote.dividendYield * 100).toFixed(2)}%` : "—" },
+                ].map(({ label, value }) => (
+                  <div key={label} style={{ background: "var(--card)", borderRadius: 8, padding: "8px 10px", border: "1px solid var(--border)" }}>
+                    <div style={{ fontSize: 9, fontFamily: "'JetBrains Mono',monospace", color: "var(--text-muted)", marginBottom: 3 }}>{label}</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-secondary)" }}>{value}</div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 8 }}>
+                {liveQuote.longName || liveQuote.shortName} · {liveQuote.exchange}
+              </div>
+              {/* View Full Analysis CTA */}
+              <button
+                onClick={() => {
+                  const sym = liveQuote.symbol || company?.Symbol;
+                  if (sym) navigate(`/app/company/${encodeURIComponent(sym)}`, { state: { company } });
+                }}
+                style={{
+                  marginTop: 14, width: "100%", padding: "10px 0",
+                  background: "var(--accent)", color: "#fff", border: "none",
+                  borderRadius: 8, fontSize: 12, fontWeight: 700,
+                  fontFamily: "'JetBrains Mono',monospace", cursor: "pointer",
+                  letterSpacing: ".04em",
+                }}
+              >
+                View Full Analysis →
+              </button>
+            </>
+          )}
         </div>
 
         {/* Rank + Score */}
