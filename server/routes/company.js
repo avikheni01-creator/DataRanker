@@ -12,7 +12,30 @@ const { requireAuth } = require("../middleware/auth");
 
 const router = express.Router();
 
-const yf = new YahooFinance({ suppressNotices: ["yahooSurvey"] });
+const yf = new YahooFinance({ suppressNotices: ["yahooSurvey", "ripHistorical"] });
+
+// Merge two fundamentalsTimeSeries arrays (revenue + netIncome) into one array
+// keyed by date, sorted chronologically.
+function mergeSeries(revenueArr, netIncomeArr) {
+  const map = {};
+  const toKey = r => {
+    if (!r?.asOfDate) return null;
+    return r.asOfDate instanceof Date
+      ? r.asOfDate.toISOString().slice(0, 10)
+      : String(r.asOfDate).slice(0, 10);
+  };
+  (revenueArr || []).forEach(r => {
+    const d = toKey(r); if (!d) return;
+    map[d] = map[d] || { date: d };
+    map[d].revenue = r.reportedValue ?? null;
+  });
+  (netIncomeArr || []).forEach(r => {
+    const d = toKey(r); if (!d) return;
+    map[d] = map[d] || { date: d };
+    map[d].netIncome = r.reportedValue ?? null;
+  });
+  return Object.values(map).sort((a, b) => (a.date < b.date ? -1 : 1));
+}
 
 // Resolve a Yahoo Finance symbol from an ISIN using the search endpoint.
 // Prefers NSE (exchange "NSI") over BSE for Indian equities.
@@ -196,7 +219,7 @@ router.get("/company/:symbol/full", requireAuth, async (req, res) => {
   const yearAgo = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
   const today   = new Date().toISOString().slice(0, 10);
 
-  const [quoteRes, summaryRes, histRes, signalRes] = await Promise.allSettled([
+  const [quoteRes, summaryRes, chartRes, tsRes, signalRes] = await Promise.allSettled([
     yf.quote(symbol),
     yf.quoteSummary(symbol, {
       modules: [
@@ -207,18 +230,21 @@ router.get("/company/:symbol/full", requireAuth, async (req, res) => {
         "earningsHistory",
         "earningsTrend",
         "recommendationTrend",
-        "incomeStatementHistoryQuarterly",
-        "balanceSheetHistoryQuarterly",
-        "cashflowStatementHistoryQuarterly",
       ],
     }),
-    yf.historical(symbol, { period1: yearAgo, period2: today, interval: "1d" }),
-    // Separate call so a missing module never breaks the core financials above.
+    // chart() replaces the deprecated historical() API.
+    yf.chart(symbol, { period1: yearAgo, period2: today, interval: "1d" }),
+    // fundamentalsTimeSeries replaces the deprecated quarterly/annual statement modules.
+    yf.fundamentalsTimeSeries(symbol, {
+      period1: "2020-01-01",
+      period2: today,
+      type: "annualTotalRevenue,annualNetIncome,quarterlyTotalRevenue,quarterlyNetIncome",
+    }),
+    // Separate call so a missing module never breaks the core data above.
     yf.quoteSummary(symbol, {
       modules: [
         "insiderTransactions",
         "upgradeDowngradeHistory",
-        "incomeStatementHistory",   // annual (4 years)
         "institutionOwnership",
       ],
     }),
@@ -228,15 +254,15 @@ router.get("/company/:symbol/full", requireAuth, async (req, res) => {
     return res.status(502).json({ error: "Could not fetch company data from Yahoo Finance" });
   }
 
-  const q    = quoteRes.status   === "fulfilled" ? quoteRes.value   : null;
-  const s    = summaryRes.status === "fulfilled" ? summaryRes.value : {};
-  const hist = histRes.status    === "fulfilled" ? histRes.value    : [];
-  const sig  = signalRes.status  === "fulfilled" ? signalRes.value  : {};
+  const q         = quoteRes.status   === "fulfilled" ? quoteRes.value   : null;
+  const s         = summaryRes.status === "fulfilled" ? summaryRes.value : {};
+  const chartData = chartRes.status   === "fulfilled" ? chartRes.value   : null;
+  const ts        = tsRes.status      === "fulfilled" ? tsRes.value      : {};
+  const sig       = signalRes.status  === "fulfilled" ? signalRes.value  : {};
 
-  const it  = sig.insiderTransactions              || {};
-  const udh = sig.upgradeDowngradeHistory          || {};
-  const iah = sig.incomeStatementHistory           || {};
-  const io  = sig.institutionOwnership             || {};
+  const it  = sig.insiderTransactions  || {};
+  const udh = sig.upgradeDowngradeHistory || {};
+  const io  = sig.institutionOwnership || {};
 
   const ap  = s.assetProfile                      || {};
   const sd  = s.summaryDetail                     || {};
@@ -245,9 +271,6 @@ router.get("/company/:symbol/full", requireAuth, async (req, res) => {
   const eh  = s.earningsHistory                   || {};
   const et  = s.earningsTrend                     || {};
   const rt  = s.recommendationTrend               || {};
-  const ish = s.incomeStatementHistoryQuarterly   || {};
-  const bsh = s.balanceSheetHistoryQuarterly      || {};
-  const csh = s.cashflowStatementHistoryQuarterly || {};
 
   res.json({
     symbol,
@@ -323,25 +346,8 @@ router.get("/company/:symbol/full", requireAuth, async (req, res) => {
         revenueEstimate: t.revenueEstimate?.avg   ?? null,
       })),
     },
-    quarterlyIncome: [...(ish.incomeStatementHistory || [])].reverse().map(q => ({
-      date:        q.endDate,
-      revenue:     q.totalRevenue ?? null,
-      netIncome:   q.netIncome    ?? null,
-      grossProfit: q.grossProfit  ?? null,
-    })),
-    quarterlyBalance: [...(bsh.balanceSheetStatements || [])].reverse().map(b => ({
-      date:             b.endDate,
-      totalAssets:      b.totalAssets            ?? null,
-      totalLiabilities: b.totalLiab              ?? null,
-      equity:           b.totalStockholderEquity ?? null,
-      cash:             b.cash                   ?? null,
-    })),
-    quarterlyCashflow: [...(csh.cashflowStatements || [])].reverse().map(c => ({
-      date:      c.endDate,
-      operating: c.totalCashFromOperatingActivities          ?? null,
-      investing: c.totalCashflowsFromInvestingActivities     ?? null,
-      financing: c.totalCashFromFinancingActivities          ?? null,
-    })),
+    quarterlyIncome: mergeSeries(ts.quarterlyTotalRevenue, ts.quarterlyNetIncome),
+    annualIncome:    mergeSeries(ts.annualTotalRevenue,    ts.annualNetIncome),
     ownership: {
       insiderPercent:     k.heldPercentInsiders     ?? null,
       institutionPercent: k.heldPercentInstitutions ?? null,
@@ -349,7 +355,7 @@ router.get("/company/:symbol/full", requireAuth, async (req, res) => {
       sharesOutstanding:  k.sharesOutstanding       ?? null,
       shortRatio:         k.shortRatio              ?? null,
     },
-    priceHistory: hist.map(r => ({
+    priceHistory: (chartData?.quotes || []).map(r => ({
       date:   r.date,
       close:  r.close,
       open:   r.open,

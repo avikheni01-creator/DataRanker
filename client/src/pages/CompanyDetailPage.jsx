@@ -458,7 +458,7 @@ function InsiderTransactionsSection({ transactions }) {
   if (!transactions?.length) return null;
   return (
     <SectionCard title="INSIDER TRANSACTIONS">
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: 400, overflowY: "auto" }}>
         {transactions.map((t, i) => {
           const isBuy = (t.shares ?? 0) > 0 ||
             (t.text || "").toLowerCase().includes("purchase");
