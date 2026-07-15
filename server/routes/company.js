@@ -196,7 +196,7 @@ router.get("/company/:symbol/full", requireAuth, async (req, res) => {
   const yearAgo = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
   const today   = new Date().toISOString().slice(0, 10);
 
-  const [quoteRes, summaryRes, histRes] = await Promise.allSettled([
+  const [quoteRes, summaryRes, histRes, signalRes] = await Promise.allSettled([
     yf.quote(symbol),
     yf.quoteSummary(symbol, {
       modules: [
@@ -213,6 +213,15 @@ router.get("/company/:symbol/full", requireAuth, async (req, res) => {
       ],
     }),
     yf.historical(symbol, { period1: yearAgo, period2: today, interval: "1d" }),
+    // Separate call so a missing module never breaks the core financials above.
+    yf.quoteSummary(symbol, {
+      modules: [
+        "insiderTransactions",
+        "upgradeDowngradeHistory",
+        "incomeStatementHistory",   // annual (4 years)
+        "institutionOwnership",
+      ],
+    }),
   ]);
 
   if (quoteRes.status === "rejected" && summaryRes.status === "rejected") {
@@ -222,6 +231,12 @@ router.get("/company/:symbol/full", requireAuth, async (req, res) => {
   const q    = quoteRes.status   === "fulfilled" ? quoteRes.value   : null;
   const s    = summaryRes.status === "fulfilled" ? summaryRes.value : {};
   const hist = histRes.status    === "fulfilled" ? histRes.value    : [];
+  const sig  = signalRes.status  === "fulfilled" ? signalRes.value  : {};
+
+  const it  = sig.insiderTransactions              || {};
+  const udh = sig.upgradeDowngradeHistory          || {};
+  const iah = sig.incomeStatementHistory           || {};
+  const io  = sig.institutionOwnership             || {};
 
   const ap  = s.assetProfile                      || {};
   const sd  = s.summaryDetail                     || {};
@@ -341,6 +356,35 @@ router.get("/company/:symbol/full", requireAuth, async (req, res) => {
       high:   r.high,
       low:    r.low,
       volume: r.volume,
+    })),
+    insiderTransactions: (it.transactions || []).slice(0, 15).map(t => ({
+      name:     t.filerName      ?? null,
+      relation: t.filerRelation  ?? null,
+      text:     t.transactionText ?? null,
+      shares:   t.shares         ?? null,
+      value:    t.value          ?? null,
+      date:     t.startDate      ?? null,
+    })),
+    analystActions: (udh.history || []).slice(0, 12).map(h => ({
+      firm:      h.firm      ?? null,
+      toGrade:   h.toGrade   ?? null,
+      fromGrade: h.fromGrade ?? null,
+      action:    h.action    ?? null,
+      date: typeof h.epochGradeDate === "number"
+        ? new Date(h.epochGradeDate * 1000)
+        : (h.epochGradeDate ?? null),
+    })),
+    annualIncome: [...(iah.incomeStatementHistory || [])].reverse().map(q => ({
+      date:      q.endDate,
+      revenue:   q.totalRevenue ?? null,
+      netIncome: q.netIncome    ?? null,
+    })),
+    topInstitutions: (io.ownershipList || []).slice(0, 10).map(o => ({
+      name:       o.organization ?? null,
+      pctHeld:    o.pctHeld      ?? null,
+      shares:     o.position     ?? null,
+      pctChange:  o.pctChange    ?? null,
+      reportDate: o.reportDate   ?? null,
     })),
   });
 });

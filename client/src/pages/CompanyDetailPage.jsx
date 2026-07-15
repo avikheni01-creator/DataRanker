@@ -4,7 +4,7 @@ import { apiFetch } from "../api";
 import {
   AreaChart, Area, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  Cell, Legend, ReferenceLine,
+  Cell, Legend,
 } from "recharts";
 
 // ── Formatting helpers ────────────────────────────────────────────────────────
@@ -336,8 +336,9 @@ function QuarterlyIncomeSection({ data, currency }) {
     netIncome: q.netIncome,
   }));
   return (
-    <SectionCard title="QUARTERLY REVENUE & NET INCOME">
-      <ResponsiveContainer width="100%" height={190}>
+    <SectionCard title="QUARTERLY REVENUE & NET INCOME" style={{ display: "flex", flexDirection: "column" }}>
+      <div style={{ flex: 1, minHeight: 190 }}>
+      <ResponsiveContainer width="100%" height="100%">
         <BarChart data={chartData} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
           <XAxis dataKey="quarter" tick={axisTickStyle()} axisLine={false} tickLine={false} />
@@ -361,42 +362,205 @@ function QuarterlyIncomeSection({ data, currency }) {
             formatter={v => v === "revenue" ? "Revenue" : "Net Income"} />
         </BarChart>
       </ResponsiveContainer>
+      </div>
     </SectionCard>
   );
 }
 
-// ── Cash Flows ────────────────────────────────────────────────────────────────
+// ── Annual Revenue & Net Income ───────────────────────────────────────────────
 
-function CashflowSection({ data, currency }) {
+function AnnualIncomeSection({ data, currency }) {
   if (!data?.length) return null;
   const chartData = data.map(q => ({
-    quarter:   fmtQDate(q.date),
-    operating: q.operating,
-    investing: q.investing,
-    financing: q.financing,
+    year:      fmtQDate(q.date),
+    revenue:   q.revenue,
+    netIncome: q.netIncome,
   }));
   return (
-    <SectionCard title="CASH FLOWS">
-      <ResponsiveContainer width="100%" height={190}>
-        <BarChart data={chartData} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-          <XAxis dataKey="quarter" tick={axisTickStyle()} axisLine={false} tickLine={false} />
-          <YAxis tick={axisTickStyle()} axisLine={false} tickLine={false} width={60}
-            tickFormatter={v => fmtLarge(v, currency)} />
-          <Tooltip
-            {...tooltipStyle()}
-            formatter={(v, name) => [
-              fmtLarge(v, currency),
-              name.charAt(0).toUpperCase() + name.slice(1),
-            ]}
-          />
-          <ReferenceLine y={0} stroke="var(--border)" />
-          <Bar dataKey="operating" name="operating" fill="#7c6cff" radius={[2, 2, 0, 0]} />
-          <Bar dataKey="investing" name="investing" fill="#f59e0b" radius={[2, 2, 0, 0]} />
-          <Bar dataKey="financing" name="financing" fill="#ec4899" radius={[2, 2, 0, 0]} />
-          <Legend wrapperStyle={{ fontSize: 9, fontFamily: MONO }} />
-        </BarChart>
-      </ResponsiveContainer>
+    <SectionCard title="ANNUAL REVENUE & NET INCOME" style={{ display: "flex", flexDirection: "column" }}>
+      <div style={{ flex: 1, minHeight: 190 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={chartData} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+            <XAxis dataKey="year" tick={axisTickStyle()} axisLine={false} tickLine={false} />
+            <YAxis tick={axisTickStyle()} axisLine={false} tickLine={false} width={60}
+              tickFormatter={v => fmtLarge(v, currency)} />
+            <Tooltip
+              {...tooltipStyle()}
+              formatter={(v, name) => [
+                fmtLarge(v, currency),
+                name === "revenue" ? "Revenue" : "Net Income",
+              ]}
+            />
+            <Bar dataKey="revenue" name="revenue" fill="var(--accent)" radius={[2,2,0,0]} opacity={0.85} />
+            <Bar dataKey="netIncome" name="netIncome" radius={[2,2,0,0]}>
+              {chartData.map((d, i) => (
+                <Cell key={i} fill={(d.netIncome ?? 0) >= 0 ? "var(--positive)" : "var(--negative)"} />
+              ))}
+            </Bar>
+            <Legend wrapperStyle={{ fontSize: 9, fontFamily: MONO }}
+              formatter={v => v === "revenue" ? "Revenue" : "Net Income"} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </SectionCard>
+  );
+}
+
+// ── Top Institutional Holders ─────────────────────────────────────────────────
+
+function TopInstitutionsSection({ institutions }) {
+  if (!institutions?.length) return null;
+  return (
+    <SectionCard title="TOP INSTITUTIONAL HOLDERS">
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {institutions.map((inst, i) => {
+          const up = (inst.pctChange ?? 0) >= 0;
+          return (
+            <div key={i} style={{
+              display: "flex", justifyContent: "space-between", alignItems: "center",
+              padding: "8px 12px", background: "var(--elevated)",
+              borderRadius: 8, border: "1px solid var(--border)",
+            }}>
+              <div style={{ minWidth: 0 }}>
+                <div style={{
+                  fontSize: 12, fontWeight: 700, color: "var(--text-secondary)",
+                  whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+                  maxWidth: 170,
+                }}>{inst.name || "—"}</div>
+                {inst.reportDate && (
+                  <div style={{ fontSize: 9, color: "var(--text-muted)", fontFamily: MONO, marginTop: 2 }}>
+                    {new Date(inst.reportDate).toLocaleDateString("en-IN", { month: "short", year: "numeric" })}
+                  </div>
+                )}
+              </div>
+              <div style={{ textAlign: "right", flexShrink: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: "var(--text)", fontFamily: MONO }}>
+                  {fmtPct(inst.pctHeld)}
+                </div>
+                {inst.pctChange != null && (
+                  <div style={{ fontSize: 10, fontWeight: 600, color: up ? "var(--positive)" : "var(--negative)", fontFamily: MONO }}>
+                    {up ? "▲" : "▼"} {Math.abs(inst.pctChange * 100).toFixed(2)}%
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </SectionCard>
+  );
+}
+
+// ── Insider Transactions ──────────────────────────────────────────────────────
+
+function InsiderTransactionsSection({ transactions }) {
+  if (!transactions?.length) return null;
+  return (
+    <SectionCard title="INSIDER TRANSACTIONS">
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {transactions.map((t, i) => {
+          const isBuy = (t.shares ?? 0) > 0 ||
+            (t.text || "").toLowerCase().includes("purchase");
+          return (
+            <div key={i} style={{
+              display: "flex", justifyContent: "space-between", alignItems: "flex-start",
+              padding: "10px 12px", background: "var(--elevated)",
+              borderRadius: 8, border: "1px solid var(--border)",
+            }}>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-secondary)" }}>
+                  {t.name || "—"}
+                </div>
+                <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 2 }}>
+                  {t.relation || ""}
+                </div>
+              </div>
+              <div style={{ textAlign: "right", flexShrink: 0, marginLeft: 10 }}>
+                <div style={{
+                  display: "inline-block", fontSize: 9, fontWeight: 700, fontFamily: MONO,
+                  padding: "2px 7px", borderRadius: 4, marginBottom: 4,
+                  background: isBuy ? "rgba(34,197,94,.15)" : "rgba(239,68,68,.15)",
+                  color: isBuy ? "var(--positive)" : "var(--negative)",
+                }}>
+                  {isBuy ? "BUY" : "SELL"}
+                </div>
+                {t.value != null && (
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-secondary)", fontFamily: MONO }}>
+                    {fmtLarge(Math.abs(t.value))}
+                  </div>
+                )}
+                {t.shares != null && (
+                  <div style={{ fontSize: 10, color: "var(--text-muted)", fontFamily: MONO }}>
+                    {Math.abs(t.shares).toLocaleString("en-IN")} shares
+                  </div>
+                )}
+                {t.date && (
+                  <div style={{ fontSize: 9, color: "var(--text-muted)", marginTop: 2 }}>
+                    {new Date(t.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </SectionCard>
+  );
+}
+
+// ── Analyst Upgrades & Downgrades ─────────────────────────────────────────────
+
+const ACTION_META = {
+  up:   { label: "UPGRADE",    bg: "rgba(34,197,94,.15)",  color: "var(--positive)" },
+  down: { label: "DOWNGRADE",  bg: "rgba(239,68,68,.15)",  color: "var(--negative)" },
+  init: { label: "INITIATE",   bg: "rgba(124,108,255,.15)",color: "var(--accent-hover)" },
+  main: { label: "MAINTAIN",   bg: "var(--elevated)",      color: "var(--text-muted)" },
+  reit: { label: "REITERATE",  bg: "var(--elevated)",      color: "var(--text-muted)" },
+};
+
+function AnalystActionsSection({ actions }) {
+  if (!actions?.length) return null;
+  return (
+    <SectionCard title="ANALYST UPGRADES & DOWNGRADES">
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {actions.map((a, i) => {
+          const meta = ACTION_META[a.action] || ACTION_META.main;
+          return (
+            <div key={i} style={{
+              display: "flex", justifyContent: "space-between", alignItems: "flex-start",
+              padding: "10px 12px", background: "var(--elevated)",
+              borderRadius: 8, border: "1px solid var(--border)",
+            }}>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-secondary)" }}>
+                  {a.firm || "—"}
+                </div>
+                {(a.fromGrade || a.toGrade) && (
+                  <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 2, fontFamily: MONO }}>
+                    {a.fromGrade && <span>{a.fromGrade} → </span>}
+                    <span style={{ fontWeight: 700, color: "var(--text-secondary)" }}>{a.toGrade}</span>
+                  </div>
+                )}
+              </div>
+              <div style={{ textAlign: "right", flexShrink: 0, marginLeft: 10 }}>
+                <div style={{
+                  display: "inline-block", fontSize: 9, fontWeight: 700, fontFamily: MONO,
+                  padding: "2px 7px", borderRadius: 4, marginBottom: 4,
+                  background: meta.bg, color: meta.color,
+                }}>
+                  {meta.label}
+                </div>
+                {a.date && (
+                  <div style={{ fontSize: 9, color: "var(--text-muted)" }}>
+                    {new Date(a.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </SectionCard>
   );
 }
@@ -690,7 +854,10 @@ export default function CompanyDetailPage() {
         <AnalystSection analyst={data.analyst} quote={q} currency={currency} />
         <EarningsSection earnings={data.earnings} />
         <QuarterlyIncomeSection data={data.quarterlyIncome} currency={currency} />
-        <CashflowSection data={data.quarterlyCashflow} currency={currency} />
+        <AnnualIncomeSection data={data.annualIncome} currency={currency} />
+        <TopInstitutionsSection institutions={data.topInstitutions} />
+        <InsiderTransactionsSection transactions={data.insiderTransactions} />
+        <AnalystActionsSection actions={data.analystActions} />
         <KeyMetricsSection
           valuation={data.valuation}
           profitability={data.profitability}
