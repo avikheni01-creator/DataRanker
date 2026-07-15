@@ -238,7 +238,7 @@ router.get("/company/:symbol/full", requireAuth, async (req, res) => {
     yf.fundamentalsTimeSeries(symbol, {
       period1: "2020-01-01",
       period2: today,
-      type: ["annualTotalRevenue", "annualNetIncome", "quarterlyTotalRevenue", "quarterlyNetIncome"],
+      module: ["annualTotalRevenue", "annualNetIncome", "quarterlyTotalRevenue", "quarterlyNetIncome"],
     }),
     // Separate call so a missing module never breaks the core data above.
     yf.quoteSummary(symbol, {
