@@ -17,7 +17,7 @@ const MAX_COMPANIES   = 6;
 const MAX_RADAR_AXES  = 8;
 const MAX_MULTI_BAR   = 12;
 const MAX_PERCENTILE  = 10;
-const PALETTE = ["#7C6CFF", "#22C55E", "#F59E0B", "#EF4444", "#3B82F6", "#EC4899"];
+const PALETTE = ["#1E3A8A", "#10B981", "#F59E0B", "#EF4444", "#3B82F6", "#EC4899"];
 const MEDALS  = ["🥇", "🥈", "🥉", "4th", "5th", "6th"];
 
 // Index-based data keys prevent collision when two company names truncate identically
@@ -334,7 +334,7 @@ const CSS = (colors, fonts, radius) => `
     flex-shrink: 0; transition: all .12s;
   }
   .cmp-chip:hover { border-color: ${colors.accent}; color: ${colors.text}; }
-  .cmp-chip.on { background: rgba(124,108,255,.15); border-color: ${colors.accent}; color: ${colors.accentHover}; }
+  .cmp-chip.on { background: rgba(16,185,129,.15); border-color: ${colors.accent}; color: ${colors.accentHover}; }
 
   /* ── Axis selectors (scatter) ─── */
   .cmp-axis-row { display: flex; gap: 12px; padding: 10px 18px; flex-wrap: wrap; }
@@ -370,9 +370,9 @@ const CSS = (colors, fonts, radius) => `
   .cmp-leader-wins { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
   .cmp-win-chip {
     font-size: 10px; padding: 2px 7px; border-radius: 999px;
-    background: rgba(124,108,255,.12); color: ${colors.accentHover}; border: 1px solid rgba(124,108,255,.25);
+    background: rgba(16,185,129,.12); color: ${colors.accentHover}; border: 1px solid rgba(16,185,129,.25);
   }
-  .cmp-leader-row:first-child { background: rgba(124,108,255,.06); border-color: rgba(124,108,255,.3); }
+  .cmp-leader-row:first-child { background: rgba(16,185,129,.06); border-color: rgba(16,185,129,.3); }
 
   /* ── Comparison table ─── */
   .cmp-table-wrap { overflow-x: auto; }

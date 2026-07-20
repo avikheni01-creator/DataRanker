@@ -4,7 +4,7 @@
 
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 
-const STORAGE_KEY = "matrix_theme";
+const STORAGE_KEY = "thinkvest_theme";
 const ThemeContext = createContext({ mode: "dark", toggle: () => {}, setMode: () => {} });
 
 function getInitialMode() {

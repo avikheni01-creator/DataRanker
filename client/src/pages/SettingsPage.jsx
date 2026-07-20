@@ -40,8 +40,8 @@ function Card({ title, children }) {
 function Banner({ type, children }) {
   const bg = type === "success"
     ? "rgba(34,197,94,0.10)" : type === "error"
-    ? "rgba(239,68,68,0.10)" : "rgba(124,108,255,0.10)";
-  const border = type === "success" ? "rgba(34,197,94,0.4)" : type === "error" ? "rgba(239,68,68,0.4)" : "rgba(124,108,255,0.4)";
+    ? "rgba(239,68,68,0.10)" : "rgba(16,185,129,0.10)";
+  const border = type === "success" ? "rgba(34,197,94,0.4)" : type === "error" ? "rgba(239,68,68,0.4)" : "rgba(16,185,129,0.4)";
   const color = type === "success" ? "#22C55E" : type === "error" ? "#EF4444" : colors.accentHover;
   return (
     <div style={{ background: bg, border: `1px solid ${border}`, borderRadius: radius.sm, padding: "12px 16px", fontSize: 13, color, marginBottom: 20 }}>
@@ -252,7 +252,7 @@ const CSS = `
     background: var(--border); border-radius: 999px;
     transition: background .2s;
   }
-  .st-toggle input:checked + .st-slider { background: #7C6CFF; }
+  .st-toggle input:checked + .st-slider { background: #10B981; }
   .st-slider::before {
     content: ""; position: absolute;
     width: 18px; height: 18px; left: 3px; bottom: 3px;
@@ -271,7 +271,7 @@ const CSS = `
     font-family: ${fonts.mono}; font-size: 13px;
     text-align: right;
   }
-  .st-number:focus { outline: none; border-color: #7C6CFF; box-shadow: 0 0 0 2px rgba(124,108,255,.2); }
+  .st-number:focus { outline: none; border-color: #10B981; box-shadow: 0 0 0 2px rgba(16,185,129,.2); }
 
   /* Text input */
   .st-text {
@@ -280,14 +280,14 @@ const CSS = `
     border-radius: ${radius.sm}; color: ${colors.text};
     font-family: ${fonts.sans}; font-size: 13px;
   }
-  .st-text:focus { outline: none; border-color: #7C6CFF; box-shadow: 0 0 0 2px rgba(124,108,255,.2); }
+  .st-text:focus { outline: none; border-color: #10B981; box-shadow: 0 0 0 2px rgba(16,185,129,.2); }
   .st-text::placeholder { color: ${colors.textMuted}; }
 
   /* Info chips */
   .st-info-chip {
     margin: 0 0 14px;
     padding: 8px 12px;
-    background: rgba(124,108,255,.08); border: 1px solid rgba(124,108,255,.22);
+    background: rgba(16,185,129,.08); border: 1px solid rgba(16,185,129,.22);
     border-radius: ${radius.sm};
     font-size: 12px; color: ${colors.accentHover}; line-height: 1.45;
   }
@@ -309,11 +309,11 @@ const CSS = `
   .st-footer { margin-top: 28px; display: flex; justify-content: flex-end; }
   .st-save-btn {
     padding: 12px 28px;
-    background: linear-gradient(135deg, #7C6CFF 0%, #4F46E5 100%);
+    background: linear-gradient(135deg, #10B981 0%, #1E3A8A 100%);
     border: none; border-radius: ${radius.sm};
     color: #fff; font-size: 14px; font-weight: 600;
     font-family: ${fonts.sans}; cursor: pointer;
-    box-shadow: 0 4px 14px rgba(124,108,255,.32);
+    box-shadow: 0 4px 14px rgba(16,185,129,.32);
     transition: all .18s ease;
   }
   .st-save-btn:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.08); }

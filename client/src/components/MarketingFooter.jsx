@@ -30,7 +30,7 @@ export default function MarketingFooter() {
         </div>
       </div>
       <div className="mkt-footer-bar">
-        <span>© {new Date().getFullYear()} Matrix</span>
+        <span>© {new Date().getFullYear()} ThinkVest</span>
         <span>For internal & authorized use</span>
       </div>
     </footer>

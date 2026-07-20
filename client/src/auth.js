@@ -7,8 +7,8 @@
 import { apiFetch } from "./api";
 import { clearResult } from "./lib/resultStore";
 
-const USER_KEY  = "matrix_user";
-const TOKEN_KEY = "matrix_token";
+const USER_KEY  = "thinkvest_user";
+const TOKEN_KEY = "thinkvest_token";
 
 function cacheUser(user, token) {
   if (user) localStorage.setItem(USER_KEY, JSON.stringify(user));

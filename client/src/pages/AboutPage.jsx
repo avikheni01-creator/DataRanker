@@ -9,7 +9,7 @@ import { colors, gradients, fonts, radius, glassCss } from "../theme";
 const VALUES = [
   { title: "Defensible by design", desc: "Every score traces back to a KPI, a weight and a direction you control. No black boxes." },
   { title: "Analyst-first", desc: "Built around the real workflow of equity research — export, map, rank, export again." },
-  { title: "Your methodology", desc: "Matrix runs your templates. The edge stays yours; we just make it fast and repeatable." },
+  { title: "Your methodology", desc: "ThinkVest runs your templates. The edge stays yours; we just make it fast and repeatable." },
 ];
 
 const STATS = [
@@ -24,17 +24,17 @@ export default function AboutPage() {
       <Seo
         title="About"
         path="/about"
-        description="Matrix turns fundamentals into defensible equity rankings — built around the real research workflow: export, map, rank, export again. Your methodology, made fast and repeatable."
+        description="ThinkVest turns fundamentals into defensible equity rankings — built around the real research workflow: think, research, analyse, invest. Your methodology, made fast and repeatable."
       />
       <style>{ABOUT_CSS}</style>
       <MarketingNav />
 
       <section className="ab-hero">
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-          <div className="ab-kicker">About Matrix</div>
+          <div className="ab-kicker">About ThinkVest</div>
           <h1 className="ab-title">We turn fundamentals into<br /><span className="ab-grad">defensible rankings.</span></h1>
           <p className="ab-sub">
-            Matrix is a proprietary equity-ranking engine. It maps company fundamentals
+            ThinkVest is a proprietary equity-ranking engine. It maps company fundamentals
             to your sectors and scores them against your KPI templates — so your team
             spends time on judgement, not spreadsheets.
           </p>
@@ -97,8 +97,8 @@ const ABOUT_CSS = `
   .ab-value-desc { color: ${colors.textSecondary}; font-size: 14px; line-height: 1.6; }
 
   .ab-cta-section { max-width: 1000px; margin: 20px auto 0; padding: 40px; }
-  .ab-cta { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; border-radius: ${radius.lg}; padding: 40px 44px; background: linear-gradient(165deg, ${colors.accentSoft}, transparent 70%); border: 1px solid rgba(124,108,255,0.3); }
-  .ab-btn { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; border-radius: ${radius.pill}; padding: 15px 30px; background: ${gradients.brand}; color: #fff; box-shadow: 0 4px 18px rgba(124,108,255,0.3), inset 0 1px 0 rgba(255,255,255,0.22); transition: all .15s ease; }
+  .ab-cta { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; border-radius: ${radius.lg}; padding: 40px 44px; background: linear-gradient(165deg, ${colors.accentSoft}, transparent 70%); border: 1px solid rgba(16,185,129,0.3); }
+  .ab-btn { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; border-radius: ${radius.pill}; padding: 15px 30px; background: ${gradients.brand}; color: #fff; box-shadow: 0 4px 18px rgba(16,185,129,0.3), inset 0 1px 0 rgba(255,255,255,0.22); transition: all .15s ease; }
   .ab-btn:hover { transform: translateY(-1px); filter: brightness(1.08); }
   .ab-btn span { transition: transform .15s ease; }
   .ab-btn:hover span { transform: translateX(3px); }

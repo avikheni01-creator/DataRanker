@@ -528,7 +528,7 @@ export default function ScreenerPage() {
 
         {!loading && !snapshot && (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: "64px 32px", gap: 16, minHeight: 360 }}>
-            <div style={{ width: 68, height: 68, borderRadius: 20, display: "flex", alignItems: "center", justifyContent: "center", background: isAdmin ? "rgba(124,108,255,.10)" : "rgba(148,163,184,.08)", border: `1px solid ${isAdmin ? "rgba(124,108,255,.22)" : "rgba(148,163,184,.2)"}`, fontSize: 30 }}>
+            <div style={{ width: 68, height: 68, borderRadius: 20, display: "flex", alignItems: "center", justifyContent: "center", background: isAdmin ? "rgba(16,185,129,.10)" : "rgba(148,163,184,.08)", border: `1px solid ${isAdmin ? "rgba(16,185,129,.22)" : "rgba(148,163,184,.2)"}`, fontSize: 30 }}>
               {isAdmin ? "📤" : "⏳"}
             </div>
             <div style={{ fontFamily: "'Space Grotesk','Inter',sans-serif", fontSize: 20, fontWeight: 700, color: "var(--text)" }}>
@@ -540,7 +540,7 @@ export default function ScreenerPage() {
                 : "The admin hasn't uploaded today's screener snapshot yet. Check back shortly."}
             </div>
             {isAdmin && (
-              <label style={{ marginTop: 4, padding: "11px 26px", borderRadius: 999, color: "#fff", fontSize: 14, fontWeight: 600, background: "linear-gradient(135deg,#7C6CFF,#4F46E5)", boxShadow: "0 4px 18px rgba(124,108,255,.30)", cursor: "pointer" }}>
+              <label style={{ marginTop: 4, padding: "11px 26px", borderRadius: 999, color: "#fff", fontSize: 14, fontWeight: 600, background: "linear-gradient(135deg,#10B981,#1E3A8A)", boxShadow: "0 4px 18px rgba(16,185,129,.30)", cursor: "pointer" }}>
                 Upload CSV / Excel
                 <input type="file" accept=".csv,.xlsx,.xls" onChange={handleAdminUpload} disabled={adminUploading} style={{ display: "none" }} />
               </label>

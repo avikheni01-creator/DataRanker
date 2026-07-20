@@ -64,7 +64,7 @@ const STYLES = `
   .pl-card-icon {
     width: 26px; height: 26px; border-radius: 7px; flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
-    background: rgba(124,108,255,0.13); color: var(--accent-hover);
+    background: rgba(16,185,129,0.13); color: var(--accent-hover);
     font-size: 12px; font-weight: 700;
   }
   .pl-card-title { font-size: 13px; font-weight: 600; color: var(--text); }
@@ -74,7 +74,7 @@ const STYLES = `
   .upload-zone {
     display: flex; flex-direction: column; align-items: center;
     gap: 8px; padding: 30px 20px;
-    border: 1.5px dashed rgba(124,108,255,0.3); border-radius: 10px;
+    border: 1.5px dashed rgba(16,185,129,0.3); border-radius: 10px;
     background: var(--inset); cursor: pointer;
     transition: all 0.18s ease; text-align: center;
   }
@@ -88,7 +88,7 @@ const STYLES = `
   }
   .upload-icon {
     width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
-    background: linear-gradient(135deg, rgba(124,108,255,0.2), rgba(79,70,229,0.14));
+    background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(30,58,138,0.14));
     display: flex; align-items: center; justify-content: center;
     font-size: 15px; color: var(--accent-hover);
   }
@@ -117,12 +117,12 @@ const STYLES = `
   }
   .step-badge:last-child { margin-bottom: 0; }
   .step-idle    { background: var(--inset); border-color: var(--border); }
-  .step-running { background: rgba(124,108,255,0.10); border-color: rgba(124,108,255,0.55); animation: pulse 1.2s ease-in-out infinite; }
+  .step-running { background: rgba(16,185,129,0.10); border-color: rgba(16,185,129,0.55); animation: pulse 1.2s ease-in-out infinite; }
   .step-done    { background: rgba(34,197,94,0.07); border-color: rgba(34,197,94,0.45); }
   .step-error   { background: rgba(239,68,68,0.07); border-color: rgba(239,68,68,0.5); }
   @keyframes pulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(124,108,255,0); }
-    50%       { box-shadow: 0 0 14px 2px rgba(124,108,255,0.28); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+    50%       { box-shadow: 0 0 14px 2px rgba(16,185,129,0.28); }
   }
   .step-num {
     width: 20px; height: 20px; border-radius: 6px; flex-shrink: 0;
@@ -130,7 +130,7 @@ const STYLES = `
     font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700;
     background: var(--elevated); color: var(--text-muted);
   }
-  .step-running .step-num { background: rgba(124,108,255,0.2); color: var(--accent-hover); }
+  .step-running .step-num { background: rgba(16,185,129,0.2); color: var(--accent-hover); }
   .step-done    .step-num { background: var(--positive-soft); color: var(--positive); }
   .step-error   .step-num { background: var(--negative-soft); color: var(--negative); }
   .step-info { flex: 1; min-width: 0; }
@@ -153,7 +153,7 @@ const STYLES = `
   }
   .run-btn:hover:not(:disabled) {
     transform: translateY(-1px); filter: brightness(1.08);
-    box-shadow: 0 8px 26px rgba(124,108,255,0.45);
+    box-shadow: 0 8px 26px rgba(16,185,129,0.45);
   }
   .run-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; box-shadow: none; }
 
@@ -376,7 +376,7 @@ export default function Dashboard({ setOutputFile, backendConfig, queryFile, set
 
                 {/* Compact page header */}
                 <div className="pl-header">
-                    <div className="pl-eyebrow">Matrix · Equity Ranking</div>
+                    <div className="pl-eyebrow">ThinkVest · Equity Ranking</div>
                     <h1 className="pl-title">Ranking Pipeline</h1>
                     <p className="pl-sub">
                         Upload your Screener.in export to generate a fully scored,

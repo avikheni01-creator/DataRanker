@@ -37,7 +37,7 @@ export default function PricingPage() {
       <Seo
         title="Pricing"
         path="/pricing"
-        description="Start free with the full Matrix ranking pipeline — column mapper, KPI editor, results dashboard and Excel export. Premium and Enterprise tiers coming soon."
+        description="Start free with the full ThinkVest ranking pipeline — column mapper, KPI editor, results dashboard and Excel export. Premium and Enterprise tiers coming soon."
       />
       <style>{PRICING_CSS}</style>
       <MarketingNav />
@@ -101,8 +101,8 @@ const PRICING_CSS = `
   .pr-grid-wrap { max-width: 1080px; margin: 0 auto; padding: 40px 40px 20px; }
   .pr-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: stretch; }
   .pr-card { position: relative; display: flex; flex-direction: column; border-radius: ${radius.lg}; padding: 32px 28px; ${glassCss} }
-  .pr-card.highlighted { border-color: rgba(124,108,255,0.5); border-top-color: rgba(157,144,255,0.6); box-shadow: 0 20px 60px rgba(124,108,255,0.18); }
-  .pr-badge { position: absolute; top: -12px; left: 28px; font-family: ${fonts.mono}; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #fff; background: ${gradients.brand}; padding: 5px 12px; border-radius: ${radius.pill}; box-shadow: 0 6px 18px rgba(124,108,255,0.4); }
+  .pr-card.highlighted { border-color: rgba(16,185,129,0.5); border-top-color: rgba(52,211,153,0.6); box-shadow: 0 20px 60px rgba(16,185,129,0.18); }
+  .pr-badge { position: absolute; top: -12px; left: 28px; font-family: ${fonts.mono}; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #fff; background: ${gradients.brand}; padding: 5px 12px; border-radius: ${radius.pill}; box-shadow: 0 6px 18px rgba(16,185,129,0.4); }
   .pr-plan-name { font-family: ${fonts.display}; font-size: 20px; font-weight: 700; color: ${colors.text}; }
   .pr-price { display: flex; align-items: baseline; gap: 6px; margin: 16px 0 4px; }
   .pr-price-amt { font-family: ${fonts.display}; font-size: 44px; font-weight: 700; letter-spacing: -0.02em; color: ${colors.text}; }
@@ -112,7 +112,7 @@ const PRICING_CSS = `
   .pr-features li { display: flex; align-items: flex-start; gap: 11px; font-size: 14px; color: ${colors.text}; line-height: 1.4; }
   .pr-tick { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; flex-shrink: 0; border-radius: 999px; background: ${colors.accentSoft}; color: ${colors.accentHover}; font-size: 11px; }
   .pr-cta { display: inline-flex; align-items: center; justify-content: center; height: 46px; border-radius: ${radius.sm}; font-weight: 600; font-size: 15px; font-family: ${fonts.sans}; cursor: pointer; border: 1px solid transparent; transition: all .15s ease; }
-  .pr-cta-solid { background: ${gradients.brand}; color: #fff; box-shadow: 0 4px 18px rgba(124,108,255,0.3), inset 0 1px 0 rgba(255,255,255,0.22); }
+  .pr-cta-solid { background: ${gradients.brand}; color: #fff; box-shadow: 0 4px 18px rgba(16,185,129,0.3), inset 0 1px 0 rgba(255,255,255,0.22); }
   .pr-cta-solid:hover { transform: translateY(-1px); filter: brightness(1.08); }
   .pr-cta-muted { background: ${colors.glass}; color: ${colors.textMuted}; border-color: ${colors.glassBorder}; cursor: not-allowed; }
   .pr-note { text-align: center; color: ${colors.textMuted}; font-size: 13px; margin: 28px 0 0; }

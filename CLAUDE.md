@@ -52,11 +52,13 @@ Routes (in `client/src/App.js`):
 /app/settings          SettingsPage
 /app/account           AccountPage
 /app/admin/users       AdminUsersPage (admin only)
+/app/company/:symbol   CompanyDetailPage — real-time quote, fundamentals, OHLCV chart (Yahoo Finance); opened from StockDashboard company drawer
 *                      NotFoundPage (real 404)
 ```
 
 Key files:
 - `src/api.js` — `API_BASE` from `REACT_APP_API_URL` + `apiFetch` helper (always sends `credentials:'include'` so the auth cookie travels)
+- `src/seo.js` — per-route `<title>`/`<meta>`/`<link>` components; React 19 hoists them into `<head>` automatically
 - `src/auth.js` — real auth: `signUp`/`logIn`/`logOut`/`fetchMe` against `/auth/*`; caches the user object in `localStorage` (the JWT itself is an httpOnly cookie, not readable in JS)
 - `src/AppConfigContext.js` — React context for app-wide feature flags; `App.js` fetches `GET /app-config` after auth and stores result here; components consume it via `useContext(AppConfigContext)`
 - `src/App.js` — root router; seeds `backendConfig` from `GET /column-mapping`; lifts `outputFile`, `COLUMN_MAPPING`, and the single pipeline upload file (query export)
@@ -87,6 +89,7 @@ Deployment plumbing: `client/vercel.json` + `client/public/_redirects` provide t
 ### Backend — `server/` (Express, MongoDB/Mongoose, JWT)
 
 - `server.js` — loads env, connects MongoDB (`config/db.js`), credentialed CORS (`CLIENT_ORIGIN`), mounts routers; `express.json` limit is **10 MB** (raised from default for `/screener/run-pipeline` JSON body)
+- `config/db.js` — Mongoose connection helper; called once at startup
 - `routes/auth.js` + `controllers/authController.js` — `POST /auth/signup|login|logout`, `GET /auth/me`. Sets/clears the httpOnly JWT cookie via `middleware/auth.js`
 - `middleware/auth.js` — `signToken`, cookie helpers, `requireAuth` (guards most app routes), and `requireAdmin` (chains after `requireAuth`; checks `req.user.isAdmin`)
 - `models/User.js` — `{ name, email, passwordHash, plan, isAdmin }`; bcrypt hashing; `plan` defaults to `free`, `isAdmin` defaults to `false`. `toSafeJSON()` exposes `isAdmin` to the frontend.

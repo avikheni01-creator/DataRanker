@@ -27,8 +27,8 @@
   --shadow-elevated: 0 16px 48px rgba(0,0,0,0.55);
 
   /* Ambient backdrop layers */
-  --bd-glow-1: rgba(124,108,255,0.13);
-  --bd-glow-2: rgba(79,70,229,0.10);
+  --bd-glow-1: rgba(16,185,129,0.13);
+  --bd-glow-2: rgba(30,58,138,0.10);
   --bd-grid: rgba(255,255,255,0.018);
 
   --scrollbar-thumb: #232C49;
@@ -57,8 +57,8 @@
   --shadow-card: 0 1px 2px rgba(16,24,64,0.06), 0 8px 24px rgba(16,24,64,0.08);
   --shadow-elevated: 0 16px 48px rgba(16,24,64,0.16);
 
-  --bd-glow-1: rgba(124,108,255,0.10);
-  --bd-glow-2: rgba(79,70,229,0.07);
+  --bd-glow-1: rgba(16,185,129,0.10);
+  --bd-glow-2: rgba(30,58,138,0.07);
   --bd-grid: rgba(15,23,55,0.035);
 
   --scrollbar-thumb: #C7D0E2;
@@ -67,18 +67,18 @@
   --autofill-bg: #EEF2F9;
 
   /* Accent used as TEXT/links needs more contrast on a light canvas than the
-     dark-mode lilac (#9D90FF). Buttons keep the shared --accent/--accent-deep. */
-  --accent-hover: #5B4FCF;
-  --accent-soft: rgba(124,108,255,0.10);
+     dark-mode teal (#34D399). Buttons keep the shared --accent/--accent-deep. */
+  --accent-hover: #059669;
+  --accent-soft: rgba(16,185,129,0.10);
 }
 
 /* Brand + semantic — shared by both modes */
 :root {
-  --accent: #7C6CFF;
-  --accent-deep: #4F46E5;
-  --accent-hover: #9D90FF;
-  --accent-soft: rgba(124,108,255,0.12);
-  --focus-glow: rgba(124,108,255,0.22);
+  --accent: #10B981;
+  --accent-deep: #1E3A8A;
+  --accent-hover: #34D399;
+  --accent-soft: rgba(16,185,129,0.12);
+  --focus-glow: rgba(16,185,129,0.22);
 
   --positive: #22C55E;
   --positive-soft: rgba(34,197,94,0.12);
@@ -136,7 +136,7 @@ a { color: inherit; text-decoration: none; }
 *::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 999px; border: 2px solid var(--scrollbar-border); }
 *::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
 
-::selection { background: rgba(124,108,255,0.4); color: #fff; }
+::selection { background: rgba(16,185,129,0.4); color: #fff; }
 
 /* Autofill fix for themed inputs */
 input:-webkit-autofill,

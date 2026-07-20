@@ -6,7 +6,7 @@ function Banner({ type, children }) {
   const styles = {
     success: { bg: "rgba(34,197,94,.10)", border: "rgba(34,197,94,.4)", color: "#22C55E" },
     error:   { bg: "rgba(239,68,68,.10)",  border: "rgba(239,68,68,.4)",  color: "#EF4444" },
-    info:    { bg: "rgba(124,108,255,.10)", border: "rgba(124,108,255,.4)", color: "#7C6CFF" },
+    info:    { bg: "rgba(16,185,129,.10)", border: "rgba(16,185,129,.4)", color: "#10B981" },
   }[type] || {};
   return (
     <div style={{
@@ -61,11 +61,11 @@ const INPUT_STYLE = {
 };
 
 const BTN_PRIMARY = {
-  background: "linear-gradient(135deg,#7C6CFF 0%,#4F46E5 100%)",
+  background: "linear-gradient(135deg,#10B981 0%,#1E3A8A 100%)",
   border: "none", borderRadius: radius.sm, color: "#fff",
   fontSize: 13, fontWeight: 600, fontFamily: fonts.sans,
   padding: "9px 20px", cursor: "pointer",
-  boxShadow: "0 4px 14px rgba(124,108,255,.28)", transition: "all .18s",
+  boxShadow: "0 4px 14px rgba(16,185,129,.28)", transition: "all .18s",
 };
 
 const BTN_GHOST = {
@@ -75,7 +75,7 @@ const BTN_GHOST = {
   padding: "9px 20px", cursor: "pointer", transition: "all .15s",
 };
 
-const PLAN_COLORS = { free: "#94A3B8", premium: "#F59E0B", enterprise: "#7C6CFF" };
+const PLAN_COLORS = { free: "#94A3B8", premium: "#F59E0B", enterprise: "#10B981" };
 
 // ── Profile section ───────────────────────────────────────────────────────────
 
@@ -158,8 +158,8 @@ function ProfileCard({ user, onUpdate }) {
         <Row label="Role">
           <span style={{
             fontSize: 12, fontWeight: 700, letterSpacing: ".06em",
-            color: "#7C6CFF", background: "rgba(124,108,255,.12)",
-            border: "1px solid rgba(124,108,255,.3)",
+            color: "#10B981", background: "rgba(16,185,129,.12)",
+            border: "1px solid rgba(16,185,129,.3)",
             borderRadius: 999, padding: "3px 10px",
           }}>
             Admin

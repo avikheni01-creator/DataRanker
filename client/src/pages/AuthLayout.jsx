@@ -23,7 +23,7 @@ export default function AuthLayout({ title, subtitle, children, footer }) {
             them against your KPI templates.
           </p>
         </div>
-        <div className="auth-brand-foot">© {new Date().getFullYear()} Matrix</div>
+        <div className="auth-brand-foot">© {new Date().getFullYear()} ThinkVest</div>
       </div>
 
       <div className="auth-form-side">
@@ -48,7 +48,7 @@ const AUTH_CSS = `
 
   .auth-brand { position: relative; overflow: hidden; border-right: 1px solid ${colors.borderSubtle}; padding: 44px; display: flex; flex-direction: column; justify-content: space-between; }
   .auth-orb { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; animation: authFloat 14s ease-in-out infinite alternate; }
-  .auth-orb-a { width: 440px; height: 440px; top: -120px; left: -140px; background: rgba(124,108,255,0.22); }
+  .auth-orb-a { width: 440px; height: 440px; top: -120px; left: -140px; background: rgba(16,185,129,0.22); }
   .auth-orb-b { width: 360px; height: 360px; bottom: -120px; right: -100px; background: rgba(34,211,238,0.10); animation-delay: -7s; }
   @keyframes authFloat { from { transform: translate(-10px, -10px); } to { transform: translate(16px, 22px); } }
 
@@ -69,10 +69,10 @@ const AUTH_CSS = `
   .auth-label { display: block; font-size: 13px; font-weight: 500; color: ${colors.textSecondary}; margin-bottom: 8px; }
   .auth-input { width: 100%; height: 46px; padding: 0 14px; background: rgba(255,255,255,0.04); border: 1px solid ${colors.glassBorder}; border-radius: ${radius.sm}; color: ${colors.text}; font-size: 15px; font-family: ${fonts.sans}; transition: border-color .15s, box-shadow .15s, background .15s; }
   .auth-input::placeholder { color: ${colors.textMuted}; }
-  .auth-input:focus { outline: none; border-color: ${colors.accent}; background: rgba(124,108,255,0.06); box-shadow: 0 0 0 3px ${colors.focusGlow}; }
+  .auth-input:focus { outline: none; border-color: ${colors.accent}; background: rgba(16,185,129,0.06); box-shadow: 0 0 0 3px ${colors.focusGlow}; }
 
-  .auth-submit { width: 100%; height: 48px; margin-top: 6px; background: ${gradients.brand}; color: #fff; border: none; border-radius: ${radius.sm}; font-size: 15px; font-weight: 600; font-family: ${fonts.sans}; cursor: pointer; transition: all .15s ease; box-shadow: 0 4px 18px rgba(124,108,255,0.3), inset 0 1px 0 rgba(255,255,255,0.22); }
-  .auth-submit:hover { transform: translateY(-1px); box-shadow: 0 10px 30px rgba(124,108,255,0.45), inset 0 1px 0 rgba(255,255,255,0.22); filter: brightness(1.08); }
+  .auth-submit { width: 100%; height: 48px; margin-top: 6px; background: ${gradients.brand}; color: #fff; border: none; border-radius: ${radius.sm}; font-size: 15px; font-weight: 600; font-family: ${fonts.sans}; cursor: pointer; transition: all .15s ease; box-shadow: 0 4px 18px rgba(16,185,129,0.3), inset 0 1px 0 rgba(255,255,255,0.22); }
+  .auth-submit:hover { transform: translateY(-1px); box-shadow: 0 10px 30px rgba(16,185,129,0.45), inset 0 1px 0 rgba(255,255,255,0.22); filter: brightness(1.08); }
   .auth-submit:active { transform: translateY(1px); }
 
   .auth-footer { margin-top: 26px; text-align: center; font-size: 14px; color: ${colors.textSecondary}; }

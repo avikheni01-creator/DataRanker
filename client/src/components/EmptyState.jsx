@@ -9,8 +9,8 @@ export default function EmptyState({ icon, title, description, actions, minHeigh
         <div style={{
           width: 68, height: 68, borderRadius: 20, flexShrink: 0,
           display: "flex", alignItems: "center", justifyContent: "center",
-          background: "rgba(124,108,255,0.10)",
-          border: "1px solid rgba(124,108,255,0.22)", fontSize: 30,
+          background: "rgba(16,185,129,0.10)",
+          border: "1px solid rgba(16,185,129,0.22)", fontSize: 30,
         }}>
           {icon}
         </div>
@@ -42,8 +42,8 @@ export function PrimaryBtn({ to, onClick, children }) {
   const style = {
     display: "inline-block", padding: "11px 26px", borderRadius: 999,
     color: "#fff", fontSize: 14, fontWeight: 600, textDecoration: "none",
-    background: "linear-gradient(135deg,#7C6CFF,#4F46E5)",
-    boxShadow: "0 4px 18px rgba(124,108,255,0.30)", border: "none", cursor: "pointer",
+    background: "linear-gradient(135deg,#10B981,#1E3A8A)",
+    boxShadow: "0 4px 18px rgba(16,185,129,0.30)", border: "none", cursor: "pointer",
     fontFamily: "inherit",
   };
   if (to) {

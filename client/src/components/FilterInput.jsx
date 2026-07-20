@@ -200,7 +200,7 @@ export default function FilterInput({
                 style={{
                   display: "flex", alignItems: "center", gap: 10,
                   padding: "9px 14px", cursor: "pointer",
-                  background: i === activeIdx ? "rgba(124,108,255,.08)" : "transparent",
+                  background: i === activeIdx ? "rgba(16,185,129,.08)" : "transparent",
                   borderBottom: i < suggestions.length - 1 ? "1px solid var(--border)" : "none",
                   transition: "background .1s",
                 }}

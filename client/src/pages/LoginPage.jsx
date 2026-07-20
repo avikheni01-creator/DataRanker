@@ -56,7 +56,7 @@ export default function LoginPage() {
       subtitle="Sign in to run your rankings."
       footer={<>Don&apos;t have an account? <Link to="/signup">Sign up</Link></>}
     >
-      <Seo title="Log in" path="/login" description="Log in to Matrix to rank and score your equity universe by industry-specific KPI templates." />
+      <Seo title="Log in" path="/login" description="Log in to ThinkVest to rank and score your equity universe by industry-specific KPI templates." />
       {error && <div className="auth-error">{error}</div>}
       <GoogleButton onClick={handleGoogle} disabled={busy} label="Continue with Google" />
       <AuthDivider />

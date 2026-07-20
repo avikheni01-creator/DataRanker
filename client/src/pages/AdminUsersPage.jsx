@@ -5,7 +5,7 @@ import { getUser } from "../auth";
 import { colors, fonts, radius } from "../theme";
 
 const PLANS = ["free", "premium", "enterprise"];
-const PLAN_COLORS = { free: "#94A3B8", premium: "#F59E0B", enterprise: "#7C6CFF" };
+const PLAN_COLORS = { free: "#94A3B8", premium: "#F59E0B", enterprise: "#10B981" };
 
 // ── Tiny shared components ────────────────────────────────────────────────────
 
@@ -27,7 +27,7 @@ function Toggle({ checked, onChange, disabled }) {
       <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} disabled={disabled} style={{ opacity: 0, width: 0, height: 0, position: "absolute" }} />
       <span style={{
         position: "absolute", inset: 0, borderRadius: 999,
-        background: checked ? "#7C6CFF" : "var(--border)", transition: "background .2s",
+        background: checked ? "#10B981" : "var(--border)", transition: "background .2s",
       }}>
         <span style={{
           position: "absolute", width: 14, height: 14, left: 3, top: 3,
@@ -102,7 +102,7 @@ function UserRow({ user, isSelf, onUpdate, onDelete }) {
           <div style={{
             width: 32, height: 32, borderRadius: "50%", flexShrink: 0,
             display: "flex", alignItems: "center", justifyContent: "center",
-            background: "linear-gradient(135deg,#7C6CFF,#4F46E5)", color: "#fff",
+            background: "linear-gradient(135deg,#10B981,#1E3A8A)", color: "#fff",
             fontSize: 13, fontWeight: 700,
           }}>{initial}</div>
           <div>
@@ -324,7 +324,7 @@ const CSS = `
     font-family: ${fonts.sans}; font-size: 13px;
     outline: none;
   }
-  .au-search:focus { border-color: #7C6CFF; box-shadow: 0 0 0 2px rgba(124,108,255,.2); }
+  .au-search:focus { border-color: #10B981; box-shadow: 0 0 0 2px rgba(16,185,129,.2); }
   .au-search::placeholder { color: ${colors.textMuted}; }
   .au-count { font-size: 12px; color: ${colors.textMuted}; white-space: nowrap; margin-left: 12px; }
 

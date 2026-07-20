@@ -514,7 +514,7 @@ function InsiderTransactionsSection({ transactions }) {
 const ACTION_META = {
   up:   { label: "UPGRADE",    bg: "rgba(34,197,94,.15)",  color: "var(--positive)" },
   down: { label: "DOWNGRADE",  bg: "rgba(239,68,68,.15)",  color: "var(--negative)" },
-  init: { label: "INITIATE",   bg: "rgba(124,108,255,.15)",color: "var(--accent-hover)" },
+  init: { label: "INITIATE",   bg: "rgba(16,185,129,.15)",color: "var(--accent-hover)" },
   main: { label: "MAINTAIN",   bg: "var(--elevated)",      color: "var(--text-muted)" },
   reit: { label: "REITERATE",  bg: "var(--elevated)",      color: "var(--text-muted)" },
 };
@@ -818,15 +818,15 @@ export default function CompanyDetailPage() {
           </div>
         )}
 
-        {/* Matrix ranking context, only when navigated from results */}
+        {/* ThinkVest ranking context, only when navigated from results */}
         {matrixCompany && (
           <div style={{
             marginTop: 16, padding: "10px 14px", borderRadius: 8,
-            background: "rgba(124,108,255,.08)", border: "1px solid rgba(124,108,255,.2)",
+            background: "rgba(16,185,129,.08)", border: "1px solid rgba(16,185,129,.2)",
             display: "flex", gap: 24, alignItems: "center", flexWrap: "wrap",
           }}>
             <span style={{ fontSize: 10, fontFamily: MONO, color: "var(--accent-hover)", letterSpacing: ".1em" }}>
-              MATRIX RANK
+              THINKVEST RANK
             </span>
             {[
               { label: "Rank",     value: `#${Math.round(matrixCompany.Company_Rank)}` },

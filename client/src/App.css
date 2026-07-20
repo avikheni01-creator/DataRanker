@@ -1,4 +1,4 @@
-/* App.css — global helpers shared across Matrix pages.
+/* App.css — global helpers shared across ThinkVest pages.
    Component-specific styling lives in each component's own <style> block or
    CSS file. Keep this lean. */
 
@@ -6,6 +6,6 @@
 
 /* Generic focus-visible ring for keyboard users */
 :focus-visible {
-  outline: 2px solid #7C6CFF;
+  outline: 2px solid #10B981;
   outline-offset: 2px;
 }

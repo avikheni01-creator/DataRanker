@@ -1,0 +1,47 @@
+name: Deploy to AWS EC2
+
+# Triggers: every push to main, plus a manual "Run workflow" button in GitHub UI.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: SSH → git pull → npm install → pm2 restart
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          timeout: 60s
+          command_timeout: 10m
+          script: |
+            set -e
+
+            echo "──────────────────────────────────────"
+            echo " ThinkVest — deploying $(date '+%Y-%m-%d %H:%M:%S')"
+            echo "──────────────────────────────────────"
+
+            # ── 1. Pull latest code ─────────────────────────────────────────
+            cd ${{ secrets.EC2_PROJECT_PATH }}
+            git pull origin main
+            rm -rf client
+
+            # ── 2. Install backend dependencies (prod only) ─────────────────
+            cd server
+            npm install --omit=dev
+
+            # ── 3. Restart backend with PM2 ─────────────────────────────────
+            pm2 restart ${{ secrets.PM2_APP_NAME }} --update-env
+            pm2 save
+
+            # ── 4. Show live status so the Action log confirms it's up ───────
+            pm2 status
+
+            echo "✓ Deploy complete"

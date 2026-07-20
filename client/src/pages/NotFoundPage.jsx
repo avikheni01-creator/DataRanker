@@ -18,12 +18,12 @@ export default function NotFoundPage() {
         .nf-sub { font-size: 16px; color: ${colors.textSecondary}; line-height: 1.6; max-width: 380px; margin: 0 auto 36px; }
         .nf-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
         .nf-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 26px; border-radius: ${radius.pill}; font-weight: 600; font-size: 14px; text-decoration: none; transition: all .15s ease; border: 1px solid transparent; cursor: pointer; }
-        .nf-btn-solid { background: ${gradients.brand}; color: #fff; box-shadow: 0 4px 18px rgba(124,108,255,0.3); }
-        .nf-btn-solid:hover { transform: translateY(-1px); box-shadow: 0 8px 26px rgba(124,108,255,0.45); filter: brightness(1.08); }
+        .nf-btn-solid { background: ${gradients.brand}; color: #fff; box-shadow: 0 4px 18px rgba(16,185,129,0.3); }
+        .nf-btn-solid:hover { transform: translateY(-1px); box-shadow: 0 8px 26px rgba(16,185,129,0.45); filter: brightness(1.08); }
         .nf-btn-ghost { background: transparent; color: ${colors.textSecondary}; border-color: ${colors.border}; }
         .nf-btn-ghost:hover { border-color: ${colors.accent}; color: ${colors.text}; background: ${colors.accentSoft}; }
         .nf-orb { position: fixed; border-radius: 50%; filter: blur(90px); pointer-events: none; opacity: .6; }
-        .nf-orb-a { width: 380px; height: 380px; top: 5%; left: 50%; margin-left: -350px; background: rgba(124,108,255,0.18); }
+        .nf-orb-a { width: 380px; height: 380px; top: 5%; left: 50%; margin-left: -350px; background: rgba(16,185,129,0.18); }
         .nf-orb-b { width: 300px; height: 300px; bottom: 10%; right: 8%; background: rgba(34,211,238,0.10); }
       `}</style>
 

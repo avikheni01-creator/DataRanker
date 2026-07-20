@@ -12,7 +12,7 @@ export function apiUrl(path) {
 }
 
 function getToken() {
-  try { return localStorage.getItem("matrix_token"); } catch { return null; }
+  try { return localStorage.getItem("thinkvest_token"); } catch { return null; }
 }
 
 // Use this in raw fetch() calls (e.g. FormData / blob uploads) that can't go

@@ -23,7 +23,7 @@ const FEATURES = [
 ];
 
 const FAQ = [
-  { q: "What do I need to get started?", a: "Just your Screener.in CSV export. Industry mapping and your KPI library are managed server-side — Matrix handles everything else." },
+  { q: "What do I need to get started?", a: "Just your Screener.in CSV export. Industry mapping and your KPI library are managed server-side — ThinkVest handles everything else." },
   { q: "Is my methodology safe?", a: "Your KPI weights and ranking logic stay in your workspace. The pipeline runs your templates exactly as you define them." },
   { q: "What does the Free plan include?", a: "The full ranking pipeline, column mapper, KPI editor, results dashboard and Excel export — everything you need to rank your first universe." },
   { q: "Can I change the scoring later?", a: "Yes. Edit templates, weights and directions in the KPI editor and re-run the pipeline any time." },
@@ -61,7 +61,7 @@ export default function LandingPage() {
     <div style={{ color: colors.text, fontFamily: fonts.sans, minHeight: "100vh", overflowX: "hidden" }}>
       <Seo
         path="/"
-        description="Matrix turns raw equity fundamentals into a defensible, weighted ranking — mapped to your sectors and scored against your KPI templates. Export, map, rank, done."
+        description="ThinkVest turns raw equity fundamentals into a defensible, weighted ranking — mapped to your sectors and scored against your KPI templates. Think. Research. Analyse. Invest."
       />
       <style>{LANDING_CSS}</style>
 
@@ -73,14 +73,14 @@ export default function LandingPage() {
         <div className="lp-orb lp-orb-b" aria-hidden="true" />
         <motion.div {...fadeUp(0)} className="lp-eyebrow">
           <span className="lp-eyebrow-dot" />
-          Proprietary Equity Ranking Engine
+          Think · Research · Analyse · Invest
         </motion.div>
         <motion.h1 {...fadeUp(0.06)} className="lp-title">
           Rank every company.<br />
           <span className="lp-grad">With precision.</span>
         </motion.h1>
         <motion.p {...fadeUp(0.12)} className="lp-sub">
-          Matrix turns raw fundamentals into a defensible, weighted ranking —
+          ThinkVest turns raw fundamentals into a defensible, weighted ranking —
           mapped to your sectors and scored against your KPI templates.
         </motion.p>
         <motion.div {...fadeUp(0.18)} className="lp-cta">
@@ -215,8 +215,8 @@ export default function LandingPage() {
 const LANDING_CSS = `
   .lp-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; font-size: 14px; border-radius: ${radius.pill}; padding: 10px 20px; transition: all .15s ease; cursor: pointer; border: 1px solid transparent; }
   .lp-btn-lg { padding: 15px 30px; font-size: 15px; }
-  .lp-btn-solid { background: ${gradients.brand}; color: #fff; box-shadow: 0 4px 18px rgba(124,108,255,0.3), inset 0 1px 0 rgba(255,255,255,0.22); }
-  .lp-btn-solid:hover { transform: translateY(-1px); box-shadow: 0 10px 32px rgba(124,108,255,0.45), inset 0 1px 0 rgba(255,255,255,0.22); filter: brightness(1.08); }
+  .lp-btn-solid { background: ${gradients.brand}; color: #fff; box-shadow: 0 4px 18px rgba(16,185,129,0.3), inset 0 1px 0 rgba(255,255,255,0.22); }
+  .lp-btn-solid:hover { transform: translateY(-1px); box-shadow: 0 10px 32px rgba(16,185,129,0.45), inset 0 1px 0 rgba(255,255,255,0.22); filter: brightness(1.08); }
   .lp-btn-ghost { background: ${colors.glass}; color: ${colors.text}; border-color: ${colors.glassBorder}; backdrop-filter: blur(8px); }
   .lp-btn-ghost:hover { border-color: ${colors.accent}; background: ${colors.accentSoft}; }
   .lp-btn-arrow { transition: transform .15s ease; }
@@ -232,12 +232,12 @@ const LANDING_CSS = `
 
   .lp-hero { position: relative; text-align: center; padding: 90px 24px 80px; }
   .lp-orb { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; animation: lpFloat 14s ease-in-out infinite alternate; }
-  .lp-orb-a { width: 520px; height: 520px; top: -180px; left: 50%; margin-left: -460px; background: rgba(124,108,255,0.20); }
+  .lp-orb-a { width: 520px; height: 520px; top: -180px; left: 50%; margin-left: -460px; background: rgba(16,185,129,0.20); }
   .lp-orb-b { width: 420px; height: 420px; top: -60px; left: 50%; margin-left: 80px; background: rgba(34,211,238,0.10); animation-delay: -7s; }
-  .lp-orb-c { width: 480px; height: 480px; bottom: -240px; left: 50%; margin-left: -240px; background: rgba(124,108,255,0.14); }
+  .lp-orb-c { width: 480px; height: 480px; bottom: -240px; left: 50%; margin-left: -240px; background: rgba(16,185,129,0.14); }
   @keyframes lpFloat { from { transform: translateY(-14px); } to { transform: translateY(22px); } }
 
-  .lp-eyebrow { position: relative; display: inline-flex; align-items: center; gap: 9px; font-family: ${fonts.mono}; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: ${colors.accentHover}; margin-bottom: 26px; padding: 8px 16px; border-radius: ${radius.pill}; background: ${colors.accentSoft}; border: 1px solid rgba(124,108,255,0.25); }
+  .lp-eyebrow { position: relative; display: inline-flex; align-items: center; gap: 9px; font-family: ${fonts.mono}; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: ${colors.accentHover}; margin-bottom: 26px; padding: 8px 16px; border-radius: ${radius.pill}; background: ${colors.accentSoft}; border: 1px solid rgba(16,185,129,0.25); }
   .lp-eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: ${colors.accent}; box-shadow: 0 0 10px ${colors.accent}; animation: lpPulse 2.2s ease-in-out infinite; }
   @keyframes lpPulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
 
@@ -246,7 +246,7 @@ const LANDING_CSS = `
   .lp-sub { position: relative; max-width: 560px; margin: 28px auto 0; color: ${colors.textSecondary}; font-size: 18px; line-height: 1.65; }
   .lp-cta { position: relative; display: flex; gap: 14px; justify-content: center; margin-top: 40px; }
 
-  .lp-panel { position: relative; max-width: 620px; margin: 70px auto 0; border-radius: ${radius.lg}; padding: 0 0 14px; overflow: hidden; ${glassCss} box-shadow: 0 30px 80px rgba(0,0,0,0.25), 0 0 80px rgba(124,108,255,0.08); }
+  .lp-panel { position: relative; max-width: 620px; margin: 70px auto 0; border-radius: ${radius.lg}; padding: 0 0 14px; overflow: hidden; ${glassCss} box-shadow: 0 30px 80px rgba(0,0,0,0.25), 0 0 80px rgba(16,185,129,0.08); }
   .lp-panel-head { display: flex; align-items: center; gap: 7px; padding: 14px 18px; border-bottom: 1px solid ${colors.glassBorder}; }
   .lp-panel-dot { width: 9px; height: 9px; border-radius: 50%; background: ${colors.elevated}; border: 1px solid ${colors.glassBorder}; }
   .lp-panel-title { margin-left: 10px; font-family: ${fonts.mono}; font-size: 10px; letter-spacing: .14em; color: ${colors.textMuted}; }
@@ -268,28 +268,28 @@ const LANDING_CSS = `
   .lp-h2 { font-family: ${fonts.display}; font-size: clamp(28px, 4vw, 44px); font-weight: 700; line-height: 1.12; letter-spacing: -0.015em; text-align: center; margin: 0 0 48px; color: ${colors.text}; }
 
   .lp-flow { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
-  .lp-flow-line { position: absolute; top: 39px; left: 6%; right: 6%; height: 1px; background: linear-gradient(90deg, transparent, rgba(124,108,255,0.45), rgba(124,108,255,0.45), transparent); pointer-events: none; }
+  .lp-flow-line { position: absolute; top: 39px; left: 6%; right: 6%; height: 1px; background: linear-gradient(90deg, transparent, rgba(16,185,129,0.45), rgba(16,185,129,0.45), transparent); pointer-events: none; }
   .lp-flow-card { position: relative; border-radius: ${radius.md}; padding: 28px 22px; transition: transform .15s ease, box-shadow .15s ease; ${glassCss} }
-  .lp-flow-card:hover { transform: translateY(-4px); box-shadow: 0 16px 44px rgba(0,0,0,0.25), 0 0 40px rgba(124,108,255,0.12); }
-  .lp-flow-n { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: ${radius.pill}; font-family: ${fonts.mono}; font-size: 12px; color: #fff; background: ${gradients.brand}; box-shadow: 0 0 18px rgba(124,108,255,0.4); margin-bottom: 16px; }
+  .lp-flow-card:hover { transform: translateY(-4px); box-shadow: 0 16px 44px rgba(0,0,0,0.25), 0 0 40px rgba(16,185,129,0.12); }
+  .lp-flow-n { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: ${radius.pill}; font-family: ${fonts.mono}; font-size: 12px; color: #fff; background: ${gradients.brand}; box-shadow: 0 0 18px rgba(16,185,129,0.4); margin-bottom: 16px; }
   .lp-flow-title { font-family: ${fonts.display}; font-size: 17px; font-weight: 700; margin-bottom: 8px; color: ${colors.text}; }
   .lp-flow-desc { font-size: 14px; color: ${colors.textSecondary}; line-height: 1.55; }
 
   .lp-features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
   @media (max-width: 860px) { .lp-features { grid-template-columns: 1fr 1fr; } }
   .lp-feature { border-radius: ${radius.md}; padding: 28px 24px; transition: transform .15s ease, box-shadow .15s ease; ${glassCss} }
-  .lp-feature:hover { transform: translateY(-4px); box-shadow: 0 16px 44px rgba(0,0,0,0.25), 0 0 40px rgba(124,108,255,0.12); }
-  .lp-feature-icon { display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: ${radius.sm}; background: ${colors.accentSoft}; color: ${colors.accentHover}; border: 1px solid rgba(124,108,255,0.25); margin-bottom: 18px; }
+  .lp-feature:hover { transform: translateY(-4px); box-shadow: 0 16px 44px rgba(0,0,0,0.25), 0 0 40px rgba(16,185,129,0.12); }
+  .lp-feature-icon { display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: ${radius.sm}; background: ${colors.accentSoft}; color: ${colors.accentHover}; border: 1px solid rgba(16,185,129,0.25); margin-bottom: 18px; }
   .lp-feature-title { font-family: ${fonts.display}; font-size: 18px; font-weight: 700; margin-bottom: 8px; color: ${colors.text}; }
   .lp-feature-desc { font-size: 14px; color: ${colors.textSecondary}; line-height: 1.6; }
 
-  .lp-teaser { display: flex; align-items: center; justify-content: space-between; gap: 30px; flex-wrap: wrap; border-radius: ${radius.lg}; padding: 44px; background: linear-gradient(165deg, ${colors.accentSoft}, transparent 70%); border: 1px solid rgba(124,108,255,0.3); }
+  .lp-teaser { display: flex; align-items: center; justify-content: space-between; gap: 30px; flex-wrap: wrap; border-radius: ${radius.lg}; padding: 44px; background: linear-gradient(165deg, ${colors.accentSoft}, transparent 70%); border: 1px solid rgba(16,185,129,0.3); }
   .lp-teaser-sub { color: ${colors.textSecondary}; font-size: 16px; margin: 16px 0 0; max-width: 420px; line-height: 1.6; }
 
   .lp-faq-section { max-width: 820px; }
   .lp-faq { display: flex; flex-direction: column; gap: 12px; }
   .lp-faq-item { border-radius: ${radius.md}; ${glassCss} overflow: hidden; }
-  .lp-faq-item.open { border-color: rgba(124,108,255,0.35); }
+  .lp-faq-item.open { border-color: rgba(16,185,129,0.35); }
   .lp-faq-q { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 24px; background: transparent; border: none; cursor: pointer; text-align: left; color: ${colors.text}; font-family: ${fonts.sans}; font-size: 16px; font-weight: 600; }
   .lp-faq-chev { color: ${colors.accentHover}; font-size: 22px; line-height: 1; }
   .lp-faq-a { padding: 0 24px 22px; color: ${colors.textSecondary}; font-size: 15px; line-height: 1.65; }

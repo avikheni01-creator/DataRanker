@@ -4,8 +4,8 @@
 // (a no-SSR SPA can only serve homepage tags to crawlers that don't run JS).
 
 // Canonical/OG absolute base. Set REACT_APP_SITE_URL to the real domain at deploy.
-export const SITE_URL = (process.env.REACT_APP_SITE_URL || "https://matrix.example.com").replace(/\/+$/, "");
-export const SITE_NAME = "Matrix";
+export const SITE_URL = (process.env.REACT_APP_SITE_URL || "https://thinkvest.in").replace(/\/+$/, "");
+export const SITE_NAME = "ThinkVest";
 
 const OG_IMAGE = `${SITE_URL}/logo512.png`;
 

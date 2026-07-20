@@ -30,6 +30,9 @@ __pycache__/
 # Trade secret — never commit or push
 LOGIC.md
 
+# Local Claude Code settings (permissions, hooks)
+.claude/
+
 # Nested Next.js + Express rewrite (its own git repo, kept as reference)
 /dataranker
 

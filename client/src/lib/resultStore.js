@@ -3,7 +3,7 @@
 // is too large/binary for localStorage, so we use IndexedDB and store the Blob
 // directly. All calls are best-effort: failures degrade to in-memory-only.
 
-const DB_NAME = "matrix";
+const DB_NAME = "thinkvest";
 const STORE = "results";
 const KEY = "latest";
 

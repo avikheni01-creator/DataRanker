@@ -1,11 +1,11 @@
-// ─── Matrix Design System ───────────────────────────────────────────────────
+// ─── ThinkVest Design System ─────────────────────────────────────────────────
 // Single source of truth for colors, typography, spacing, motion.
 //
 // Colors are expressed as CSS custom properties (var(--token)) whose concrete
 // values live in index.css under [data-theme="dark"] / [data-theme="light"].
 // Because every component consumes these tokens (e.g. style={{ color: colors.text }}),
 // flipping data-theme on <html> re-themes the entire app with no per-component
-// changes. The brand violet→indigo and semantic colors are shared by both modes.
+// changes. The brand emerald→navy and semantic colors are shared by both modes.
 
 export const colors = {
   // Surfaces
@@ -26,7 +26,7 @@ export const colors = {
   textSecondary: "var(--text-secondary)",
   textMuted: "var(--text-muted)",
 
-  // Brand — violet → indigo (shared across modes)
+  // Brand — emerald → navy (shared across modes)
   accent: "var(--accent)",
   accentDeep: "var(--accent-deep)",
   accentHover: "var(--accent-hover)",
@@ -68,9 +68,9 @@ export const radius = {
 export const shadow = {
   card: "var(--shadow-card)",
   elevated: "var(--shadow-elevated)",
-  glow: "0 8px 32px rgba(124,108,255,0.35)",
-  glowSoft: "0 0 60px rgba(124,108,255,0.12)",
-  glowGreen: "0 8px 30px rgba(34,197,94,0.25)",
+  glow: "0 8px 32px rgba(16,185,129,0.35)",
+  glowSoft: "0 0 60px rgba(16,185,129,0.12)",
+  glowGreen: "0 8px 30px rgba(16,185,129,0.28)",
 };
 
 // Reusable glass-card CSS (string) — translucent fill, blur, lit top edge.

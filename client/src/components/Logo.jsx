@@ -1,32 +1,42 @@
-import { colors, fonts } from "../theme";
+import { fonts, colors } from "../theme";
 
-// Matrix wordmark — gradient diamond glyph + name. Size scales the glyph;
-// the wordmark text follows. Used in landing, auth, and the app sidebar.
+// ThinkVest logo mark — renders only the brain icon from logo.png.
+//
+// Technique: background-image cropped via backgroundSize + backgroundPosition so
+// only the brain portion (top ~55% of the square PNG) fills the container.
+// background-blend-mode: multiply dissolves white PNG pixels into the teal
+// backgroundColor (#ECFDF5), making the white background invisible while the
+// navy and teal elements in the brain are almost perfectly preserved.
 export default function Logo({ size = 22, showText = true, color = colors.text }) {
+  const px = Math.round(size * 1.72);
   return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <defs>
-          <linearGradient id="mxg" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
-            <stop stopColor={colors.accentHover} />
-            <stop offset="1" stopColor={colors.accentDeep} />
-          </linearGradient>
-        </defs>
-        <rect x="3" y="3" width="18" height="18" rx="5" transform="rotate(45 12 12)" fill="url(#mxg)" opacity="0.18" />
-        <rect x="4.5" y="4.5" width="15" height="15" rx="4" transform="rotate(45 12 12)" stroke="url(#mxg)" strokeWidth="1.6" />
-        <path d="M8 15.5v-7l4 4 4-4v7" stroke="url(#mxg)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 9 }}>
+      <span
+        role="img"
+        aria-label="ThinkVest"
+        style={{
+          display: "inline-block",
+          width: px,
+          height: px,
+          flexShrink: 0,
+          borderRadius: "8px",
+          // Crop to brain: 185% scale shows the top ~54% of the square image.
+          // Position 50% horizontal (centered), 12% vertical (shifts down past
+          // the small white gap above the brain, centering the icon).
+          backgroundImage: "url('/logo.png')",
+          backgroundRepeat: "no-repeat",
+          backgroundSize: "185% auto",
+          backgroundPosition: "50% 12%",
+          // multiply blend: white PNG pixels × #ECFDF5 = #ECFDF5 (invisible).
+          // Navy/teal pixels are preserved — multiply barely changes them.
+          backgroundColor: "#ECFDF5",
+          backgroundBlendMode: "multiply",
+          boxShadow: "0 0 0 1.5px rgba(16,185,129,0.35)",
+        }}
+      />
       {showText && (
-        <span
-          style={{
-            fontFamily: fonts.display,
-            fontWeight: 700,
-            fontSize: size * 0.85,
-            letterSpacing: "0.01em",
-            color,
-          }}
-        >
-          Matrix
+        <span style={{ fontFamily: fonts.display, fontWeight: 700, fontSize: size * 0.82, letterSpacing: "0.01em", color }}>
+          Think<span style={{ color: "#10B981" }}>Vest</span>
         </span>
       )}
     </span>

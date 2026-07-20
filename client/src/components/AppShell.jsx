@@ -78,12 +78,12 @@ export default function AppShell() {
   const [showChangelog, setShowChangelog] = useState(false);
   const [hasNew, setHasNew] = useState(false);
   useEffect(() => {
-    setHasNew(localStorage.getItem("matrix_changelog_seen") !== CHANGELOG_VERSION);
+    setHasNew(localStorage.getItem("thinkvest_changelog_seen") !== CHANGELOG_VERSION);
   }, []);
   const openChangelog = () => {
     setShowChangelog(true);
     setHasNew(false);
-    localStorage.setItem("matrix_changelog_seen", CHANGELOG_VERSION);
+    localStorage.setItem("thinkvest_changelog_seen", CHANGELOG_VERSION);
   };
 
   // Fetch live settings as soon as the authenticated shell mounts.
@@ -130,7 +130,7 @@ export default function AppShell() {
 
   return (
     <div className={`shell${topNav ? " topbar" : ""}`}>
-      <Seo title="Workspace" noindex description="Matrix workspace — the signed-in ranking pipeline, column mapper, results dashboard and KPI editor." />
+      <Seo title="Workspace" noindex description="ThinkVest workspace — the signed-in ranking pipeline, column mapper, results dashboard and KPI editor." />
       <style>{SHELL_CSS}</style>
 
       <aside className="shell-side">
@@ -161,7 +161,7 @@ export default function AppShell() {
           <NavLink to="/app/account" className="shell-avatar" title="Account" aria-label="Account">{initial}</NavLink>
           <div className="shell-user-meta">
             <div className="shell-user-name">{user.name || "Analyst"}</div>
-            <div className="shell-user-email">{user.email || "matrix prototype"}</div>
+            <div className="shell-user-email">{user.email || "thinkvest"}</div>
           </div>
           <ThemeToggle size={34} />
           <button className="shell-signout" onClick={handleSignOut} title="Sign out" aria-label="Sign out">
@@ -213,7 +213,7 @@ export default function AppShell() {
           <div className="shell-cl-panel" onClick={e => e.stopPropagation()}>
             <div className="shell-cl-head">
               <div>
-                <div style={{ fontSize: 11, fontFamily: "monospace", letterSpacing: ".14em", color: "rgba(124,108,255,.8)", marginBottom: 4 }}>MATRIX</div>
+                <div style={{ fontSize: 11, fontFamily: "monospace", letterSpacing: ".14em", color: "rgba(16,185,129,.8)", marginBottom: 4 }}>THINKVEST</div>
                 <div style={{ fontSize: 18, fontWeight: 700 }}>What's New</div>
               </div>
               <button className="shell-cl-close" onClick={() => setShowChangelog(false)} aria-label="Close">✕</button>
@@ -260,14 +260,14 @@ const SHELL_CSS = `
   .shell-nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
   .shell-link { position: relative; display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: ${radius.sm}; color: ${colors.textSecondary}; font-size: 14px; font-weight: 500; transition: all .15s ease; }
   .shell-link:hover { color: ${colors.text}; background: rgba(255,255,255,0.05); }
-  .shell-link.active { color: ${colors.text}; background: linear-gradient(90deg, rgba(124,108,255,0.18), rgba(124,108,255,0.05)); box-shadow: inset 0 0 0 1px rgba(124,108,255,0.28); }
-  .shell-link.active::before { content: ""; position: absolute; left: 0; top: 9px; bottom: 9px; width: 3px; border-radius: 3px; background: ${gradients.brand}; box-shadow: 0 0 10px rgba(124,108,255,0.6); }
+  .shell-link.active { color: ${colors.text}; background: linear-gradient(90deg, rgba(16,185,129,0.18), rgba(16,185,129,0.05)); box-shadow: inset 0 0 0 1px rgba(16,185,129,0.28); }
+  .shell-link.active::before { content: ""; position: absolute; left: 0; top: 9px; bottom: 9px; width: 3px; border-radius: 3px; background: ${gradients.brand}; box-shadow: 0 0 10px rgba(16,185,129,0.6); }
   .shell-link-icon { display: inline-flex; color: inherit; opacity: .85; }
   .shell-link.active .shell-link-icon { color: ${colors.accentHover}; opacity: 1; }
 
   .shell-user { display: flex; align-items: center; gap: 10px; padding: 12px 10px 4px; border-top: 1px solid ${colors.glassBorder}; margin-top: 8px; }
-  .shell-avatar { width: 36px; height: 36px; border-radius: 999px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: ${gradients.brand}; color: #fff; font-weight: 700; font-size: 14px; box-shadow: 0 0 16px rgba(124,108,255,0.35); text-decoration: none; transition: box-shadow .15s, transform .15s; }
-  .shell-avatar:hover { box-shadow: 0 0 22px rgba(124,108,255,0.55); transform: scale(1.06); }
+  .shell-avatar { width: 36px; height: 36px; border-radius: 999px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: ${gradients.brand}; color: #fff; font-weight: 700; font-size: 14px; box-shadow: 0 0 16px rgba(16,185,129,0.35); text-decoration: none; transition: box-shadow .15s, transform .15s; }
+  .shell-avatar:hover { box-shadow: 0 0 22px rgba(16,185,129,0.55); transform: scale(1.06); }
   .shell-user-meta { flex: 1; min-width: 0; }
   .shell-user-name { font-size: 13px; font-weight: 600; color: ${colors.text}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .shell-user-email { font-size: 11px; color: ${colors.textMuted}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -312,7 +312,7 @@ const SHELL_CSS = `
   /* What's New button — same styles as a NavLink */
   .shell-whatsnew { background: none; border: none; cursor: pointer; font-family: ${fonts.sans}; font-size: 14px; font-weight: 500; width: 100%; display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: ${radius.sm}; color: ${colors.textSecondary}; transition: all .15s ease; }
   .shell-whatsnew:hover { color: ${colors.text}; background: rgba(255,255,255,0.05) !important; }
-  .shell-whatsnew.active { color: ${colors.text}; background: linear-gradient(90deg, rgba(124,108,255,0.18), rgba(124,108,255,0.05)); box-shadow: inset 0 0 0 1px rgba(124,108,255,0.28); }
+  .shell-whatsnew.active { color: ${colors.text}; background: linear-gradient(90deg, rgba(16,185,129,0.18), rgba(16,185,129,0.05)); box-shadow: inset 0 0 0 1px rgba(16,185,129,0.28); }
 
   /* Badge dot */
   .shell-badge { width: 7px; height: 7px; border-radius: 50%; background: #F59E0B; margin-left: auto; flex-shrink: 0; box-shadow: 0 0 6px rgba(245,158,11,.6); }
