@@ -8,7 +8,7 @@ on:
 
 jobs:
   deploy:
-    name: SSH → git pull → npm install → pm2 restart
+    name: SSH → fetch + reset → npm install → pm2 restart
     runs-on: ubuntu-latest
 
     steps:
