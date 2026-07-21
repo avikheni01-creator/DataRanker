@@ -3,7 +3,6 @@ import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, Cell,
-  ScatterChart, Scatter, ZAxis,
   ReferenceLine,
 } from "recharts";
 import { Navigate } from "react-router-dom";
@@ -336,9 +335,6 @@ const CSS = (colors, fonts, radius) => `
   .cmp-chip:hover { border-color: ${colors.accent}; color: ${colors.text}; }
   .cmp-chip.on { background: rgba(16,185,129,.15); border-color: ${colors.accent}; color: ${colors.accentHover}; }
 
-  /* ── Axis selectors (scatter) ─── */
-  .cmp-axis-row { display: flex; gap: 12px; padding: 10px 18px; flex-wrap: wrap; }
-  .cmp-axis-group { display: flex; align-items: center; gap: 8px; }
   .cmp-axis-label { font-size: 11px; font-weight: 600; color: ${colors.textMuted}; text-transform: uppercase; letter-spacing: .06em; }
   .cmp-axis-select {
     padding: 5px 28px 5px 10px; border-radius: ${radius.sm};
@@ -450,6 +446,7 @@ const CSS = (colors, fonts, radius) => `
   .pct-picker-item:last-child { border-bottom: none; }
   .pct-picker-item:hover { background: ${colors.inset}; color: ${colors.text}; }
   .pct-picker-item.checked { color: ${colors.text}; }
+  .pct-picker-item.disabled { opacity: 0.38; cursor: not-allowed; pointer-events: none; }
   .pct-picker-checkbox {
     width: 14px; height: 14px; border-radius: 3px; border: 1.5px solid ${colors.border};
     flex-shrink: 0; display: flex; align-items: center; justify-content: center;
@@ -782,29 +779,63 @@ function MultiBarSection({ companies, numericCols, nameCol }) {
   );
 }
 
-// ── Single-Metric Bar ─────────────────────────────────────────────────────────
+// ── Single-Metric Bar + Sector Average ───────────────────────────────────────
 
-function SingleBarSection({ companies, numericCols, activeMetric, onMetricChange, nameCol }) {
+const SECTOR_AVG_COLOR = "#94A3B8";
+
+function SingleBarSection({ companies, numericCols, activeMetric, onMetricChange, nameCol, allRows }) {
+  // Detect which column holds sector data
+  const sectorCol = useMemo(() => {
+    if (!allRows?.length) return null;
+    return Object.keys(allRows[0] || {}).find(k => /sector/i.test(k)) || null;
+  }, [allRows]);
+
+  // Mean of activeMetric across all rows sharing the same sector(s) as selected companies
+  const sectorAvg = useMemo(() => {
+    if (!activeMetric || !allRows?.length || !sectorCol) return null;
+    const sectors = new Set(companies.map(co => co[sectorCol]).filter(Boolean));
+    if (!sectors.size) return null;
+    const vals = allRows
+      .filter(r => sectors.has(r[sectorCol]))
+      .map(r => Number(r[activeMetric]))
+      .filter(v => isFinite(v) && !isNaN(v));
+    return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
+  }, [activeMetric, allRows, companies, sectorCol]);
+
   const barData = useMemo(() => {
     if (!activeMetric) return [];
-    return companies.map((co, i) => {
+    const rows = companies.map((co, i) => {
       const v = Number(co[activeMetric]);
-      return { name: shortName(co[nameCol], 14), value: (isNaN(v) || !isFinite(v)) ? undefined : v, fill: PALETTE[i] };
+      return { name: shortName(co[nameCol], 14), value: (isNaN(v) || !isFinite(v)) ? undefined : v, fill: PALETTE[i], isAvg: false };
     });
-  }, [companies, activeMetric, nameCol]);
+    if (sectorAvg !== null) {
+      rows.push({ name: "Sector Avg", value: +sectorAvg.toFixed(2), fill: SECTOR_AVG_COLOR, isAvg: true });
+    }
+    return rows;
+  }, [companies, activeMetric, nameCol, sectorAvg]);
 
   return (
     <div className="cmp-card">
       <div className="cmp-card-head">
-        <span className="cmp-card-title">Single Metric Deep Dive</span>
+        <span className="cmp-card-title">Metric vs Sector Average</span>
         <span className="cmp-card-sub">{activeMetric || "—"} · actual values</span>
       </div>
-      <div className="cmp-chips">
-        {numericCols.map((col) => (
-          <button key={col} className={`cmp-chip${activeMetric === col ? " on" : ""}`}
-            onClick={() => onMetricChange(col)}>{col}</button>
-        ))}
+
+      {/* Metric dropdown */}
+      <div style={{ padding: "10px 16px 12px" }}>
+        <select
+          value={activeMetric || ""}
+          onChange={e => onMetricChange(e.target.value)}
+          style={{
+            width: "100%", padding: "7px 10px", borderRadius: 6,
+            border: "1px solid var(--border)", background: "var(--card)",
+            color: "var(--text)", fontSize: 13, cursor: "pointer", outline: "none",
+          }}
+        >
+          {numericCols.map(col => <option key={col} value={col}>{col}</option>)}
+        </select>
       </div>
+
       <div className="cmp-card-body">
         <ResponsiveContainer width="100%" height={240}>
           <BarChart data={barData} margin={{ top: 8, right: 16, bottom: 8, left: 0 }}>
@@ -814,107 +845,197 @@ function SingleBarSection({ companies, numericCols, activeMetric, onMetricChange
               width={52} tickFormatter={formatNum} />
             <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
             <Bar dataKey="value" radius={[6, 6, 0, 0]} maxBarSize={52}>
-              {barData.map((_, i) => <Cell key={i} fill={PALETTE[i]} />)}
+              {barData.map((entry, i) => (
+                <Cell key={i} fill={entry.fill} opacity={entry.isAvg ? 0.75 : 1} />
+              ))}
             </Bar>
           </BarChart>
         </ResponsiveContainer>
+        {sectorAvg !== null && (
+          <p style={{ textAlign: "center", fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>
+            Grey bar = sector peer average ({formatNum(sectorAvg)})
+          </p>
+        )}
       </div>
     </div>
   );
 }
 
-// ── Scatter Plot ──────────────────────────────────────────────────────────────
+// ── Dataset Average Radar ─────────────────────────────────────────────────────
 
-function ScatterSection({ companies, numericCols, nameCol }) {
-  const [xMetric, setXMetric] = useState(numericCols[0] || "");
-  const [yMetric, setYMetric] = useState(numericCols[1] || numericCols[0] || "");
+const DATASET_AVG_COLOR = "#94A3B8";
+const MAX_RADAR_METRICS = 6;
 
+function DatasetAvgSection({ companies, numericCols, allRows, nameCol }) {
+  const autoMetrics = useMemo(
+    () => sortByCV(numericCols, companies).slice(0, MAX_RADAR_METRICS),
+    [numericCols, companies]
+  );
+
+  const [selected, setSelected] = useState(() => new Set(autoMetrics));
+  const [open, setOpen]         = useState(false);
+  const [search, setSearch]     = useState("");
+  const panelRef                = useRef(null);
+
+  // Re-sync default selection when companies change
+  useEffect(() => { setSelected(new Set(autoMetrics)); }, [autoMetrics]);
+
+  // Close panel on outside click
   useEffect(() => {
-    if (numericCols.length >= 2) {
-      setXMetric(numericCols[0]);
-      setYMetric(numericCols[1]);
-    }
-  }, [numericCols]);
+    const h = (e) => { if (panelRef.current && !panelRef.current.contains(e.target)) setOpen(false); };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, []);
 
-  const points = useMemo(() =>
-    companies.map((co, i) => {
-      const x = Number(co[xMetric]);
-      const y = Number(co[yMetric]);
-      if (isNaN(x) || !isFinite(x) || isNaN(y) || !isFinite(y)) return null;
-      return { x, y, label: shortName(co[nameCol], 12), color: PALETTE[i] };
-    }),
-    [companies, xMetric, yMetric, nameCol]
-  );
-  const missingScatter = useMemo(() =>
-    companies.filter((co, i) => points[i] === null).map((co) => shortName(co[nameCol], 22)),
-    [companies, points, nameCol]
+  const filteredCols = useMemo(() =>
+    search.trim()
+      ? numericCols.filter(c => c.toLowerCase().includes(search.toLowerCase()))
+      : numericCols,
+    [numericCols, search]
   );
 
-  const CustomDot = ({ cx, cy, payload }) => (
-    <g>
-      <circle cx={cx} cy={cy} r={10} fill={payload.color} fillOpacity={0.85}
-        stroke={payload.color} strokeWidth={1.5} />
-      <text x={cx} y={cy - 14} textAnchor="middle" fill={payload.color}
-        fontSize={10} fontWeight={600}>{payload.label}</text>
-    </g>
+  const toggleMetric = (col) => setSelected(prev => {
+    const next = new Set(prev);
+    if (next.has(col)) { next.delete(col); }
+    else if (next.size < MAX_RADAR_METRICS) { next.add(col); }
+    return next;
+  });
+
+  // Keep display order stable (by numericCols order)
+  const metrics = useMemo(
+    () => numericCols.filter(c => selected.has(c)),
+    [numericCols, selected]
   );
+
+  const radarData = useMemo(() => {
+    return metrics.map(metric => {
+      const allVals = allRows
+        .map(r => Number(r[metric]))
+        .filter(v => isFinite(v) && !isNaN(v))
+        .sort((a, b) => a - b);
+      if (!allVals.length) return null;
+
+      // Linear interpolation percentile
+      const pct = (p) => {
+        const idx = (p / 100) * (allVals.length - 1);
+        const lo = Math.floor(idx);
+        const hi = Math.ceil(idx);
+        return allVals[lo] + (allVals[hi] - allVals[lo]) * (idx - lo);
+      };
+
+      const p5  = pct(5);
+      const p95 = pct(95);
+      const range = p95 - p5 || 1;
+
+      const mean = allVals.reduce((a, b) => a + b, 0) / allVals.length;
+
+      // Clamp to [p5, p95] then normalize to 20–90
+      const norm = v => {
+        const clamped = Math.min(Math.max(v, p5), p95);
+        return +(((clamped - p5) / range) * 70 + 20).toFixed(1);
+      };
+
+      const entry = { metric: shortName(metric, 14), fullMetric: metric };
+      companies.forEach((co, i) => {
+        const v = Number(co[metric]);
+        entry[ck(i)] = (isNaN(v) || !isFinite(v)) ? undefined : norm(v);
+      });
+      entry.avg = norm(mean);
+      return entry;
+    }).filter(Boolean);
+  }, [metrics, companies, allRows]);
 
   return (
     <div className="cmp-card">
       <div className="cmp-card-head">
-        <span className="cmp-card-title">Scatter Plot</span>
-        <span className="cmp-card-sub">Two metrics vs each other</span>
+        <span className="cmp-card-title">vs Dataset Average</span>
+        <span className="cmp-card-sub">Select up to 6 metrics · p5–p95 range, outliers clamped</span>
       </div>
-      {missingScatter.length > 0 && (
-        <div style={{ margin: "8px 14px 0", padding: "7px 12px", borderRadius: 7, fontSize: 11,
-          background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.3)", color: "var(--text-muted)" }}>
-          <strong style={{ color: "#F59E0B" }}>Not plotted — </strong>
-          {missingScatter.join(", ")} {missingScatter.length === 1 ? "has" : "have"} no data for one or both selected metrics.
-        </div>
-      )}
-      <div className="cmp-axis-row">
-        <div className="cmp-axis-group">
-          <span className="cmp-axis-label">X</span>
-          <select className="cmp-axis-select" value={xMetric} onChange={(e) => setXMetric(e.target.value)}>
-            {numericCols.map((c) => <option key={c} value={c}>{c}</option>)}
-          </select>
-        </div>
-        <div className="cmp-axis-group">
-          <span className="cmp-axis-label">Y</span>
-          <select className="cmp-axis-select" value={yMetric} onChange={(e) => setYMetric(e.target.value)}>
-            {numericCols.map((c) => <option key={c} value={c}>{c}</option>)}
-          </select>
-        </div>
-      </div>
-      <div className="cmp-card-body">
-        <ResponsiveContainer width="100%" height={280}>
-          <ScatterChart margin={{ top: 20, right: 24, bottom: 16, left: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-            <XAxis type="number" dataKey="x" name={xMetric} tick={{ fontSize: 11 }}
-              axisLine={false} tickLine={false} tickFormatter={formatNum}
-              label={{ value: xMetric, position: "insideBottom", offset: -6, fontSize: 11, fill: "var(--text-muted)" }} />
-            <YAxis type="number" dataKey="y" name={yMetric} tick={{ fontSize: 11 }}
-              axisLine={false} tickLine={false} tickFormatter={formatNum} width={52} />
-            <ZAxis range={[80, 80]} />
-            <Tooltip
-              content={({ active, payload }) => {
-                if (!active || !payload?.length) return null;
-                const d = payload[0]?.payload;
+
+      {/* Metric picker */}
+      <div className="pct-picker-wrap" ref={panelRef}>
+        <button className="pct-picker-trigger" onClick={() => setOpen(o => !o)}>
+          <span className="pct-picker-trigger-label">
+            {metrics.length === 0 ? "Select metrics to display…" : `Showing ${metrics.length} metric${metrics.length !== 1 ? "s" : ""}`}
+          </span>
+          <span className="pct-picker-trigger-count">{selected.size}/{MAX_RADAR_METRICS}</span>
+          <span className={`pct-picker-chevron${open ? " open" : ""}`}>▾</span>
+        </button>
+
+        {open && (
+          <div className="pct-picker-panel">
+            <div className="pct-picker-search">
+              <input
+                placeholder="Search metrics…"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <div className="pct-picker-actions">
+              <button className="pct-picker-action" onClick={() => setSelected(new Set(autoMetrics))}>
+                Auto (top {MAX_RADAR_METRICS} by CV)
+              </button>
+              <button className="pct-picker-action" onClick={() => setSelected(new Set())}>Clear</button>
+            </div>
+            <div className="pct-picker-list">
+              {filteredCols.map(col => {
+                const checked = selected.has(col);
+                const disabled = !checked && selected.size >= MAX_RADAR_METRICS;
                 return (
-                  <div style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8, padding: "8px 12px", fontSize: 12 }}>
-                    <div style={{ fontWeight: 600, color: d?.color, marginBottom: 4 }}>{d?.label}</div>
-                    <div style={{ color: "var(--text-muted)" }}>{xMetric}: <span style={{ color: "var(--text)" }}>{formatNum(d?.x)}</span></div>
-                    <div style={{ color: "var(--text-muted)" }}>{yMetric}: <span style={{ color: "var(--text)" }}>{formatNum(d?.y)}</span></div>
+                  <div
+                    key={col}
+                    className={`pct-picker-item${checked ? " checked" : ""}${disabled ? " disabled" : ""}`}
+                    onClick={() => !disabled && toggleMetric(col)}
+                  >
+                    <div className="pct-picker-checkbox">{checked ? "✓" : ""}</div>
+                    {col}
                   </div>
                 );
-              }}
-            />
-            {points.map((pt, i) => pt && (
-              <Scatter key={i} name={pt.label} data={[pt]} fill={pt.color} shape={<CustomDot />} />
-            ))}
-            <Legend wrapperStyle={{ fontSize: 11 }} />
-          </ScatterChart>
-        </ResponsiveContainer>
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="cmp-card-body">
+        {metrics.length < 3 ? (
+          <div style={{ padding: "32px 0", textAlign: "center", fontSize: 12, color: "var(--text-muted)" }}>
+            Select at least 3 metrics to draw the radar.
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={290}>
+            <RadarChart data={radarData} outerRadius="70%">
+              <PolarGrid stroke="rgba(128,128,128,0.15)" />
+              <PolarAngleAxis dataKey="metric" tick={{ fontSize: 10, fill: "var(--text-muted)" }} />
+              <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
+              {companies.map((co, i) => (
+                <Radar
+                  key={i}
+                  name={shortName(co[nameCol], 18)}
+                  dataKey={ck(i)}
+                  stroke={PALETTE[i]}
+                  fill={PALETTE[i]}
+                  fillOpacity={0.1}
+                  strokeWidth={2}
+                  dot={{ r: 3, fill: PALETTE[i] }}
+                />
+              ))}
+              <Radar
+                name="Dataset Avg"
+                dataKey="avg"
+                stroke={DATASET_AVG_COLOR}
+                fill={DATASET_AVG_COLOR}
+                fillOpacity={0.15}
+                strokeWidth={1.5}
+                strokeDasharray="5 3"
+                dot={false}
+              />
+              <Legend wrapperStyle={{ fontSize: 10, paddingTop: 4 }} />
+              <Tooltip content={<ChartTooltip />} />
+            </RadarChart>
+          </ResponsiveContainer>
+        )}
       </div>
     </div>
   );
@@ -1276,11 +1397,13 @@ export default function ComparisonPage() {
             <div className="cmp-row cmp-row-2">
               <SingleBarSection
                 companies={selected} numericCols={numericCols}
-                activeMetric={activeMetric} onMetricChange={setActiveMetric} nameCol={nameCol}
+                activeMetric={activeMetric} onMetricChange={setActiveMetric}
+                nameCol={nameCol} allRows={snapshot.rows}
               />
-              {numericCols.length >= 2 && (
-                <ScatterSection companies={selected} numericCols={numericCols} nameCol={nameCol} />
-              )}
+              <DatasetAvgSection
+                companies={selected} numericCols={numericCols}
+                allRows={snapshot.rows} nameCol={nameCol}
+              />
             </div>
           </div>
 

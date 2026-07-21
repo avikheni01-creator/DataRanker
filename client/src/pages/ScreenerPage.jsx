@@ -1326,15 +1326,24 @@ const CSS = `
   .sp-page-size:focus { border-color: ${colors.accent}; }
 
   @media (max-width: 640px) {
-    .sp-header { padding: 12px 16px; flex-direction: column; align-items: flex-start; }
+    .sp-wrap { overflow-x: hidden; }
+    .sp-header { padding: 12px 16px; flex-direction: column; align-items: flex-start; gap: 8px; }
     .sp-controls { padding: 12px 16px 12px; }
-    .sp-table-section { padding: 10px 16px 12px; }
-    .sp-action-bar { flex-direction: column; align-items: flex-start; }
+    .sp-table-section { padding: 10px 8px 12px; }
+    .sp-action-bar { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .sp-actions { flex-wrap: wrap; }
     .sp-fsbar { flex-direction: column; align-items: stretch; }
     .sp-bar-sep { width: 100%; height: 1px; margin: 0; }
     .sp-search-wrap { width: 100%; }
+    .sp-table-wrap { border-radius: 8px; }
     .cp-panel { right: auto; left: 0; width: 240px; }
     .sp-dl-panel { right: auto; left: 0; }
     .sp-empty-state { margin: 16px; padding: 40px 20px; }
+    .sp-filter-toggle span { display: none; }
+
+    /* Compact table on mobile — tighter cells fit more columns */
+    .sp-table { font-size: 11px; }
+    .sp-th-sortable { padding: 7px 8px; font-size: 9.5px; }
+    .sp-table td { padding: 7px 8px; }
   }
 `;

@@ -889,8 +889,12 @@ export default function StockDashboard({ resultFile }) {
 
         @media (max-width: 640px) {
           .sd-topbar { padding: 10px 12px !important; flex-wrap: wrap; gap: 8px !important; }
-          .sd-stats  { overflow-x: auto; }
+          .sd-stats  { overflow-x: auto; -webkit-overflow-scrolling: touch; }
           .sd-stat-cell { padding: 8px 12px !important; min-width: 80px; }
+
+          /* Compact table — halve horizontal padding to fit more columns */
+          .sd-table-wrap td { padding: 7px 8px !important; font-size: 10.5px; }
+          .sd-table-wrap th { padding: 7px 8px !important; font-size: 8px !important; }
         }
       `}</style>
 
@@ -1059,9 +1063,9 @@ export default function StockDashboard({ resultFile }) {
               { label: "Max Score", value: maxScore.toFixed(1) },
               { label: "KPI Cols", value: `${visibleKpiKeys.length} / ${allKpiKeys.length}` },
             ].map(({ label, value }, i) => (
-              <div key={i} className="sd-stat-cell" style={{ flex: 1, padding: "10px 20px", borderRight: i < 4 ? "1px solid var(--border)" : "none" }}>
+              <div key={i} className="sd-stat-cell" style={{ flex: 1, minWidth: 0, padding: "10px 20px", borderRight: i < 4 ? "1px solid var(--border)" : "none" }}>
                 <div className="mono" style={{ fontSize: 9, color: "var(--text-muted)", letterSpacing: ".12em", marginBottom: 3 }}>{label}</div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: "var(--accent-hover)" }}>{value}</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: "var(--accent-hover)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{value}</div>
               </div>
             ))}
           </div>
@@ -1076,7 +1080,7 @@ export default function StockDashboard({ resultFile }) {
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {sectorData.map(({ name, count, pct }, i) => (
                   <div key={name} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <div className="mono" style={{ fontSize: 10, color: "var(--text-secondary)", minWidth: 140, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{name}</div>
+                    <div className="mono" style={{ fontSize: 10, color: "var(--text-secondary)", flex: "0 0 140px", width: 140, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{name}</div>
                     <div style={{ flex: 1, height: 6, background: "var(--elevated)", borderRadius: 3, overflow: "hidden" }}>
                       <div style={{
                         height: "100%", width: `${pct}%`, borderRadius: 3,
@@ -1099,7 +1103,7 @@ export default function StockDashboard({ resultFile }) {
           )}
 
           {/* ── Table ── */}
-          <div style={{ flex: 1, overflowY: "auto", overflowX: "auto", minHeight: 0 }}>
+          <div className="sd-table-wrap" style={{ flex: 1, overflowY: "auto", overflowX: "auto", minHeight: 0 }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 600 }}>
               <thead>
                 <tr style={{ background: "var(--card)", position: "sticky", top: 0, zIndex: 10 }}>
@@ -1189,7 +1193,7 @@ export default function StockDashboard({ resultFile }) {
                         } else if (isKpi) {
                           const lowerIsBetter = kpiDirectionMap[key] === "lower";
                           const bad = lowerIsBetter ? v > 0 : v < 0;
-                          color = bad ? "#FCA5A5" : "#6EE7B7";
+                          color = bad ? "var(--negative)" : "var(--positive)";
                         } else {
                           color = "var(--text-secondary)";
                         }

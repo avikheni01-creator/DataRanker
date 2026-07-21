@@ -75,6 +75,7 @@ export default function AppShell() {
   const [verifyStep, setVerifyStep] = useState("prompt"); // "prompt" | "otp" | "busy"
   const [verifyError, setVerifyError] = useState("");
 
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [showChangelog, setShowChangelog] = useState(false);
   const [hasNew, setHasNew] = useState(false);
   useEffect(() => {
@@ -135,6 +136,12 @@ export default function AppShell() {
 
       <aside className="shell-side">
         <div className="shell-brand"><Logo size={22} /></div>
+
+        <button className="shell-hamburger" onClick={() => setMobileNavOpen(true)} aria-label="Open navigation">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
 
         <div className="shell-section">Workspace</div>
         <nav className="shell-nav">
@@ -207,6 +214,34 @@ export default function AppShell() {
         <Outlet />
       </main>
 
+      {/* Mobile nav drawer */}
+      {mobileNavOpen && (
+        <div className="mob-drawer" onClick={() => setMobileNavOpen(false)}>
+          <div className="mob-panel" onClick={e => e.stopPropagation()}>
+            <div className="mob-panel-head">
+              <Logo size={20} />
+              <button className="mob-close" onClick={() => setMobileNavOpen(false)} aria-label="Close navigation">✕</button>
+            </div>
+            <nav className="mob-nav">
+              {items.map(({ to, label, icon, end }) => (
+                <NavLink key={to} to={to} end={end}
+                  className={({ isActive }) => `shell-link ${isActive ? "active" : ""}`}
+                  onClick={() => setMobileNavOpen(false)}>
+                  <span className="shell-link-icon">{icon}</span>
+                  <span>{label}</span>
+                </NavLink>
+              ))}
+              <button className={`shell-link shell-whatsnew${showChangelog ? " active" : ""}`}
+                onClick={() => { setMobileNavOpen(false); openChangelog(); }}>
+                <span className="shell-link-icon"><Icon paths={["M13 10V3L4 14h7v7l9-11h-7z"]} /></span>
+                <span>What's new</span>
+                {hasNew && <span className="shell-badge" aria-label="New updates" />}
+              </button>
+            </nav>
+          </div>
+        </div>
+      )}
+
       {/* Changelog modal */}
       {showChangelog && (
         <div className="shell-cl-overlay" onClick={() => setShowChangelog(false)}>
@@ -274,7 +309,8 @@ const SHELL_CSS = `
   .shell-signout { background: transparent; border: none; color: ${colors.textMuted}; cursor: pointer; padding: 6px; border-radius: ${radius.sm}; display: inline-flex; transition: all .15s; }
   .shell-signout:hover { color: ${colors.negative}; background: ${colors.negativeSoft}; }
 
-  .shell-main { min-width: 0; }
+  /* min-width:0 prevents the grid column from expanding beyond viewport on mobile */
+  .shell-main { min-width: 0; overflow-x: hidden; }
 
   .shell-verify-banner {
     display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
@@ -349,15 +385,58 @@ const SHELL_CSS = `
   .shell.topbar .shell-user { border-top: none; margin-top: 0; padding: 0; }
   .shell.topbar .shell-user-meta { display: none; }
 
+  /* Hamburger — hidden on desktop, shown on mobile */
+  .shell-hamburger { display: none; }
+
   @media (max-width: 760px) {
     .shell { grid-template-columns: 1fr; }
-    .shell-side { position: static; height: auto; flex-direction: row; align-items: center; gap: 8px; padding: 12px; overflow-x: auto; }
-    .shell-brand { padding: 0 8px 0 4px; }
+
+    .shell-side {
+      position: sticky; top: 0; z-index: 100;
+      height: auto; flex-direction: row; align-items: center;
+      padding: 10px 16px; gap: 0; overflow-x: visible;
+    }
+    .shell-brand { padding: 0; flex: 1; }
     .shell-section { display: none; }
-    .shell-nav { flex-direction: row; flex: 1; }
+    .shell-nav { display: none; }
     .shell-link.active::before { display: none; }
-    .shell-link { white-space: nowrap; }
-    .shell-user { border-top: none; margin-top: 0; padding: 0; }
+    .shell-user { border-top: none; margin-top: 0; padding: 0; gap: 8px; }
     .shell-user-meta { display: none; }
+
+    .shell-hamburger {
+      display: flex; align-items: center; justify-content: center;
+      width: 36px; height: 36px; margin-right: 8px;
+      border-radius: 8px; border: 1px solid ${colors.border};
+      background: transparent; color: ${colors.textSecondary};
+      cursor: pointer; transition: all .15s; flex-shrink: 0;
+    }
+    .shell-hamburger:hover { background: ${colors.elevated}; color: ${colors.text}; }
+
+    /* Mobile drawer */
+    .mob-drawer {
+      position: fixed; inset: 0; z-index: 500;
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+      display: flex;
+    }
+    .mob-panel {
+      width: 260px; height: 100%; background: var(--canvas);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      padding: 20px 14px; overflow-y: auto;
+      box-shadow: 4px 0 32px rgba(0,0,0,0.4);
+      animation: mob-slide .2s ease;
+    }
+    @keyframes mob-slide { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+    .mob-panel-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px; padding: 0 4px;
+    }
+    .mob-close {
+      background: transparent; border: none; color: ${colors.textMuted};
+      font-size: 18px; cursor: pointer; padding: 4px 8px;
+      border-radius: 6px; line-height: 1; display: flex;
+    }
+    .mob-close:hover { color: ${colors.text}; background: ${colors.elevated}; }
+    .mob-nav { display: flex; flex-direction: column; gap: 4px; }
   }
 `;
