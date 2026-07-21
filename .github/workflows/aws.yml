@@ -30,7 +30,7 @@ jobs:
 
             # ── 1. Pull latest code ─────────────────────────────────────────
             cd ${{ secrets.EC2_PROJECT_PATH }}
-            git pull origin main
+            git fetch origin main && git reset --hard origin/main
             rm -rf client
 
             # ── 2. Install backend dependencies (prod only) ─────────────────
