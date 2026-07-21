@@ -57,7 +57,7 @@ const BASE_NAV = [
 ];
 
 const KPI_NAV     = { to: "/app/kpi-editor", label: "KPI Editor", icon: <Icon paths={["M12 20h9", "M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"]} /> };
-const PREMIUM_NAV = { to: "/app/premium", label: "Premium", icon: <Icon paths={["M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"]} /> };
+const PREMIUM_NAV = { to: "/app/premium", label: "Premium", cls: "shell-link-premium", icon: <Icon paths={["M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"]} /> };
 const SETTINGS_NAV = { to: "/app/settings", label: "Settings", icon: <Icon paths={["M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z", "M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"]} /> };
 const ADMIN_USERS_NAV = { to: "/app/admin/users", label: "Users", icon: <Icon paths={["M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2", "M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z", "M23 21v-2a4 4 0 0 0-3-3.87", "M16 3.13a4 4 0 0 1 0 7.75"]} /> };
 
@@ -146,9 +146,9 @@ export default function AppShell() {
 
         <div className="shell-section">Workspace</div>
         <nav className="shell-nav">
-          {items.map(({ to, label, icon, end }) => (
+          {items.map(({ to, label, icon, end, cls }) => (
             <NavLink key={to} to={to} end={end}
-              className={({ isActive }) => `shell-link ${isActive ? "active" : ""}`}>
+              className={({ isActive }) => `shell-link${cls ? ` ${cls}` : ""} ${isActive ? "active" : ""}`}>
               <span className="shell-link-icon">{icon}</span>
               <span>{label}</span>
             </NavLink>
@@ -224,9 +224,9 @@ export default function AppShell() {
               <button className="mob-close" onClick={() => setMobileNavOpen(false)} aria-label="Close navigation">✕</button>
             </div>
             <nav className="mob-nav">
-              {items.map(({ to, label, icon, end }) => (
+              {items.map(({ to, label, icon, end, cls }) => (
                 <NavLink key={to} to={to} end={end}
-                  className={({ isActive }) => `shell-link ${isActive ? "active" : ""}`}
+                  className={({ isActive }) => `shell-link${cls ? ` ${cls}` : ""} ${isActive ? "active" : ""}`}
                   onClick={() => setMobileNavOpen(false)}>
                   <span className="shell-link-icon">{icon}</span>
                   <span>{label}</span>
@@ -300,6 +300,27 @@ const SHELL_CSS = `
   .shell-link.active::before { content: ""; position: absolute; left: 0; top: 9px; bottom: 9px; width: 3px; border-radius: 3px; background: ${gradients.brand}; box-shadow: 0 0 10px rgba(16,185,129,0.6); }
   .shell-link-icon { display: inline-flex; color: inherit; opacity: .85; }
   .shell-link.active .shell-link-icon { color: ${colors.accentHover}; opacity: 1; }
+
+  /* ── Premium golden nav item ── */
+  .shell-link-premium {
+    background: linear-gradient(135deg, rgba(212,175,55,0.18) 0%, rgba(255,215,0,0.08) 100%);
+    border: 1px solid rgba(212,175,55,0.32);
+    color: #D4AF37 !important;
+    margin-top: 4px;
+  }
+  .shell-link-premium .shell-link-icon { color: #D4AF37 !important; opacity: 1; }
+  .shell-link-premium:hover {
+    background: linear-gradient(135deg, rgba(212,175,55,0.28) 0%, rgba(255,215,0,0.15) 100%);
+    border-color: rgba(255,215,0,0.55);
+    color: #FFD700 !important;
+  }
+  .shell-link-premium:hover .shell-link-icon { color: #FFD700 !important; }
+  .shell-link-premium.active {
+    background: linear-gradient(135deg, rgba(212,175,55,0.32) 0%, rgba(255,215,0,0.18) 100%);
+    box-shadow: inset 0 0 0 1px rgba(212,175,55,0.5), 0 0 12px rgba(212,175,55,0.15);
+    color: #FFD700 !important;
+  }
+  .shell-link-premium.active::before { background: linear-gradient(180deg, #D4AF37, #FFD700) !important; box-shadow: 0 0 10px rgba(212,175,55,0.7) !important; }
 
   .shell-user { display: flex; align-items: center; gap: 10px; padding: 12px 10px 4px; border-top: 1px solid ${colors.glassBorder}; margin-top: 8px; }
   .shell-avatar { width: 36px; height: 36px; border-radius: 999px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: ${gradients.brand}; color: #fff; font-weight: 700; font-size: 14px; box-shadow: 0 0 16px rgba(16,185,129,0.35); text-decoration: none; transition: box-shadow .15s, transform .15s; }
