@@ -1,8 +1,7 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
 Allow: /
-# Signed-in app is auth-gated and has no crawlable content.
-Disallow: /app
+# Signed-in app routes are auth-gated — no crawlable content behind /app
+Disallow: /app/
 
-# Replace the host with the real domain at deploy time.
-Sitemap: https://data-ranker.vercel.app/sitemap.xml
+Sitemap: https://thinkvest.in/sitemap.xml

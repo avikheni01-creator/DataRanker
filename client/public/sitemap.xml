@@ -1,30 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Public pages only. Replace the host with the real domain at deploy time.
-     The auth-gated /app routes are intentionally omitted. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
   <url>
-    <loc>https://data-ranker.vercel.app/</loc>
+    <loc>https://thinkvest.in/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
+
   <url>
-    <loc>https://data-ranker.vercel.app/pricing</loc>
+    <loc>https://thinkvest.in/about</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://thinkvest.in/pricing</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+
   <url>
-    <loc>https://data-ranker.vercel.app/about</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <loc>https://thinkvest.in/login</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
   </url>
+
   <url>
-    <loc>https://data-ranker.vercel.app/signup</loc>
-    <changefreq>monthly</changefreq>
+    <loc>https://thinkvest.in/signup</loc>
+    <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
-  <url>
-    <loc>https://data-ranker.vercel.app/login</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.3</priority>
-  </url>
+
 </urlset>

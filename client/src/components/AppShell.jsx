@@ -301,26 +301,26 @@ const SHELL_CSS = `
   .shell-link-icon { display: inline-flex; color: inherit; opacity: .85; }
   .shell-link.active .shell-link-icon { color: ${colors.accentHover}; opacity: 1; }
 
-  /* ── Premium golden nav item ── */
+  /* ── Premium purple nav item ── */
   .shell-link-premium {
-    background: linear-gradient(135deg, rgba(212,175,55,0.18) 0%, rgba(255,215,0,0.08) 100%);
-    border: 1px solid rgba(212,175,55,0.32);
-    color: #D4AF37 !important;
+    background: rgba(124,108,255,0.13);
+    border: 1px solid rgba(124,108,255,0.32);
+    color: #A78BFA !important;
     margin-top: 4px;
   }
-  .shell-link-premium .shell-link-icon { color: #D4AF37 !important; opacity: 1; }
+  .shell-link-premium .shell-link-icon { color: #A78BFA !important; opacity: 1; }
   .shell-link-premium:hover {
-    background: linear-gradient(135deg, rgba(212,175,55,0.28) 0%, rgba(255,215,0,0.15) 100%);
-    border-color: rgba(255,215,0,0.55);
-    color: #FFD700 !important;
+    background: rgba(124,108,255,0.22);
+    border-color: rgba(124,108,255,0.5);
+    color: #C4B5FD !important;
   }
-  .shell-link-premium:hover .shell-link-icon { color: #FFD700 !important; }
+  .shell-link-premium:hover .shell-link-icon { color: #C4B5FD !important; }
   .shell-link-premium.active {
-    background: linear-gradient(135deg, rgba(212,175,55,0.32) 0%, rgba(255,215,0,0.18) 100%);
-    box-shadow: inset 0 0 0 1px rgba(212,175,55,0.5), 0 0 12px rgba(212,175,55,0.15);
-    color: #FFD700 !important;
+    background: rgba(124,108,255,0.25);
+    box-shadow: inset 0 0 0 1px rgba(124,108,255,0.45), 0 0 12px rgba(124,108,255,0.15);
+    color: #C4B5FD !important;
   }
-  .shell-link-premium.active::before { background: linear-gradient(180deg, #D4AF37, #FFD700) !important; box-shadow: 0 0 10px rgba(212,175,55,0.7) !important; }
+  .shell-link-premium.active::before { background: linear-gradient(180deg, #7C6CFF, #A78BFA) !important; box-shadow: 0 0 10px rgba(124,108,255,0.6) !important; }
 
   .shell-user { display: flex; align-items: center; gap: 10px; padding: 12px 10px 4px; border-top: 1px solid ${colors.glassBorder}; margin-top: 8px; }
   .shell-avatar { width: 36px; height: 36px; border-radius: 999px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: ${gradients.brand}; color: #fff; font-weight: 700; font-size: 14px; box-shadow: 0 0 16px rgba(16,185,129,0.35); text-decoration: none; transition: box-shadow .15s, transform .15s; }
