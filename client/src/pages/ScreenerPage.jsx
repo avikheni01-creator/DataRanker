@@ -222,6 +222,7 @@ export default function ScreenerPage() {
   const [showDownloads, setShowDownloads] = useState(false);
   // Drag-and-drop upload
   const [dragOver, setDragOver] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(true);
 
   const fileInputRef = useRef(null);
   const searchRef = useRef(null);
@@ -617,8 +618,9 @@ export default function ScreenerPage() {
         {!loading && snapshot && (
           <>
             {/* ── Controls ── */}
-            <div className="sp-controls">
+            <div className={`sp-controls${filtersOpen ? "" : " sp-controls-collapsed"}`}>
 
+              {filtersOpen && (<>
               {/* Saved preset chips */}
               {presets.length > 0 && (
                 <div className="sp-presets-row">
@@ -713,10 +715,24 @@ export default function ScreenerPage() {
               )}
 
               {filterError && <p className="sp-filter-error">{filterError}</p>}
+              </>)}
 
               {/* Action bar */}
               <div className="sp-action-bar">
                 <div className="sp-count-area">
+                  <button
+                    className="sp-filter-toggle"
+                    onClick={() => setFiltersOpen(v => !v)}
+                    title={filtersOpen ? "Collapse filters" : "Expand filters"}
+                    aria-label={filtersOpen ? "Collapse filters" : "Expand filters"}
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                      style={{ transition: "transform .2s", transform: filtersOpen ? "none" : "rotate(180deg)" }}>
+                      <polyline points="18 15 12 9 6 15"/>
+                    </svg>
+                    <span>Filter | Search</span>
+                  </button>
                   <span className="sp-count">
                     {searchedRows.length === rowCount
                       ? `${rowCount.toLocaleString()} companies`
@@ -1068,6 +1084,21 @@ const CSS = `
   .sp-inbar-clear:hover { color: ${colors.text}; }
   .sp-filter-error { margin: 0; font-size: 12px; color: ${colors.negative}; }
 
+  /* Filter toggle button */
+  .sp-filter-toggle {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 0 12px; height: 32px; flex-shrink: 0;
+    border-radius: 6px; border: 1px solid ${colors.border};
+    background: ${colors.elevated}; color: ${colors.textMuted};
+    cursor: pointer; transition: all .15s;
+    font-size: 12px; font-weight: 500; font-family: ${fonts.sans};
+    white-space: nowrap;
+  }
+  .sp-filter-toggle:hover { background: ${colors.card}; color: ${colors.text}; border-color: ${colors.accent}; }
+
+  /* Collapsed controls */
+  .sp-controls-collapsed { padding-top: 8px; padding-bottom: 8px; }
+
   /* Action bar */
   .sp-action-bar {
     display: flex; align-items: center; justify-content: space-between;
@@ -1233,7 +1264,7 @@ const CSS = `
   .sp-th-sortable {
     padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700;
     letter-spacing: .06em; text-transform: uppercase; color: ${colors.textMuted};
-    background: #050810;; border-bottom: 2px solid ${colors.border};
+    background: ${colors.canvas}; border-bottom: 2px solid ${colors.border};
     white-space: nowrap; cursor: pointer; user-select: none;
     transition: color .12s, background .12s;
   }
@@ -1258,7 +1289,7 @@ const CSS = `
   /* Sticky first column */
   .sp-th-sortable:first-child {
     position: sticky; left: 0; z-index: 3;
-    background-color: #050810;
+    background: ${colors.canvas};
     max-width: 220px; border-right: 1px solid ${colors.border};
   }
   .sp-table td:first-child {
@@ -1267,7 +1298,6 @@ const CSS = `
     overflow: hidden; text-overflow: ellipsis;
     border-right: 1px solid ${colors.border};
     color: ${colors.text}; font-weight: 600;
-    background-color: #050810;
   }
   .sp-table tbody tr:hover td:first-child { background: ${colors.inset} !important; color: ${colors.accent}; }
 

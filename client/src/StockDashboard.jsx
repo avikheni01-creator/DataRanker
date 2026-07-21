@@ -39,6 +39,7 @@ function extractKpiKeys(rows) {
 // Columns treated as company identifiers — shown right after the fixed columns,
 // before any KPI columns. Matched by output column name after COLUMN_MAPPING.
 const IDENTIFIER_COLS = new Set(["BSE Code", "ISIN Code", "NSE Code"]);
+const DEFAULT_HIDDEN_COLS = new Set(["BSE Code", "ISIN Code"]);
 
 /**
  * Split non-system keys into three ordered groups:
@@ -76,6 +77,15 @@ function rankColor(rank, total) {
 
 function scoreBarPct(score, max) {
   return max > 0 ? Math.min((score / max) * 100, 100) : 0;
+}
+
+function scoreColor(pct) {
+  // pct = 0–100 (score as % of template max); higher is better
+  if (pct >= 80) return "var(--positive)";
+  if (pct >= 60) return "#4ADE80";
+  if (pct >= 40) return "var(--warning)";
+  if (pct >= 20) return "#FB923C";
+  return "var(--negative)";
 }
 
 function fmt(val, key) {
@@ -558,6 +568,16 @@ export default function StockDashboard({ resultFile }) {
   const [visibleKpiMap, setVisibleKpiMap] = useState({});
   // kpiOrderMap: { templateName: { scored: [], other: [] } } — set once at parse time, never mutated
   const [kpiOrderMap, setKpiOrderMap] = useState({});
+  // kpiDirectionMap: { kpiName: "higher" | "lower" } — fetched from KPI library
+  const [kpiDirectionMap, setKpiDirectionMap] = useState({});
+
+  useEffect(() => {
+    apiFetch("/kpi-library").then(data => {
+      const map = {};
+      (data?.rows || []).forEach(row => { if (row.kpi) map[row.kpi] = (row.direction || "higher").toLowerCase(); });
+      setKpiDirectionMap(map);
+    }).catch(() => {});
+  }, []);
 
   // Persisted result: if we arrived without an in-memory result (page refresh or
   // deep-link), hydrate the last run from IndexedDB.
@@ -598,7 +618,7 @@ export default function StockDashboard({ resultFile }) {
         Object.entries(parsed).forEach(([name, rows]) => {
           const { identifiers, scored, other } = partitionKpiKeys(rows);
           initOrder[name] = { identifiers, scored, other };
-          initVisible[name] = [...identifiers, ...scored, ...other];
+          initVisible[name] = [...identifiers, ...scored, ...other].filter(k => !DEFAULT_HIDDEN_COLS.has(k));
         });
         setKpiOrderMap(initOrder);
         setVisibleKpiMap(initVisible);
@@ -1149,10 +1169,10 @@ export default function StockDashboard({ resultFile }) {
                           <div style={{ flex: 1, height: 5, background: "var(--elevated)", borderRadius: 3, overflow: "hidden" }}>
                             <div style={{
                               height: "100%", width: `${pct}%`,
-                              background: "linear-gradient(90deg,var(--accent),var(--positive))", borderRadius: 3,
+                              background: scoreColor(pct), borderRadius: 3,
                             }} />
                           </div>
-                          <span className="mono" style={{ fontSize: 11, color: "var(--accent-hover)", minWidth: 36, textAlign: "right" }}>
+                          <span className="mono" style={{ fontSize: 11, color: scoreColor(pct), minWidth: 36, textAlign: "right" }}>
                             {score.toFixed(1)}
                           </span>
                         </div>
@@ -1162,13 +1182,20 @@ export default function StockDashboard({ resultFile }) {
                       {visibleKpiKeys.map(key => {
                         const raw = r[key];
                         const v = parseFloat(raw);
-                        const isGood = !isNaN(v) && v > 0;
+                        const isKpi = scoredKpiKeys.includes(key);
+                        let color;
+                        if (isNaN(v) || raw == null) {
+                          color = "var(--text-muted)";
+                        } else if (isKpi) {
+                          const lowerIsBetter = kpiDirectionMap[key] === "lower";
+                          const bad = lowerIsBetter ? v > 0 : v < 0;
+                          color = bad ? "#FCA5A5" : "#6EE7B7";
+                        } else {
+                          color = "var(--text-secondary)";
+                        }
                         return (
                           <td key={key} style={tdStyle}>
-                            <span className="mono" style={{
-                              fontSize: 11,
-                              color: isNaN(v) ? "var(--text-muted)" : isGood ? "var(--positive)" : "var(--negative)",
-                            }}>
+                            <span className="mono" style={{ fontSize: 11, color }}>
                               {isNaN(v) ? (raw || "—") : fmt(v, key)}
                             </span>
                           </td>
