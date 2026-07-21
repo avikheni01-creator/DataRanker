@@ -5,10 +5,11 @@
 const nodemailer = require("nodemailer");
 
 const SENDER = "noreply@thinkvest.in";
+const GMAIL_USER = process.env.GMAIL_USER;
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
-  auth: { user: SENDER, pass: process.env.GMAIL_APP_PASSWORD },
+  auth: { user: GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD },
 });
 
 const BRAND_HEADER = `
@@ -24,8 +25,8 @@ const BRAND_FOOTER = `
 `;
 
 async function sendOtpEmail(to, otp, purpose) {
-  if (!process.env.GMAIL_APP_PASSWORD) {
-    throw new Error("Email service is not configured (GMAIL_APP_PASSWORD not set)");
+  if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+    throw new Error("Email service is not configured (GMAIL_USER or GMAIL_APP_PASSWORD not set)");
   }
   const subjects = {
     reset:  "Reset your ThinkVest password",
@@ -64,8 +65,8 @@ async function sendOtpEmail(to, otp, purpose) {
 }
 
 async function sendRankingsSummaryEmail(to, pdfBuffer, templateCount) {
-  if (!process.env.GMAIL_APP_PASSWORD) {
-    throw new Error("Email service is not configured (GMAIL_APP_PASSWORD not set)");
+  if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+    throw new Error("Email service is not configured (GMAIL_USER or GMAIL_APP_PASSWORD not set)");
   }
   const templateWord = templateCount === 1 ? "template" : "templates";
   await transporter.sendMail({
@@ -97,8 +98,8 @@ async function sendRankingsSummaryEmail(to, pdfBuffer, templateCount) {
 }
 
 async function sendResultsEmail(to, xlsxBuffer, filename) {
-  if (!process.env.GMAIL_APP_PASSWORD) {
-    throw new Error("Email service is not configured (GMAIL_APP_PASSWORD not set)");
+  if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+    throw new Error("Email service is not configured (GMAIL_USER or GMAIL_APP_PASSWORD not set)");
   }
   await transporter.sendMail({
     from: `"ThinkVest" <${SENDER}>`,
