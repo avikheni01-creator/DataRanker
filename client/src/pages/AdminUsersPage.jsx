@@ -57,6 +57,63 @@ function Toast({ msg, type, onClose }) {
   );
 }
 
+// ── Trial date editor ─────────────────────────────────────────────────────────
+
+function TrialDateEditor({ user, isSelf, busy, onPatch }) {
+  const trialDate = user.trialEndsAt
+    ? new Date(user.trialEndsAt)
+    : new Date(new Date(user.createdAt).getTime() + 90 * 24 * 60 * 60 * 1000);
+  const expired = trialDate < new Date();
+
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(trialDate.toISOString().slice(0, 10));
+
+  const handleSave = () => {
+    if (!value) { setEditing(false); return; }
+    onPatch({ trialEndsAt: new Date(value).toISOString() });
+    setEditing(false);
+  };
+
+  if (editing) {
+    return (
+      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        <input
+          type="date"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          autoFocus
+          style={{
+            background: "var(--inset)", border: "1px solid #10B981",
+            borderRadius: 6, color: colors.text, fontSize: 12,
+            padding: "3px 6px", fontFamily: fonts.sans,
+          }}
+        />
+        <button onClick={handleSave} style={iconBtn("#10B981")}>✓</button>
+        <button onClick={() => setEditing(false)} style={iconBtn("#EF4444")}>✕</button>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+      <span style={{ color: expired ? "#EF4444" : "#F59E0B", fontWeight: 600 }}>
+        {expired ? "Expired " : ""}
+        {trialDate.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+      </span>
+      {!isSelf && !busy && (
+        <button onClick={() => setEditing(true)} title="Edit trial end date" style={iconBtn(colors.textMuted)}>
+          ✎
+        </button>
+      )}
+    </div>
+  );
+}
+
+const iconBtn = (color) => ({
+  background: "none", border: "none", cursor: "pointer",
+  fontSize: 13, color, padding: "0 2px", lineHeight: 1,
+});
+
 // ── User row ──────────────────────────────────────────────────────────────────
 
 function UserRow({ user, isSelf, onUpdate, onDelete }) {
@@ -152,18 +209,9 @@ function UserRow({ user, isSelf, onUpdate, onDelete }) {
         />
       </td>
 
-      {/* Trial ends — fixed 3 months from signup */}
+      {/* Trial ends — editable by admin */}
       <td style={{ padding: "14px 16px", fontSize: 12, whiteSpace: "nowrap" }}>
-        {user.createdAt ? (() => {
-          const d = new Date(new Date(user.createdAt).getTime() + 90 * 24 * 60 * 60 * 1000);
-          const expired = d < new Date();
-          return (
-            <span style={{ color: expired ? "#EF4444" : "#F59E0B", fontWeight: 600 }}>
-              {expired ? "Expired " : ""}
-              {d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
-            </span>
-          );
-        })() : <span style={{ color: colors.textMuted }}>—</span>}
+        <TrialDateEditor user={user} isSelf={isSelf} busy={busy} onPatch={patch} />
       </td>
 
       {/* Valid until — subscription expiry for paid users */}
