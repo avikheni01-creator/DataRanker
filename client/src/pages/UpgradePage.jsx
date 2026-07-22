@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { getUser, logOut } from "../auth";
 import { useNavigate } from "react-router-dom";
 import { colors, fonts, radius } from "../theme";
@@ -24,6 +25,15 @@ export default function UpgradePage() {
     }
     return null;
   })();
+
+  // Redirect users who already have active access away from this page
+  const paidActive = user.paidUntil && new Date(user.paidUntil) > new Date();
+  const trialActive = effectiveTrialEnd && effectiveTrialEnd > new Date();
+  useEffect(() => {
+    if (paidActive || trialActive || user.planOverrideFree) {
+      navigate("/app", { replace: true });
+    }
+  }, [paidActive, trialActive, user.planOverrideFree, navigate]);
   const trialEndDate = effectiveTrialEnd
     ? effectiveTrialEnd.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
     : null;
