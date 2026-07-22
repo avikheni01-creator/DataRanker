@@ -133,7 +133,8 @@ export default function AppShell() {
     }
     return null;
   })();
-  const trialExpired = effectiveTrialEnd && effectiveTrialEnd < new Date() && !user.planOverrideFree;
+  const paidActive = user.paidUntil && new Date(user.paidUntil) > new Date();
+  const trialExpired = effectiveTrialEnd && effectiveTrialEnd < new Date() && !user.planOverrideFree && !paidActive;
   const TRIAL_ALLOWED = ["/app/upgrade", "/app/account", "/app/premium"];
   if (trialExpired && !TRIAL_ALLOWED.some((p) => location.pathname.startsWith(p))) {
     return <Navigate to="/app/upgrade" replace />;
