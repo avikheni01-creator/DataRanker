@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
+import { NavLink, Navigate, Outlet, useLocation } from "react-router-dom";
 import Logo from "./Logo";
-import ThemeToggle from "./ThemeToggle";
-import { logOut, getUser, verifyEmail, resendVerification } from "../auth";
+import { getUser, verifyEmail, resendVerification } from "../auth";
 import Seo from "../seo";
 import { colors, gradients, fonts, radius } from "../theme";
 import { useAppConfig, useRefreshAppConfig } from "../AppConfigContext";
@@ -60,9 +59,9 @@ const KPI_NAV     = { to: "/app/kpi-editor", label: "KPI Editor", icon: <Icon pa
 const PREMIUM_NAV = { to: "/app/premium", label: "Premium", cls: "shell-link-premium", icon: <Icon paths={["M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"]} /> };
 const SETTINGS_NAV = { to: "/app/settings", label: "Settings", icon: <Icon paths={["M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z", "M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"]} /> };
 const ADMIN_USERS_NAV = { to: "/app/admin/users", label: "Users", icon: <Icon paths={["M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2", "M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z", "M23 21v-2a4 4 0 0 0-3-3.87", "M16 3.13a4 4 0 0 1 0 7.75"]} /> };
+const ADMIN_PLANS_NAV = { to: "/app/admin/plans", label: "Plans", icon: <Icon paths={["M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z", "M5 3h14", "M5 21h14"]} /> };
 
 export default function AppShell() {
-  const navigate = useNavigate();
   const location = useLocation();
   const user = getUser();
   const appConfig = useAppConfig();
@@ -94,14 +93,9 @@ export default function AppShell() {
 
   // Filter nav items by feature flags
   const NAV = BASE_NAV.filter((item) => !item.flag || appConfig[item.flag] !== false);
-  const items = [...NAV, KPI_NAV, PREMIUM_NAV, ...(user?.isAdmin ? [ADMIN_USERS_NAV, SETTINGS_NAV] : [])];
+  const items = [...NAV, KPI_NAV, PREMIUM_NAV, ...(user?.isAdmin ? [ADMIN_USERS_NAV, ADMIN_PLANS_NAV, SETTINGS_NAV] : [])];
 
-  const topNav = ["/app", "/app/results", "/app/kpi-editor", "/app/screener", "/app/comparison", "/app/premium", "/app/settings", "/app/account", "/app/admin/users"].includes(location.pathname);
-
-  const handleSignOut = async () => {
-    await logOut();
-    navigate("/");
-  };
+  const topNav = ["/app", "/app/results", "/app/kpi-editor", "/app/screener", "/app/comparison", "/app/premium", "/app/upgrade", "/app/settings", "/app/account", "/app/admin/users", "/app/admin/plans"].includes(location.pathname);
 
   const handleResendVerification = async () => {
     setVerifyError("");
@@ -129,6 +123,21 @@ export default function AppShell() {
   };
 
   const initial = (user.name || user.email || "M").trim().charAt(0).toUpperCase();
+
+  // Force expired-trial users to the upgrade page (except allowed paths).
+  // Standard plan gets 90 days free from signup; derive from createdAt when trialEndsAt is absent.
+  const effectiveTrialEnd = (() => {
+    if (user.trialEndsAt) return new Date(user.trialEndsAt);
+    if (user.plan === "standard" && user.createdAt) {
+      return new Date(new Date(user.createdAt).getTime() + 90 * 24 * 60 * 60 * 1000);
+    }
+    return null;
+  })();
+  const trialExpired = effectiveTrialEnd && effectiveTrialEnd < new Date() && !user.planOverrideFree;
+  const TRIAL_ALLOWED = ["/app/upgrade", "/app/account", "/app/premium"];
+  if (trialExpired && !TRIAL_ALLOWED.some((p) => location.pathname.startsWith(p))) {
+    return <Navigate to="/app/upgrade" replace />;
+  }
 
   return (
     <div className={`shell${topNav ? " topbar" : ""}`}>
@@ -166,15 +175,19 @@ export default function AppShell() {
         </nav>
 
         <div className="shell-user">
-          <NavLink to="/app/account" className="shell-avatar" title="Account" aria-label="Account">{initial}</NavLink>
+          <div className="shell-avatar-wrap">
+            <div className="shell-avatar-initial">{initial}</div>
+          </div>
           <div className="shell-user-meta">
             <div className="shell-user-name">{user.name || "Analyst"}</div>
             <div className="shell-user-email">{user.email || "thinkvest"}</div>
           </div>
-          <ThemeToggle size={34} />
-          <button className="shell-signout" onClick={handleSignOut} title="Sign out" aria-label="Sign out">
-            <Icon paths={["M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4", "M16 17l5-5-5-5", "M21 12H9"]} />
-          </button>
+          <NavLink to="/app/account" className="shell-settings-btn" title="Settings" aria-label="Settings">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </NavLink>
         </div>
       </aside>
 
@@ -323,13 +336,14 @@ const SHELL_CSS = `
   .shell-link-premium.active::before { background: linear-gradient(180deg, #7C6CFF, #A78BFA) !important; box-shadow: 0 0 10px rgba(124,108,255,0.6) !important; }
 
   .shell-user { display: flex; align-items: center; gap: 10px; padding: 12px 10px 4px; border-top: 1px solid ${colors.glassBorder}; margin-top: 8px; }
-  .shell-avatar { width: 36px; height: 36px; border-radius: 999px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: ${gradients.brand}; color: #fff; font-weight: 700; font-size: 14px; box-shadow: 0 0 16px rgba(16,185,129,0.35); text-decoration: none; transition: box-shadow .15s, transform .15s; }
-  .shell-avatar:hover { box-shadow: 0 0 22px rgba(16,185,129,0.55); transform: scale(1.06); }
+  .shell-avatar-wrap { width: 36px; height: 36px; border-radius: 999px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: ${gradients.brand}; box-shadow: 0 0 16px rgba(16,185,129,0.35); }
+  .shell-avatar-initial { color: #fff; font-weight: 700; font-size: 14px; }
   .shell-user-meta { flex: 1; min-width: 0; }
   .shell-user-name { font-size: 13px; font-weight: 600; color: ${colors.text}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .shell-user-email { font-size: 11px; color: ${colors.textMuted}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .shell-signout { background: transparent; border: none; color: ${colors.textMuted}; cursor: pointer; padding: 6px; border-radius: ${radius.sm}; display: inline-flex; transition: all .15s; }
-  .shell-signout:hover { color: ${colors.negative}; background: ${colors.negativeSoft}; }
+  .shell-settings-btn { background: transparent; border: none; color: ${colors.textMuted}; cursor: pointer; padding: 6px; border-radius: ${radius.sm}; display: inline-flex; transition: all .15s; text-decoration: none; }
+  .shell-settings-btn:hover { color: ${colors.text}; background: rgba(255,255,255,0.08); }
+  .shell-settings-btn.active { color: ${colors.accentHover}; background: rgba(16,185,129,0.12); }
 
   /* min-width:0 prevents the grid column from expanding beyond viewport on mobile */
   .shell-main { min-width: 0; overflow-x: hidden; }

@@ -1,9 +1,5 @@
-// core/plans.js — subscription tiers.
-//
-// `free` is the only tier implemented today and is the default for every new
-// user. Paid tiers are scaffolded with PLACEHOLDER names/prices/features —
-// edit these freely; nothing is gated by them yet beyond the `comingSoon` flag.
-// The frontend Pricing page renders this list verbatim.
+// core/plans.js — hardcoded fallback subscription tiers (used when DB has no plans).
+// Admin can override all of these via the Plan Management page (/app/admin/plans).
 
 const PLANS = [
   {
@@ -11,16 +7,33 @@ const PLANS = [
     name: "Free",
     price: 0,
     period: "forever",
-    tagline: "Everything you need to rank your first universe.",
+    tagline: "Admin-assigned free access.",
+    features: [
+      "Full ranking pipeline",
+      "KPI library editor",
+      "Results dashboard & Excel export",
+    ],
+    cta: "Admin assigned",
+    active: true,
+    comingSoon: false,
+    highlighted: false,
+  },
+  {
+    id: "standard",
+    name: "Standard",
+    price: 0,
+    period: "3 months free, then paid",
+    tagline: "Default plan for all new signups. First 3 months free.",
     features: [
       "Full ranking pipeline (format → map → rank)",
       "Column mapper & KPI library editor",
       "Results dashboard & Excel export",
+      "Screener & Comparison dashboard",
     ],
     cta: "Get started",
     active: true,
     comingSoon: false,
-    highlighted: false,
+    highlighted: true,
   },
   {
     id: "premium",

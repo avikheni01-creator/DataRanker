@@ -71,6 +71,13 @@ export function isAuthed() {
   return Boolean(localStorage.getItem(USER_KEY));
 }
 
+// Update the cached user without touching the token — used after payment to
+// refresh trialEndsAt so AppShell's trial check re-evaluates on next render.
+export function saveUser(user) {
+  if (user) localStorage.setItem(USER_KEY, JSON.stringify(user));
+  return user;
+}
+
 export function getUser() {
   try {
     return JSON.parse(localStorage.getItem(USER_KEY)) || {};

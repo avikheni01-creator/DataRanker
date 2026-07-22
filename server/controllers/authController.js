@@ -25,7 +25,8 @@ async function signup(req, res) {
       return res.status(409).json({ detail: "An account with that email already exists" });
     }
 
-    const user = new User({ name, email, plan: "free" });
+    const trialEndsAt = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000); // 90-day trial
+    const user = new User({ name, email, plan: "standard", trialEndsAt });
     await user.setPassword(password);
     await user.save();
 

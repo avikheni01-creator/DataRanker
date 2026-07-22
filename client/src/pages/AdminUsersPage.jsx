@@ -4,8 +4,8 @@ import { apiFetch } from "../api";
 import { getUser } from "../auth";
 import { colors, fonts, radius } from "../theme";
 
-const PLANS = ["free", "premium", "enterprise"];
-const PLAN_COLORS = { free: "#94A3B8", premium: "#F59E0B", enterprise: "#10B981" };
+const PLANS = ["free", "standard", "premium", "enterprise"];
+const PLAN_COLORS = { free: "#94A3B8", standard: "#3B82F6", premium: "#F59E0B", enterprise: "#10B981" };
 
 // ── Tiny shared components ────────────────────────────────────────────────────
 
@@ -129,6 +129,20 @@ function UserRow({ user, isSelf, onUpdate, onDelete }) {
         </select>
       </td>
 
+      {/* Free override */}
+      <td style={{ padding: "14px 16px", textAlign: "center" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
+          <Toggle
+            checked={user.planOverrideFree || false}
+            disabled={isSelf || busy}
+            onChange={(v) => patch({ planOverrideFree: v })}
+          />
+          {user.planOverrideFree && (
+            <span style={{ fontSize: 9, color: "#22C55E", fontWeight: 700, letterSpacing: ".05em" }}>ACTIVE</span>
+          )}
+        </div>
+      </td>
+
       {/* Admin toggle */}
       <td style={{ padding: "14px 16px", textAlign: "center" }}>
         <Toggle
@@ -136,6 +150,20 @@ function UserRow({ user, isSelf, onUpdate, onDelete }) {
           disabled={isSelf || busy}
           onChange={(v) => patch({ isAdmin: v })}
         />
+      </td>
+
+      {/* Trial expiry */}
+      <td style={{ padding: "14px 16px", fontSize: 12, color: colors.textMuted, whiteSpace: "nowrap" }}>
+        {user.trialEndsAt ? (() => {
+          const d = new Date(user.trialEndsAt);
+          const expired = d < new Date();
+          return (
+            <span style={{ color: expired ? "#EF4444" : "#F59E0B", fontWeight: 600 }}>
+              {expired ? "Expired " : ""}
+              {d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+            </span>
+          );
+        })() : <span style={{ color: colors.textMuted }}>—</span>}
       </td>
 
       {/* Email verified */}
@@ -259,7 +287,9 @@ function UsersTable({ selfId }) {
                 <tr>
                   <th>User</th>
                   <th>Plan</th>
+                  <th style={{ textAlign: "center" }}>Free Override</th>
                   <th style={{ textAlign: "center" }}>Admin</th>
+                  <th>Trial Ends</th>
                   <th style={{ textAlign: "center" }}>Email</th>
                   <th>Joined</th>
                   <th style={{ textAlign: "right" }}>Actions</th>
@@ -351,7 +381,8 @@ const CSS = `
   @media (max-width: 760px) {
     .au-page { padding: 24px 16px 48px; }
     .au-stats { grid-template-columns: repeat(2, 1fr); }
-    .au-table th:nth-child(4), .au-table td:nth-child(4),
-    .au-table th:nth-child(5), .au-table td:nth-child(5) { display: none; }
+    .au-table th:nth-child(5), .au-table td:nth-child(5),
+    .au-table th:nth-child(6), .au-table td:nth-child(6),
+    .au-table th:nth-child(7), .au-table td:nth-child(7) { display: none; }
   }
 `;

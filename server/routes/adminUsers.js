@@ -28,7 +28,7 @@ router.patch("/admin/users/:id", requireAuth, requireAdmin, async (req, res) => 
       return res.status(400).json({ detail: "You cannot modify your own account from this panel" });
     }
 
-    const allowed = ["plan", "isAdmin"];
+    const allowed = ["plan", "isAdmin", "planOverrideFree"];
     const updates = {};
     for (const key of allowed) {
       if (req.body[key] !== undefined) updates[key] = req.body[key];

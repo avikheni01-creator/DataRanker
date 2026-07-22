@@ -2,7 +2,6 @@
 
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
-const { PLAN_IDS } = require("../core/plans");
 
 const userSchema = new mongoose.Schema(
   {
@@ -16,9 +15,11 @@ const userSchema = new mongoose.Schema(
     },
     passwordHash: { type: String, default: null },
     googleId: { type: String, default: null, sparse: true },
-    plan: { type: String, enum: PLAN_IDS, default: "free" },
+    plan: { type: String, default: "standard" },
     isAdmin: { type: Boolean, default: false },
     emailVerified: { type: Boolean, default: false },
+    trialEndsAt: { type: Date, default: null },       // set on signup; null = no trial
+    planOverrideFree: { type: Boolean, default: false }, // admin grants permanent free access
   },
   { timestamps: true }
 );
@@ -43,6 +44,8 @@ userSchema.methods.toSafeJSON = function toSafeJSON() {
     isAdmin: this.isAdmin || false,
     emailVerified: this.emailVerified || false,
     hasPassword: Boolean(this.passwordHash),
+    trialEndsAt: this.trialEndsAt || null,
+    planOverrideFree: this.planOverrideFree || false,
     createdAt: this.createdAt,
   };
 };
