@@ -66,7 +66,7 @@ export default function UpgradePage() {
                 period="monthly"
                 user={user}
                 label="Pay Monthly"
-                priceLabel="₹499 / month"
+                priceLabel="₹5 / month"
                 onSuccess={() => navigate("/app")}
               />
               <PaymentButton

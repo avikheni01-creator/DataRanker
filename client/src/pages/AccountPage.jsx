@@ -376,7 +376,7 @@ function MembershipSection({ user, onUpdate }) {
                 period="monthly"
                 user={user}
                 label="Pay Monthly"
-                priceLabel={`₹${monthlyPrice || 499} / month`}
+                priceLabel={`₹${monthlyPrice || 5} / month`}
                 onSuccess={(updated) => { setPaySuccess(updated); onUpdate(updated); }}
               />
               <PaymentButton

@@ -24,7 +24,7 @@ const { requireAuth } = require("../middleware/auth");
 const router = express.Router();
 
 // Fallback prices in paise when no Plan document exists (₹499/mo, ₹4,999/yr)
-const FALLBACK_PAISE = { monthly: 49900, yearly: 499900 };
+const FALLBACK_PAISE = { monthly: 500, yearly: 499900 };
 
 function getRazorpay() {
   const key_id     = process.env.RAZORPAY_KEY_ID;
