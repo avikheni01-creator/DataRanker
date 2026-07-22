@@ -375,9 +375,9 @@ const CSS = `
 
   .au-table-wrap {
     background: var(--card); border: 1px solid var(--border);
-    border-radius: 14px; overflow: hidden;
+    border-radius: 14px; overflow-x: auto;
   }
-  .au-table { width: 100%; border-collapse: collapse; }
+  .au-table { width: max-content; min-width: 100%; border-collapse: collapse; }
   .au-table thead tr { background: var(--inset); border-bottom: 1px solid var(--border); }
   .au-table th {
     padding: 10px 16px; text-align: left;
@@ -396,9 +396,5 @@ const CSS = `
   @media (max-width: 760px) {
     .au-page { padding: 24px 16px 48px; }
     .au-stats { grid-template-columns: repeat(2, 1fr); }
-    .au-table th:nth-child(5), .au-table td:nth-child(5),
-    .au-table th:nth-child(6), .au-table td:nth-child(6),
-    .au-table th:nth-child(7), .au-table td:nth-child(7),
-    .au-table th:nth-child(8), .au-table td:nth-child(8) { display: none; }
   }
 `;
