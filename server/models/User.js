@@ -18,7 +18,8 @@ const userSchema = new mongoose.Schema(
     plan: { type: String, default: "standard" },
     isAdmin: { type: Boolean, default: false },
     emailVerified: { type: Boolean, default: false },
-    trialEndsAt: { type: Date, default: null },       // set on signup; null = no trial
+    trialEndsAt: { type: Date, default: null },         // fixed 3-month trial from signup; never extended
+    paidUntil: { type: Date, default: null },           // set on payment; null = never paid
     planOverrideFree: { type: Boolean, default: false }, // admin grants permanent free access
   },
   { timestamps: true }
@@ -45,6 +46,7 @@ userSchema.methods.toSafeJSON = function toSafeJSON() {
     emailVerified: this.emailVerified || false,
     hasPassword: Boolean(this.passwordHash),
     trialEndsAt: this.trialEndsAt || null,
+    paidUntil: this.paidUntil || null,
     planOverrideFree: this.planOverrideFree || false,
     createdAt: this.createdAt,
   };

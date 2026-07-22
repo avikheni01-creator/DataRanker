@@ -152,13 +152,27 @@ function UserRow({ user, isSelf, onUpdate, onDelete }) {
         />
       </td>
 
-      {/* Trial expiry */}
-      <td style={{ padding: "14px 16px", fontSize: 12, color: colors.textMuted, whiteSpace: "nowrap" }}>
-        {user.trialEndsAt ? (() => {
-          const d = new Date(user.trialEndsAt);
+      {/* Trial ends — fixed 3 months from signup */}
+      <td style={{ padding: "14px 16px", fontSize: 12, whiteSpace: "nowrap" }}>
+        {user.createdAt ? (() => {
+          const d = new Date(new Date(user.createdAt).getTime() + 90 * 24 * 60 * 60 * 1000);
           const expired = d < new Date();
           return (
             <span style={{ color: expired ? "#EF4444" : "#F59E0B", fontWeight: 600 }}>
+              {expired ? "Expired " : ""}
+              {d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+            </span>
+          );
+        })() : <span style={{ color: colors.textMuted }}>—</span>}
+      </td>
+
+      {/* Valid until — subscription expiry for paid users */}
+      <td style={{ padding: "14px 16px", fontSize: 12, whiteSpace: "nowrap" }}>
+        {user.paidUntil ? (() => {
+          const d = new Date(user.paidUntil);
+          const expired = d < new Date();
+          return (
+            <span style={{ color: expired ? "#EF4444" : "#22C55E", fontWeight: 600 }}>
               {expired ? "Expired " : ""}
               {d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
             </span>
@@ -290,6 +304,7 @@ function UsersTable({ selfId }) {
                   <th style={{ textAlign: "center" }}>Free Override</th>
                   <th style={{ textAlign: "center" }}>Admin</th>
                   <th>Trial Ends</th>
+                  <th>Valid Until</th>
                   <th style={{ textAlign: "center" }}>Email</th>
                   <th>Joined</th>
                   <th style={{ textAlign: "right" }}>Actions</th>
@@ -383,6 +398,7 @@ const CSS = `
     .au-stats { grid-template-columns: repeat(2, 1fr); }
     .au-table th:nth-child(5), .au-table td:nth-child(5),
     .au-table th:nth-child(6), .au-table td:nth-child(6),
-    .au-table th:nth-child(7), .au-table td:nth-child(7) { display: none; }
+    .au-table th:nth-child(7), .au-table td:nth-child(7),
+    .au-table th:nth-child(8), .au-table td:nth-child(8) { display: none; }
   }
 `;
