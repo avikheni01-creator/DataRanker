@@ -18,6 +18,10 @@ const AppSettingsSchema = new mongoose.Schema(
 
     // Optional banner shown to every logged-in user. Empty string = no banner.
     maintenanceBanner: { type: String, default: "" },
+
+    // Limited-time promo shown on the public Pricing page. Empty = no promo.
+    promoBanner: { type: String, default: "" },
+    promoExpiry: { type: Date,   default: null },
   },
   { timestamps: true }
 );

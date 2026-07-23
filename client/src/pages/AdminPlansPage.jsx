@@ -134,7 +134,18 @@ function PlanModal({ plan, onSave, onClose }) {
 
           <div className="apl-grid-3">
             {field("Trial Days", "trialDays", "number", { min: 0 })}
-            {field("CTA Button Text", "cta", "text")}
+            <div className="apl-field">
+              <label className="apl-label">CTA Button Text</label>
+              <input
+                type="text" value={form.cta} className="apl-input"
+                onChange={(e) => set("cta", e.target.value)}
+              />
+              <span className="apl-hint">
+                {(Number(form.monthlyPrice) === 0 && Number(form.yearlyPrice) === 0)
+                  ? "⚠ Both prices are ₹0 — pricing page will show a \"Contact us\" email link, not this button."
+                  : "✓ Shown as the signup button on the pricing page."}
+              </span>
+            </div>
             {field("Display Order", "order", "number", { min: 0 })}
           </div>
 

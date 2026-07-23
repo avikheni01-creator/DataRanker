@@ -54,22 +54,20 @@ function Banner({ type, children }) {
 
 export default function SettingsPage() {
   const user = getUser();
-  const appConfig = useAppConfig();
-
-  // Non-admins get redirected immediately
   if (!user?.isAdmin) return <Navigate to="/app" replace />;
-
-  return <SettingsForm initialValues={appConfig} />;
+  return <SettingsForm />;
 }
 
-function SettingsForm({ initialValues }) {
-  const [form, setForm] = useState(initialValues);
+function SettingsForm() {
+  const [form, setForm] = useState(null);
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState(null); // { type: "success"|"error", msg }
   const refreshAppConfig = useRefreshAppConfig();
 
-  // Sync when initialValues load from context (first fetch)
-  useEffect(() => { setForm(initialValues); }, [initialValues]);
+  // Always load from /admin/settings so promo + all fields are present
+  useEffect(() => {
+    apiFetch("/admin/settings").then(setForm).catch(() => {});
+  }, []);
 
   const set = (key, value) => setForm((f) => ({ ...f, [key]: value }));
 
@@ -90,6 +88,8 @@ function SettingsForm({ initialValues }) {
       setSaving(false);
     }
   };
+
+  if (!form) return <div style={{ padding: 48, textAlign: "center", color: "var(--text-muted)" }}>Loading settings…</div>;
 
   return (
     <>
@@ -182,6 +182,46 @@ function SettingsForm({ initialValues }) {
               <div className="st-banner-preview">
                 <span className="st-banner-preview-label">Preview:</span>
                 {form.maintenanceBanner}
+              </div>
+            )}
+          </Card>
+
+          {/* Promo Banner */}
+          <Card title="Limited-Time Offer">
+            <SettingRow
+              label="Promo Banner Text"
+              description="Shown on the public Pricing page as an announcement bar. Leave empty to hide."
+            >
+              <input
+                type="text"
+                className="st-text"
+                placeholder="e.g. 🎉 Special launch offer — 30% off yearly plan this week!"
+                value={form.promoBanner || ""}
+                onChange={(e) => set("promoBanner", e.target.value)}
+              />
+            </SettingRow>
+            <SettingRow
+              label="Offer Expiry Date & Time"
+              description="Promo automatically disappears after this date. Leave empty for no expiry."
+            >
+              <input
+                type="datetime-local"
+                className="st-text"
+                value={form.promoExpiry
+                  ? new Date(form.promoExpiry).toISOString().slice(0, 16)
+                  : ""}
+                onChange={(e) => set("promoExpiry", e.target.value ? new Date(e.target.value).toISOString() : null)}
+              />
+            </SettingRow>
+            {form.promoBanner && (
+              <div className="st-banner-preview" style={{ background: "rgba(16,185,129,.08)", borderColor: "rgba(16,185,129,.35)", color: "#10B981" }}>
+                <span className="st-banner-preview-label">Preview:</span>
+                {form.promoBanner}
+                {form.promoExpiry && (
+                  <span style={{ marginLeft: 8, fontSize: 11, opacity: 0.75 }}>
+                    · Expires {new Date(form.promoExpiry).toLocaleString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                  </span>
+                )}
               </div>
             )}
           </Card>
