@@ -23,6 +23,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 import CompanyDetailPage from "./pages/CompanyDetailPage";
 import PremiumPage from "./pages/PremiumPage";
 import AdminPlansPage from "./pages/AdminPlansPage";
+import AdminLogsPage from "./pages/AdminLogsPage";
 import UpgradePage from "./pages/UpgradePage";
 import { apiUrl, getAuthHeaders } from "./api";
 import { AppConfigContext, DEFAULT_APP_CONFIG } from "./AppConfigContext";
@@ -117,6 +118,7 @@ export default function App() {
           <Route path="premium" element={<PremiumPage />} />
           <Route path="upgrade" element={<UpgradePage />} />
           <Route path="admin/plans" element={<AdminPlansPage />} />
+          <Route path="admin/logs" element={<AdminLogsPage />} />
         </Route>
 
         {/* 404 — must be last */}

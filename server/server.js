@@ -36,6 +36,8 @@ const screenerRouter = require("./routes/screener");
 const adminSettingsRouter = require("./routes/adminSettings");
 const adminUsersRouter = require("./routes/adminUsers");
 const adminPlansRouter = require("./routes/adminPlans");
+const adminLogsRouter  = require("./routes/adminLogs");
+require("./models/AdminLog"); // ensure model is registered
 const paymentRouter    = require("./routes/payment");
 const statsRouter = require("./routes/stats");
 const resultsRouter = require("./routes/results");
@@ -75,6 +77,7 @@ app.use(screenerRouter);        // GET/POST /screener, POST /admin/screener
 app.use(adminSettingsRouter);  // GET /app-config, GET/PUT /admin/settings
 app.use(adminUsersRouter);     // GET/PATCH/DELETE /admin/users
 app.use(adminPlansRouter);    // GET/POST/PUT/DELETE /admin/plans
+app.use(adminLogsRouter);     // GET /admin/logs
 app.use(paymentRouter);       // POST /payment/create-order, POST /payment/verify
 app.use(statsRouter);          // GET /stats (public)
 app.use(resultsRouter);        // POST /results/email

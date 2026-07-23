@@ -123,11 +123,15 @@ router.post("/payment/verify", requireAuth, async (req, res) => {
     const user = await User.findById(req.user._id);
 
     if (isNew) {
-      // Extend paidUntil, stacking on the existing value if still in the future.
-      // trialEndsAt is never touched here — it stays as the fixed 3-month trial date.
-      const base = user.paidUntil && user.paidUntil > new Date()
-        ? user.paidUntil
-        : new Date();
+      // Base = latest of: current paidUntil, trial end, or now.
+      // This ensures payment always starts after the trial period (not overlap it).
+      const now = new Date();
+      const candidates = [
+        now,
+        user.paidUntil && user.paidUntil > now ? user.paidUntil : null,
+        user.trialEndsAt && user.trialEndsAt > now ? user.trialEndsAt : null,
+      ].filter(Boolean);
+      const base = new Date(Math.max(...candidates.map((d) => d.getTime())));
       user.paidUntil = new Date(base.getTime() + daysToAdd * 24 * 60 * 60 * 1000);
       await user.save();
     }

@@ -60,6 +60,7 @@ const PREMIUM_NAV = { to: "/app/premium", label: "Premium", cls: "shell-link-pre
 const SETTINGS_NAV = { to: "/app/settings", label: "Settings", icon: <Icon paths={["M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z", "M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"]} /> };
 const ADMIN_USERS_NAV = { to: "/app/admin/users", label: "Users", icon: <Icon paths={["M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2", "M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z", "M23 21v-2a4 4 0 0 0-3-3.87", "M16 3.13a4 4 0 0 1 0 7.75"]} /> };
 const ADMIN_PLANS_NAV = { to: "/app/admin/plans", label: "Plans", icon: <Icon paths={["M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z", "M5 3h14", "M5 21h14"]} /> };
+const ADMIN_LOGS_NAV  = { to: "/app/admin/logs",  label: "Logs",  icon: <Icon paths={["M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z", "M14 2v6h6", "M16 13H8", "M16 17H8", "M10 9H8"]} /> };
 
 export default function AppShell() {
   const location = useLocation();
@@ -93,9 +94,9 @@ export default function AppShell() {
 
   // Filter nav items by feature flags
   const NAV = BASE_NAV.filter((item) => !item.flag || appConfig[item.flag] !== false);
-  const items = [...NAV, KPI_NAV, PREMIUM_NAV, ...(user?.isAdmin ? [ADMIN_USERS_NAV, ADMIN_PLANS_NAV, SETTINGS_NAV] : [])];
+  const items = [...NAV, KPI_NAV, PREMIUM_NAV, ...(user?.isAdmin ? [ADMIN_USERS_NAV, ADMIN_PLANS_NAV, ADMIN_LOGS_NAV, SETTINGS_NAV] : [])];
 
-  const topNav = ["/app", "/app/results", "/app/kpi-editor", "/app/screener", "/app/comparison", "/app/premium", "/app/upgrade", "/app/settings", "/app/account", "/app/admin/users", "/app/admin/plans"].includes(location.pathname);
+  const topNav = ["/app", "/app/results", "/app/kpi-editor", "/app/screener", "/app/comparison", "/app/premium", "/app/upgrade", "/app/settings", "/app/account", "/app/admin/users", "/app/admin/plans", "/app/admin/logs"].includes(location.pathname);
 
   const handleResendVerification = async () => {
     setVerifyError("");

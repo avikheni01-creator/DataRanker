@@ -42,13 +42,21 @@ async function run() {
     // Already migrated — skip
     if (user.paidUntil) { skipped++; continue; }
 
-    // Reconstruct paidUntil by stacking payments in chronological order
+    // Reconstruct paidUntil by stacking payments in chronological order.
+    // Each payment starts from the latest of: payment date, trial end, or previous paidUntil.
+    const naturalTrialEndForCalc = new Date(
+      new Date(user.createdAt).getTime() + 90 * 24 * 60 * 60 * 1000
+    );
     let paidUntil = null;
     for (const p of userPayments) {
       const daysToAdd = p.period === "yearly" ? 365 : 30;
-      const base = paidUntil && paidUntil > new Date(p.createdAt)
-        ? paidUntil
-        : new Date(p.createdAt);
+      const paymentDate = new Date(p.createdAt);
+      const candidates = [
+        paymentDate,
+        paidUntil && paidUntil > paymentDate ? paidUntil : null,
+        naturalTrialEndForCalc > paymentDate ? naturalTrialEndForCalc : null,
+      ].filter(Boolean);
+      const base = new Date(Math.max(...candidates.map((d) => d.getTime())));
       paidUntil = new Date(base.getTime() + daysToAdd * 24 * 60 * 60 * 1000);
     }
 

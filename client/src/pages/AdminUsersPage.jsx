@@ -114,6 +114,67 @@ const iconBtn = (color) => ({
   fontSize: 13, color, padding: "0 2px", lineHeight: 1,
 });
 
+// ── Paid-until editor ─────────────────────────────────────────────────────────
+
+function PaidUntilEditor({ user, isSelf, busy, onPatch }) {
+  const [editing, setEditing] = useState(false);
+  const defaultVal = user.paidUntil
+    ? new Date(user.paidUntil).toISOString().slice(0, 10)
+    : new Date().toISOString().slice(0, 10);
+  const [value, setValue] = useState(defaultVal);
+
+  const handleSave = () => {
+    if (!value) { setEditing(false); return; }
+    onPatch({ paidUntil: new Date(value).toISOString() });
+    setEditing(false);
+  };
+
+  if (editing) {
+    return (
+      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        <input
+          type="date"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          autoFocus
+          style={{
+            background: "var(--inset)", border: "1px solid #22C55E",
+            borderRadius: 6, color: colors.text, fontSize: 12,
+            padding: "3px 6px", fontFamily: fonts.sans,
+          }}
+        />
+        <button onClick={handleSave} style={iconBtn("#10B981")}>✓</button>
+        <button onClick={() => setEditing(false)} style={iconBtn("#EF4444")}>✕</button>
+      </div>
+    );
+  }
+
+  if (!user.paidUntil) {
+    return (
+      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        <span style={{ color: colors.textMuted }}>—</span>
+        {!isSelf && !busy && (
+          <button onClick={() => setEditing(true)} title="Set paid until" style={iconBtn(colors.textMuted)}>✎</button>
+        )}
+      </div>
+    );
+  }
+
+  const d = new Date(user.paidUntil);
+  const expired = d < new Date();
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+      <span style={{ color: expired ? "#EF4444" : "#22C55E", fontWeight: 600 }}>
+        {expired ? "Expired " : ""}
+        {d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+      </span>
+      {!isSelf && !busy && (
+        <button onClick={() => setEditing(true)} title="Edit paid until" style={iconBtn(colors.textMuted)}>✎</button>
+      )}
+    </div>
+  );
+}
+
 // ── User row ──────────────────────────────────────────────────────────────────
 
 function UserRow({ user, isSelf, onUpdate, onDelete }) {
@@ -214,18 +275,9 @@ function UserRow({ user, isSelf, onUpdate, onDelete }) {
         <TrialDateEditor user={user} isSelf={isSelf} busy={busy} onPatch={patch} />
       </td>
 
-      {/* Valid until — subscription expiry for paid users */}
+      {/* Valid until — subscription expiry for paid users, editable */}
       <td style={{ padding: "14px 16px", fontSize: 12, whiteSpace: "nowrap" }}>
-        {user.paidUntil ? (() => {
-          const d = new Date(user.paidUntil);
-          const expired = d < new Date();
-          return (
-            <span style={{ color: expired ? "#EF4444" : "#22C55E", fontWeight: 600 }}>
-              {expired ? "Expired " : ""}
-              {d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
-            </span>
-          );
-        })() : <span style={{ color: colors.textMuted }}>—</span>}
+        <PaidUntilEditor user={user} isSelf={isSelf} busy={busy} onPatch={patch} />
       </td>
 
       {/* Email verified */}
