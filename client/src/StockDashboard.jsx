@@ -151,7 +151,7 @@ function ColumnPicker({ allKpiKeys, visibleKpiKeys, onChange, identifierKeys = [
           background: open ? "var(--elevated)" : "var(--card)",
           border: `1px solid ${open ? "var(--accent-hover)" : "var(--border)"}`,
           borderRadius: 8, color: "var(--text-secondary)", padding: "8px 12px",
-          cursor: "pointer", fontSize: 11, fontFamily: "'JetBrains Mono',monospace",
+          cursor: "pointer", fontSize: 11, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
           transition: "all .15s",
         }}
       >
@@ -211,7 +211,7 @@ function ColumnPicker({ allKpiKeys, visibleKpiKeys, onChange, identifierKeys = [
                   </span>
                   <input type="checkbox" checked={checked} onChange={() => toggle(key)} style={{ display: "none" }} />
                   <span style={{
-                    fontSize: 11, fontFamily: "'JetBrains Mono',monospace",
+                    fontSize: 11, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
                     color: checked ? "var(--accent-hover)" : "var(--text-secondary)",
                   }}>
                     {key}
@@ -223,7 +223,7 @@ function ColumnPicker({ allKpiKeys, visibleKpiKeys, onChange, identifierKeys = [
             const sectionLabel = (text) => (
               <div style={{
                 padding: "6px 14px 4px",
-                fontSize: 9, fontFamily: "'JetBrains Mono',monospace",
+                fontSize: 9, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
                 letterSpacing: ".12em", color: "var(--text-muted)",
                 borderTop: "1px solid var(--elevated)",
                 marginTop: 4,
@@ -251,7 +251,7 @@ function ColumnPicker({ allKpiKeys, visibleKpiKeys, onChange, identifierKeys = [
 
 function quickBtnStyle(color) {
   return {
-    flex: 1, padding: "4px 0", fontSize: 10, fontFamily: "'JetBrains Mono',monospace",
+    flex: 1, padding: "4px 0", fontSize: 10, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
     background: "transparent", border: `1px solid ${color}22`,
     color, borderRadius: 5, cursor: "pointer",
   };
@@ -340,7 +340,7 @@ function CompanyDrawer({ company, allCompanies, onClose }) {
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div>
-            <div style={{ fontSize: 11, fontFamily: "'JetBrains Mono',monospace", color: "var(--accent-hover)", letterSpacing: ".12em", marginBottom: 6 }}>
+            <div style={{ fontSize: 11, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: "var(--accent-hover)", letterSpacing: ".12em", marginBottom: 6 }}>
               {company.KPI_Template}
             </div>
             <div style={{ fontSize: 26, fontWeight: 800, color: "var(--text)", letterSpacing: "-.02em" }}>
@@ -357,7 +357,7 @@ function CompanyDrawer({ company, allCompanies, onClose }) {
 
         {/* Live Market Data */}
         <div style={{ background: "var(--elevated)", borderRadius: 12, padding: "16px 18px", border: "1px solid var(--border)" }}>
-          <div style={{ fontSize: 10, fontFamily: "'JetBrains Mono',monospace", color: "var(--text-muted)", letterSpacing: ".1em", marginBottom: 12 }}>
+          <div style={{ fontSize: 10, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: "var(--text-muted)", letterSpacing: ".1em", marginBottom: 12 }}>
             LIVE MARKET DATA
           </div>
           {liveLoading && (
@@ -380,7 +380,7 @@ function CompanyDrawer({ company, allCompanies, onClose }) {
                   {liveQuote.change >= 0 ? "+" : ""}{liveQuote.change?.toFixed(2)}{" "}
                   ({liveQuote.change >= 0 ? "+" : ""}{liveQuote.changePct?.toFixed(2)}%)
                 </span>
-                <span style={{ fontSize: 10, fontFamily: "'JetBrains Mono',monospace", color: "var(--text-muted)", marginLeft: "auto" }}>
+                <span style={{ fontSize: 10, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: "var(--text-muted)", marginLeft: "auto" }}>
                   {liveQuote.marketState}
                 </span>
               </div>
@@ -395,7 +395,7 @@ function CompanyDrawer({ company, allCompanies, onClose }) {
                   { label: "Div Yield",  value: liveQuote.dividendYield != null ? `${(liveQuote.dividendYield * 100).toFixed(2)}%` : "-" },
                 ].map(({ label, value }) => (
                   <div key={label} style={{ background: "var(--card)", borderRadius: 8, padding: "8px 10px", border: "1px solid var(--border)" }}>
-                    <div style={{ fontSize: 9, fontFamily: "'JetBrains Mono',monospace", color: "var(--text-muted)", marginBottom: 3 }}>{label}</div>
+                    <div style={{ fontSize: 9, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: "var(--text-muted)", marginBottom: 3 }}>{label}</div>
                     <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-secondary)" }}>{value}</div>
                   </div>
                 ))}
@@ -413,7 +413,7 @@ function CompanyDrawer({ company, allCompanies, onClose }) {
                   marginTop: 14, width: "100%", padding: "10px 0",
                   background: "var(--accent)", color: "#fff", border: "none",
                   borderRadius: 8, fontSize: 12, fontWeight: 700,
-                  fontFamily: "'JetBrains Mono',monospace", cursor: "pointer",
+                  fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", cursor: "pointer",
                   letterSpacing: ".04em",
                 }}
               >
@@ -432,7 +432,7 @@ function CompanyDrawer({ company, allCompanies, onClose }) {
             <div key={label} style={{
               background: "var(--elevated)", borderRadius: 10, padding: "14px 16px", border: "1px solid var(--border)",
             }}>
-              <div style={{ fontSize: 10, fontFamily: "'JetBrains Mono',monospace", color: "var(--text-muted)", letterSpacing: ".1em", marginBottom: 6 }}>{label}</div>
+              <div style={{ fontSize: 10, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: "var(--text-muted)", letterSpacing: ".1em", marginBottom: 6 }}>{label}</div>
               <div style={{ fontSize: 28, fontWeight: 800, color }}>{value}</div>
             </div>
           ))}
@@ -440,7 +440,7 @@ function CompanyDrawer({ company, allCompanies, onClose }) {
 
         {/* Score bar */}
         <div>
-          <div style={{ fontSize: 10, fontFamily: "'JetBrains Mono',monospace", color: "var(--text-muted)", letterSpacing: ".1em", marginBottom: 8 }}>SCORE VS PEERS</div>
+          <div style={{ fontSize: 10, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: "var(--text-muted)", letterSpacing: ".1em", marginBottom: 8 }}>SCORE VS PEERS</div>
           <div style={{ background: "var(--elevated)", borderRadius: 6, height: 8, overflow: "hidden" }}>
             <div style={{
               height: "100%", borderRadius: 6, transition: "width .6s ease",
@@ -449,22 +449,22 @@ function CompanyDrawer({ company, allCompanies, onClose }) {
             }} />
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}>
-            <span style={{ fontSize: 10, fontFamily: "'JetBrains Mono',monospace", color: "var(--text-muted)" }}>0</span>
-            <span style={{ fontSize: 10, fontFamily: "'JetBrains Mono',monospace", color: "var(--text-muted)" }}>{maxScore.toFixed(0)}</span>
+            <span style={{ fontSize: 10, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: "var(--text-muted)" }}>0</span>
+            <span style={{ fontSize: 10, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: "var(--text-muted)" }}>{maxScore.toFixed(0)}</span>
           </div>
         </div>
 
         {/* KPI Breakdown bar chart */}
         {radarData.length > 0 && (
           <div>
-            <div style={{ fontSize: 10, fontFamily: "'JetBrains Mono',monospace", color: "var(--text-muted)", letterSpacing: ".1em", marginBottom: 12 }}>KPI BREAKDOWN</div>
+            <div style={{ fontSize: 10, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: "var(--text-muted)", letterSpacing: ".1em", marginBottom: 12 }}>KPI BREAKDOWN</div>
             <ResponsiveContainer width="100%" height={Math.max(160, radarData.length * 32)}>
               <BarChart data={radarData} layout="vertical" margin={{ left: 0, right: 16 }}>
                 <XAxis type="number" hide domain={[0, 10]} />
                 <YAxis type="category" dataKey="kpi"
-                  tick={{ fill: "var(--text-secondary)", fontSize: 10, fontFamily: "'JetBrains Mono',monospace" }} width={130} />
+                  tick={{ fill: "var(--text-secondary)", fontSize: 10, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }} width={130} />
                 <Tooltip
-                  contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8, fontFamily: "'JetBrains Mono',monospace", fontSize: 11 }}
+                  contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", fontSize: 11 }}
                   labelStyle={{ color: "var(--text)" }}
                   itemStyle={{ color: "var(--accent-hover)" }}
                 />
@@ -481,20 +481,20 @@ function CompanyDrawer({ company, allCompanies, onClose }) {
         {/* Comparison: company vs template average across KPI scores */}
         {comparisonData.length >= 3 && (
           <div>
-            <div style={{ fontSize: 10, fontFamily: "'JetBrains Mono',monospace", color: "var(--text-muted)", letterSpacing: ".1em", marginBottom: 4 }}>VS TEMPLATE AVERAGE</div>
+            <div style={{ fontSize: 10, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: "var(--text-muted)", letterSpacing: ".1em", marginBottom: 4 }}>VS TEMPLATE AVERAGE</div>
             <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 8, lineHeight: 1.5 }}>
               {company.Symbol} vs the average of all {allCompanies.length} companies in {company.KPI_Template} (scores 0–10).
             </div>
             <ResponsiveContainer width="100%" height={280}>
               <RadarChart data={comparisonData} outerRadius="70%">
                 <PolarGrid stroke="var(--border)" />
-                <PolarAngleAxis dataKey="kpi" tick={{ fill: "var(--text-secondary)", fontSize: 9, fontFamily: "'JetBrains Mono',monospace" }} />
+                <PolarAngleAxis dataKey="kpi" tick={{ fill: "var(--text-secondary)", fontSize: 9, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }} />
                 <PolarRadiusAxis domain={[0, 10]} tick={false} axisLine={false} />
                 <Radar name={company.Symbol} dataKey="company" stroke="var(--accent)" fill="var(--accent)" fillOpacity={0.4} />
                 <Radar name="Template avg" dataKey="average" stroke="var(--positive)" fill="var(--positive)" fillOpacity={0.12} />
-                <Legend wrapperStyle={{ fontSize: 10, fontFamily: "'JetBrains Mono',monospace" }} />
+                <Legend wrapperStyle={{ fontSize: 10, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }} />
                 <Tooltip
-                  contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8, fontFamily: "'JetBrains Mono',monospace", fontSize: 11 }}
+                  contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", fontSize: 11 }}
                   labelStyle={{ color: "var(--text)" }}
                 />
               </RadarChart>
@@ -505,13 +505,13 @@ function CompanyDrawer({ company, allCompanies, onClose }) {
         {/* All raw KPI financials - dynamic */}
         {kpiKeys.length > 0 && (
           <div>
-            <div style={{ fontSize: 10, fontFamily: "'JetBrains Mono',monospace", color: "var(--text-muted)", letterSpacing: ".1em", marginBottom: 10 }}>FINANCIALS</div>
+            <div style={{ fontSize: 10, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: "var(--text-muted)", letterSpacing: ".1em", marginBottom: 10 }}>FINANCIALS</div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
               {kpiKeys
                 .filter(k => company[k] != null && company[k] !== "")
                 .map(k => (
                   <div key={k} style={{ background: "var(--elevated)", borderRadius: 8, padding: "10px 12px", border: "1px solid var(--border)" }}>
-                    <div style={{ fontSize: 9, fontFamily: "'JetBrains Mono',monospace", color: "var(--text-muted)", marginBottom: 4 }}>{k.toUpperCase()}</div>
+                    <div style={{ fontSize: 9, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: "var(--text-muted)", marginBottom: 4 }}>{k.toUpperCase()}</div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-secondary)" }}>{fmt(company[k], k)}</div>
                   </div>
                 ))}
@@ -522,7 +522,7 @@ function CompanyDrawer({ company, allCompanies, onClose }) {
         {/* Peers */}
         {peers.length > 0 && (
           <div>
-            <div style={{ fontSize: 10, fontFamily: "'JetBrains Mono',monospace", color: "var(--text-muted)", letterSpacing: ".1em", marginBottom: 10 }}>TOP PEERS IN TEMPLATE</div>
+            <div style={{ fontSize: 10, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: "var(--text-muted)", letterSpacing: ".1em", marginBottom: 10 }}>TOP PEERS IN TEMPLATE</div>
             {peers.map(p => (
               <div key={p.Symbol} style={{
                 display: "flex", justifyContent: "space-between", alignItems: "center",
@@ -531,11 +531,11 @@ function CompanyDrawer({ company, allCompanies, onClose }) {
               }}>
                 <div>
                   <span style={{ fontSize: 12, fontWeight: 700, color: "var(--text-secondary)" }}>{p.Symbol}</span>
-                  <span style={{ fontSize: 10, color: "var(--text-muted)", marginLeft: 8, fontFamily: "'JetBrains Mono',monospace" }}>
+                  <span style={{ fontSize: 10, color: "var(--text-muted)", marginLeft: 8, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
                     {(p.Description || p.Name || "").slice(0, 22)}
                   </span>
                 </div>
-                <span style={{ fontSize: 12, fontFamily: "'JetBrains Mono',monospace", color: rankColor(p.Company_Rank, allCompanies.length) }}>
+                <span style={{ fontSize: 12, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: rankColor(p.Company_Rank, allCompanies.length) }}>
                   #{Math.round(p.Company_Rank)}
                 </span>
               </div>
@@ -800,7 +800,7 @@ export default function StockDashboard({ resultFile }) {
     return (
       <div style={{
         minHeight: "100vh", display: "grid", placeItems: "center",
-        color: "var(--text-muted)", fontFamily: "'JetBrains Mono',monospace", fontSize: 13,
+        color: "var(--text-muted)", fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", fontSize: 13,
       }}>
         Loading saved results…
       </div>
@@ -852,7 +852,9 @@ export default function StockDashboard({ resultFile }) {
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: var(--card); }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-        .mono { font-family: 'JetBrains Mono', monospace; }
+        /* Body/data font matches the Screener & Comparison pages (Inter, sans).
+           tabular-nums keeps numeric columns aligned without a monospace face. */
+        .mono { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-variant-numeric: tabular-nums; }
         .fade-in { animation: fadeIn .3s ease forwards; }
         @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
         .row-hover:hover { background: var(--elevated) !important; cursor: pointer; }
@@ -971,7 +973,7 @@ export default function StockDashboard({ resultFile }) {
               <span style={{ color: "var(--text-muted)", fontSize: 13 }}>⌕</span>
               <input type="text" placeholder="Search symbol or name…" value={search}
                 onChange={e => setSearch(e.target.value)}
-                style={{ background: "none", border: "none", color: "var(--text-secondary)", fontSize: 12, fontFamily: "'JetBrains Mono',monospace", width: 180 }} />
+                style={{ background: "none", border: "none", color: "var(--text-secondary)", fontSize: 12, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", width: 180 }} />
             </div>
 
             {/* Sort dir toggle */}
@@ -1001,7 +1003,7 @@ export default function StockDashboard({ resultFile }) {
                 border: `1px solid ${showSectorChart ? "var(--accent-hover)" : "var(--border)"}`,
                 borderRadius: 8, color: showSectorChart ? "var(--accent-hover)" : "var(--text-secondary)",
                 padding: "8px 12px", cursor: "pointer", fontSize: 11,
-                fontFamily: "'JetBrains Mono',monospace", transition: "all .15s",
+                fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", transition: "all .15s",
               }}
             >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -1019,7 +1021,7 @@ export default function StockDashboard({ resultFile }) {
                 background: "var(--card)", border: "1px solid var(--border)",
                 borderRadius: 8, color: "var(--text-secondary)",
                 padding: "8px 12px", cursor: "pointer", fontSize: 11,
-                fontFamily: "'JetBrains Mono',monospace", transition: "all .15s",
+                fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", transition: "all .15s",
               }}
             >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -1038,7 +1040,7 @@ export default function StockDashboard({ resultFile }) {
                 background: "var(--card)", border: "1px solid var(--border)",
                 borderRadius: 8, color: emailMsg.startsWith("Sent") ? "var(--positive)" : "var(--text-secondary)",
                 padding: "8px 12px", cursor: emailSending ? "wait" : "pointer", fontSize: 11,
-                fontFamily: "'JetBrains Mono',monospace", transition: "all .15s",
+                fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", transition: "all .15s",
                 opacity: emailSending ? .6 : 1,
               }}
             >
@@ -1097,7 +1099,7 @@ export default function StockDashboard({ resultFile }) {
 
           {/* Error */}
           {error && (
-            <div style={{ padding: "12px 24px", background: "var(--negative-soft)", borderBottom: "1px solid var(--negative)", color: "var(--negative)", fontFamily: "'JetBrains Mono',monospace", fontSize: 12 }}>
+            <div style={{ padding: "12px 24px", background: "var(--negative-soft)", borderBottom: "1px solid var(--negative)", color: "var(--negative)", fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", fontSize: 12 }}>
               ⚠ {error}
             </div>
           )}
@@ -1151,7 +1153,7 @@ export default function StockDashboard({ resultFile }) {
                         <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                           {r.Description || r.Name || ""}
                         </div>
-                        <div style={{ fontSize: 10, color: "var(--text-secondary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginTop: 1, fontFamily: "'JetBrains Mono',monospace" }}>
+                        <div style={{ fontSize: 10, color: "var(--text-secondary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginTop: 1, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
                           {r.Symbol}
 
                         </div>
@@ -1160,7 +1162,7 @@ export default function StockDashboard({ resultFile }) {
                       {/* Sector */}
                       <td style={tdStyle}>
                         <span style={{
-                          fontSize: 9, fontFamily: "'JetBrains Mono',monospace", padding: "2px 7px",
+                          fontSize: 9, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", padding: "2px 7px",
                           background: "var(--accent-soft)", color: "var(--accent-hover)", borderRadius: 4, whiteSpace: "nowrap",
                         }}>
                           {r.Sector || r.SCS_Sector || "-"}
@@ -1213,7 +1215,7 @@ export default function StockDashboard({ resultFile }) {
                   <tr>
                     <td colSpan={FIXED_COLS.length + visibleKpiKeys.length} style={{
                       padding: 48, textAlign: "center",
-                      color: "var(--text-muted)", fontFamily: "'JetBrains Mono',monospace", fontSize: 12,
+                      color: "var(--text-muted)", fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", fontSize: 12,
                     }}>
                       {search ? `No results for "${search}"` : "No data"}
                     </td>
@@ -1252,7 +1254,7 @@ export default function StockDashboard({ resultFile }) {
                   padding: "4px 8px", borderRadius: 7,
                   border: "1px solid var(--border)", background: "var(--elevated)",
                   color: "var(--text-secondary)", fontSize: 11,
-                  fontFamily: "'JetBrains Mono',monospace", cursor: "pointer", outline: "none",
+                  fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", cursor: "pointer", outline: "none",
                 }}
               >
                 {[25, 50, 100, 200].map(n => (
@@ -1278,7 +1280,7 @@ export default function StockDashboard({ resultFile }) {
 
 const thStyle = {
   padding: "10px 14px", textAlign: "left", fontSize: 9,
-  fontFamily: "'JetBrains Mono',monospace", color: "var(--text-muted)",
+  fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: "var(--text-muted)",
   letterSpacing: ".12em", borderBottom: "1px solid var(--border)",
   fontWeight: 500, whiteSpace: "nowrap",
 };

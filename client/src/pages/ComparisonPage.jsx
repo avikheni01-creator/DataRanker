@@ -760,15 +760,17 @@ function MultiBarSection({ companies, numericCols, nameCol }) {
       </div>
 
       <div className="cmp-card-body">
-        <ResponsiveContainer width="100%" height={320}>
-          <BarChart data={data} margin={{ top: 8, right: 16, bottom: 60, left: 0 }} barCategoryGap="30%">
+        <ResponsiveContainer width="100%" height={360}>
+          {/* XAxis height reserves room for the −35° rotated labels; the legend is
+              moved to the top so it can never collide with those bottom labels. */}
+          <BarChart data={data} margin={{ top: 8, right: 24, bottom: 8, left: 8 }} barCategoryGap="30%">
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
             <XAxis dataKey="metric" tick={{ fontSize: 10 }} angle={-35} textAnchor="end"
-              interval={0} axisLine={false} tickLine={false} />
+              interval={0} axisLine={false} tickLine={false} height={72} />
             <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} axisLine={false} tickLine={false}
               tickFormatter={(v) => v + "%"} width={36} />
             <Tooltip content={<MultiBarTooltip />} cursor={{ fill: "rgba(255,255,255,0.03)" }} />
-            <Legend wrapperStyle={{ fontSize: 11, paddingTop: 8 }} />
+            <Legend verticalAlign="top" wrapperStyle={{ fontSize: 11, paddingBottom: 10 }} />
             {companies.map((co, i) => (
               <Bar key={i} dataKey={ck(i)} name={shortName(co[nameCol])} fill={PALETTE[i]} radius={[4, 4, 0, 0]} maxBarSize={28} />
             ))}
