@@ -1,22 +1,41 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getUser, logOut } from "../auth";
 import { useNavigate } from "react-router-dom";
 import { colors, fonts, radius } from "../theme";
+import { apiUrl } from "../api";
 import PaymentButton from "../components/PaymentButton";
 
 const CONTACT_EMAIL = "connect@thinkvest.in";
 
-const FEATURES = [
-  "Full ranking pipeline (format → map → rank)",
-  "Column mapper & KPI library editor",
-  "Results dashboard & Excel export",
-  "Screener with advanced DSL filters",
-  "Company comparison dashboard",
-];
+const FALLBACK_PLAN = {
+  features: [
+    "Full ranking pipeline (format → map → rank)",
+    "Column mapper & KPI library editor",
+    "Results dashboard & Excel export",
+    "Screener with advanced DSL filters",
+    "Company comparison dashboard",
+  ],
+  monthlyPrice: 499,
+  yearlyPrice: 4999,
+  yearlyDiscountPct: 17,
+};
 
 export default function UpgradePage() {
   const user = getUser();
   const navigate = useNavigate();
+  const [plan, setPlan] = useState(FALLBACK_PLAN);
+
+  useEffect(() => {
+    fetch(apiUrl("/plans"))
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          const standard = data.find((p) => p.id === "standard") || data[0];
+          if (standard) setPlan(standard);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const effectiveTrialEnd = (() => {
     if (user.trialEndsAt) return new Date(user.trialEndsAt);
@@ -76,15 +95,15 @@ export default function UpgradePage() {
                 period="monthly"
                 user={user}
                 label="Pay Monthly"
-                priceLabel="₹5 / month"
+                priceLabel={plan.monthlyPrice ? `₹${plan.monthlyPrice.toLocaleString("en-IN")} / month` : ""}
                 onSuccess={() => navigate("/app")}
               />
               <PaymentButton
                 period="yearly"
                 user={user}
                 label="Pay Yearly"
-                priceLabel="₹4,999 / year"
-                discountLabel="Save 17%"
+                priceLabel={plan.yearlyPrice ? `₹${plan.yearlyPrice.toLocaleString("en-IN")} / year` : ""}
+                discountLabel={plan.yearlyDiscountPct ? `Save ${plan.yearlyDiscountPct}%` : ""}
                 onSuccess={() => navigate("/app")}
               />
             </div>
@@ -100,7 +119,7 @@ export default function UpgradePage() {
           <div className="up-features-card">
             <div className="up-features-title">What you'll get with a paid plan</div>
             <div className="up-features-list">
-              {FEATURES.map((f) => (
+              {(plan.features || []).map((f) => (
                 <div key={f} className="up-feature-row">
                   <span className="up-feature-check">✓</span>
                   <span>{f}</span>

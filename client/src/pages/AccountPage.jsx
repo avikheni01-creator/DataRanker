@@ -207,6 +207,18 @@ function MembershipSection({ user, onUpdate }) {
     ? trialEnd.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
     : null;
 
+  const paidActive   = user.paidUntil && new Date(user.paidUntil) > new Date();
+  const paidUntil    = user.paidUntil ? new Date(user.paidUntil) : null;
+  const signupLabel  = user.createdAt
+    ? new Date(user.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
+    : null;
+  const paidStartLabel = trialEnd
+    ? trialEnd.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
+    : signupLabel;
+  const paidUntilLabel = paidUntil
+    ? paidUntil.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
+    : null;
+
   // Pricing from plan data (supports both DB and fallback formats)
   const monthlyPrice = planData?.monthlyPrice ?? planData?.price ?? null;
   const yearlyPrice  = planData?.yearlyPrice  ?? null;
@@ -239,28 +251,48 @@ function MembershipSection({ user, onUpdate }) {
         {trialEnd && !user.planOverrideFree && (
           <div style={{
             borderRadius: radius.sm, marginBottom: 16, overflow: "hidden",
-            border: `1px solid ${trialExpired ? "rgba(239,68,68,.3)" : "rgba(245,158,11,.3)"}`,
+            border: `1px solid ${
+              paidActive ? "rgba(16,185,129,.3)"
+              : trialExpired ? "rgba(239,68,68,.3)"
+              : "rgba(245,158,11,.3)"
+            }`,
           }}>
             {/* Header bar */}
             <div style={{
               padding: "10px 14px",
-              background: trialExpired ? "rgba(239,68,68,.1)" : "rgba(245,158,11,.08)",
+              background: paidActive ? "rgba(16,185,129,.08)" : trialExpired ? "rgba(239,68,68,.1)" : "rgba(245,158,11,.08)",
               display: "flex", alignItems: "center", gap: 10,
             }}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-                stroke={trialExpired ? "#EF4444" : "#F59E0B"} strokeWidth="2"
-                strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <circle cx="12" cy="12" r="10"/>
-                <polyline points="12 6 12 12 16 14"/>
-              </svg>
+              {paidActive ? (
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                  stroke="#10B981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                  <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+              ) : (
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                  stroke={trialExpired ? "#EF4444" : "#F59E0B"} strokeWidth="2"
+                  strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+              )}
               <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: trialExpired ? "#EF4444" : "#F59E0B" }}>
-                  {trialExpired
+                <div style={{ fontSize: 13, fontWeight: 700, color: paidActive ? "#10B981" : trialExpired ? "#EF4444" : "#F59E0B" }}>
+                  {paidActive && !trialExpired
+                    ? `Trial active · Paid plan secured until ${paidUntilLabel}`
+                    : paidActive && trialExpired
+                    ? `Paid plan active until ${paidUntilLabel}`
+                    : trialExpired
                     ? `Free trial ended on ${trialEndLabel}`
                     : `Free trial — ${trialDaysLeft} day${trialDaysLeft === 1 ? "" : "s"} remaining`}
                 </div>
                 <div style={{ fontSize: 11, color: colors.textMuted, marginTop: 1 }}>
-                  {trialExpired
+                  {paidActive && !trialExpired
+                    ? `Trial ends on ${trialEndLabel} · access continues seamlessly`
+                    : paidActive && trialExpired
+                    ? `Your paid subscription is active`
+                    : trialExpired
                     ? "Your 90-day free access period has expired"
                     : `Trial ends on ${trialEndLabel}`}
                 </div>
@@ -270,34 +302,71 @@ function MembershipSection({ user, onUpdate }) {
             <div style={{
               padding: "12px 14px",
               background: "var(--inset)",
-              borderTop: `1px solid ${trialExpired ? "rgba(239,68,68,.2)" : "rgba(245,158,11,.15)"}`,
+              borderTop: `1px solid ${
+                paidActive ? "rgba(16,185,129,.15)"
+                : trialExpired ? "rgba(239,68,68,.2)"
+                : "rgba(245,158,11,.15)"
+              }`,
             }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: colors.textSecondary, marginBottom: 6 }}>
-                {trialExpired ? "What happens next" : "After your trial ends"}
-              </div>
-              <div style={{ fontSize: 13, color: colors.textMuted, lineHeight: 1.55 }}>
-                A paid subscription is required to continue accessing ThinkVest.
-                {pricingText && <> The <strong style={{ color: colors.text }}>Standard plan</strong> is priced at <strong style={{ color: colors.text }}>{pricingText}</strong>.</>}
-                {" "}Contact us at{" "}
-                <a href="mailto:connect@thinkvest.in" style={{ color: "#10B981", textDecoration: "none" }}>
-                  connect@thinkvest.in
-                </a>
-                {" "}to activate your plan.
-              </div>
-              {trialExpired && (
-                <a
-                  href="/app/upgrade"
-                  style={{
-                    display: "inline-flex", alignItems: "center", gap: 6,
-                    marginTop: 12, background: "linear-gradient(135deg,#10B981 0%,#1E3A8A 100%)",
-                    border: "none", borderRadius: radius.sm, color: "#fff",
-                    fontSize: 13, fontWeight: 600, fontFamily: fonts.sans,
-                    padding: "9px 18px", textDecoration: "none",
-                    boxShadow: "0 4px 14px rgba(16,185,129,.28)",
-                  }}
-                >
-                  Go to upgrade page
-                </a>
+              {paidActive ? (
+                /* ── Paid user: show timeline ── */
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {signupLabel && trialEnd && (
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <span style={{
+                        fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".08em",
+                        color: "#F59E0B", background: "rgba(245,158,11,.12)",
+                        border: "1px solid rgba(245,158,11,.3)", borderRadius: 999, padding: "2px 9px",
+                        whiteSpace: "nowrap",
+                      }}>Trial</span>
+                      <span style={{ fontSize: 13, color: colors.textSecondary }}>
+                        {signupLabel} → {trialEndLabel}
+                      </span>
+                    </div>
+                  )}
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <span style={{
+                      fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".08em",
+                      color: "#10B981", background: "rgba(16,185,129,.12)",
+                      border: "1px solid rgba(16,185,129,.3)", borderRadius: 999, padding: "2px 9px",
+                      whiteSpace: "nowrap",
+                    }}>Paid</span>
+                    <span style={{ fontSize: 13, color: colors.textSecondary }}>
+                      {paidStartLabel} → {paidUntilLabel}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                /* ── Unpaid user: show upgrade prompt ── */
+                <>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: colors.textSecondary, marginBottom: 6 }}>
+                    {trialExpired ? "What happens next" : "After your trial ends"}
+                  </div>
+                  <div style={{ fontSize: 13, color: colors.textMuted, lineHeight: 1.55 }}>
+                    A paid subscription is required to continue accessing ThinkVest.
+                    {pricingText && <> The <strong style={{ color: colors.text }}>Standard plan</strong> is priced at <strong style={{ color: colors.text }}>{pricingText}</strong>.</>}
+                    {" "}Contact us at{" "}
+                    <a href="mailto:connect@thinkvest.in" style={{ color: "#10B981", textDecoration: "none" }}>
+                      connect@thinkvest.in
+                    </a>
+                    {" "}to activate your plan.
+                  </div>
+                  {trialExpired && (
+                    <a
+                      href="/app/upgrade"
+                      style={{
+                        display: "inline-flex", alignItems: "center", gap: 6,
+                        marginTop: 12, background: "linear-gradient(135deg,#10B981 0%,#1E3A8A 100%)",
+                        border: "none", borderRadius: radius.sm, color: "#fff",
+                        fontSize: 13, fontWeight: 600, fontFamily: fonts.sans,
+                        padding: "9px 18px", textDecoration: "none",
+                        boxShadow: "0 4px 14px rgba(16,185,129,.28)",
+                      }}
+                    >
+                      Go to upgrade page
+                    </a>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -314,20 +383,6 @@ function MembershipSection({ user, onUpdate }) {
           </div>
         )}
 
-        {/* Plan features */}
-        {planData?.features?.length > 0 && (
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 11, fontFamily: fonts.mono, letterSpacing: ".1em", textTransform: "uppercase", color: colors.textMuted, marginBottom: 8 }}>
-              Included features
-            </div>
-            {planData.features.map((f, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 5, fontSize: 13, color: colors.textSecondary }}>
-                <span style={{ color: "#10B981", marginTop: 1, flexShrink: 0 }}>✓</span>
-                <span>{f}</span>
-              </div>
-            ))}
-          </div>
-        )}
 
         {user.plan !== "premium" && user.plan !== "enterprise" && !trialExpired && (
           <a
@@ -359,7 +414,11 @@ function MembershipSection({ user, onUpdate }) {
               fontSize: 11, fontFamily: fonts.mono, letterSpacing: ".1em",
               textTransform: "uppercase", color: colors.textMuted, marginBottom: 14,
             }}>
-              Continue access
+              {paidActive
+                ? `Continue access after ${paidUntilLabel}`
+                : trialEnd && !trialExpired
+                ? `Continue access after ${trialEndLabel}`
+                : "Continue access"}
             </div>
 
             {paySuccess && (
