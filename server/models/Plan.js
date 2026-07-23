@@ -8,9 +8,11 @@ const planSchema = new mongoose.Schema(
     name:             { type: String, required: true, trim: true },
     tagline:          { type: String, default: "" },
     features:         [{ type: String }],
-    monthlyPrice:     { type: Number, default: 0 },
-    yearlyPrice:      { type: Number, default: 0 },
-    yearlyDiscountPct:{ type: Number, default: 0 },  // e.g. 20 = 20% off yearly
+    monthlyPrice:           { type: Number, default: 0 },
+    yearlyPrice:            { type: Number, default: 0 },
+    monthlyDiscountedPrice: { type: Number, default: 0 }, // 0 = no discount active
+    yearlyDiscountedPrice:  { type: Number, default: 0 }, // 0 = no discount active
+    yearlyDiscountPct:      { type: Number, default: 0 }, // e.g. 20 = 20% off yearly
     trialDays:        { type: Number, default: 0 },   // 0 = no trial period
     isActive:         { type: Boolean, default: true },
     highlighted:      { type: Boolean, default: false }, // show as recommended

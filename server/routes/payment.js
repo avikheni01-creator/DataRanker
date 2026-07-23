@@ -48,11 +48,21 @@ router.post("/payment/create-order", requireAuth, async (req, res) => {
   try {
     const plan = await Plan.findOne({ planId: "standard", isActive: true });
 
-    // Plan prices are stored in rupees; Razorpay requires paise.
-    const amountInPaise =
-      period === "yearly"
-        ? (plan?.yearlyPrice  ? Math.round(plan.yearlyPrice  * 100) : FALLBACK_PAISE.yearly)
-        : (plan?.monthlyPrice ? Math.round(plan.monthlyPrice * 100) : FALLBACK_PAISE.monthly);
+    // Use discounted price when set (> 0), otherwise fall back to regular price.
+    let amountInPaise;
+    if (period === "yearly") {
+      const discounted = plan?.yearlyDiscountedPrice || 0;
+      const regular    = plan?.yearlyPrice || 0;
+      amountInPaise = discounted > 0
+        ? Math.round(discounted * 100)
+        : (regular > 0 ? Math.round(regular * 100) : FALLBACK_PAISE.yearly);
+    } else {
+      const discounted = plan?.monthlyDiscountedPrice || 0;
+      const regular    = plan?.monthlyPrice || 0;
+      amountInPaise = discounted > 0
+        ? Math.round(discounted * 100)
+        : (regular > 0 ? Math.round(regular * 100) : FALLBACK_PAISE.monthly);
+    }
 
     const order = await rzp.orders.create({
       amount:   amountInPaise,
@@ -124,7 +134,6 @@ router.post("/payment/verify", requireAuth, async (req, res) => {
 
     if (isNew) {
       // Base = latest of: current paidUntil, trial end, or now.
-      // This ensures payment always starts after the trial period (not overlap it).
       const now = new Date();
       const candidates = [
         now,

@@ -219,13 +219,40 @@ function MembershipSection({ user, onUpdate }) {
     ? paidUntil.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
     : null;
 
-  // Pricing from plan data (supports both DB and fallback formats)
-  const monthlyPrice = planData?.monthlyPrice ?? planData?.price ?? null;
-  const yearlyPrice  = planData?.yearlyPrice  ?? null;
+  // Pricing from plan data — use discounted price when set (> 0).
+  const monthlyPrice           = planData?.monthlyPrice ?? planData?.price ?? null;
+  const yearlyPrice            = planData?.yearlyPrice  ?? null;
+  const monthlyDiscountedPrice = planData?.monthlyDiscountedPrice > 0 ? planData.monthlyDiscountedPrice : null;
+  const yearlyDiscountedPrice  = planData?.yearlyDiscountedPrice  > 0 ? planData.yearlyDiscountedPrice  : null;
+
+  const effectiveMonthly = monthlyDiscountedPrice ?? monthlyPrice;
+  const effectiveYearly  = yearlyDiscountedPrice  ?? yearlyPrice;
+
   const pricingText = (() => {
-    if (monthlyPrice === 0 || monthlyPrice == null) return null;
+    if (!effectiveMonthly) return null;
+    if (monthlyDiscountedPrice) return (
+      <>
+        <s style={{ color: colors.textMuted }}>₹{monthlyPrice}/month</s>{" "}
+        <strong style={{ color: "#10B981" }}>₹{monthlyDiscountedPrice}/month</strong>
+      </>
+    );
     return `₹${monthlyPrice}/month`;
   })();
+
+  // JSX price labels for PaymentButton (supports strikethrough when discounted).
+  const monthlyPriceLabel = monthlyDiscountedPrice ? (
+    <><s>₹{monthlyPrice} / month</s>{" "}<span style={{ color: "#10B981", fontWeight: 700 }}>₹{monthlyDiscountedPrice} / month</span></>
+  ) : `₹${effectiveMonthly || 499} / month`;
+
+  const yearlyPriceLabel = yearlyDiscountedPrice ? (
+    <><s>₹{yearlyPrice} / year</s>{" "}<span style={{ color: "#10B981", fontWeight: 700 }}>₹{yearlyDiscountedPrice} / year</span></>
+  ) : `₹${effectiveYearly || 4999} / year`;
+
+  const yearlyDiscountBadge = yearlyDiscountedPrice
+    ? `Save ₹${(yearlyPrice - yearlyDiscountedPrice).toLocaleString("en-IN")}`
+    : planData?.yearlyDiscountPct
+    ? `Save ${planData.yearlyDiscountPct}%`
+    : undefined;
 
   return (
     <SectionCard title="Membership">
@@ -344,7 +371,7 @@ function MembershipSection({ user, onUpdate }) {
                   </div>
                   <div style={{ fontSize: 13, color: colors.textMuted, lineHeight: 1.55 }}>
                     A paid subscription is required to continue accessing ThinkVest.
-                    {pricingText && <> The <strong style={{ color: colors.text }}>Standard plan</strong> is priced at <strong style={{ color: colors.text }}>{pricingText}</strong>.</>}
+                    {pricingText && <> The <strong style={{ color: colors.text }}>Standard plan</strong> is priced at {typeof pricingText === "string" ? <strong style={{ color: colors.text }}>{pricingText}</strong> : pricingText}.</>}
                     {" "}Contact us at{" "}
                     <a href="mailto:connect@thinkvest.in" style={{ color: "#10B981", textDecoration: "none" }}>
                       connect@thinkvest.in
@@ -435,15 +462,15 @@ function MembershipSection({ user, onUpdate }) {
                 period="monthly"
                 user={user}
                 label="Pay Monthly"
-                priceLabel={`₹${monthlyPrice || 499} / month`}
+                priceLabel={monthlyPriceLabel}
                 onSuccess={(updated) => { setPaySuccess(updated); onUpdate(updated); }}
               />
               <PaymentButton
                 period="yearly"
                 user={user}
                 label="Pay Yearly"
-                priceLabel={`₹${yearlyPrice || 4999} / year`}
-                discountLabel={planData?.yearlyDiscountPct ? `Save ${planData.yearlyDiscountPct}%` : undefined}
+                priceLabel={yearlyPriceLabel}
+                discountLabel={yearlyDiscountBadge}
                 onSuccess={(updated) => { setPaySuccess(updated); onUpdate(updated); }}
               />
             </div>

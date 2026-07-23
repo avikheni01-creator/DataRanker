@@ -18,6 +18,8 @@ router.get("/plans", async (req, res) => {
         features: p.features,
         monthlyPrice: p.monthlyPrice,
         yearlyPrice: p.yearlyPrice,
+        monthlyDiscountedPrice: p.monthlyDiscountedPrice || 0,
+        yearlyDiscountedPrice: p.yearlyDiscountedPrice || 0,
         yearlyDiscountPct: p.yearlyDiscountPct,
         trialDays: p.trialDays,
         highlighted: p.highlighted,

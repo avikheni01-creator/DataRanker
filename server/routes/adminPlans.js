@@ -8,6 +8,7 @@ const router = express.Router();
 
 const ALLOWED_KEYS = [
   "name", "tagline", "features", "monthlyPrice", "yearlyPrice",
+  "monthlyDiscountedPrice", "yearlyDiscountedPrice",
   "yearlyDiscountPct", "trialDays", "isActive", "highlighted", "cta", "order",
 ];
 

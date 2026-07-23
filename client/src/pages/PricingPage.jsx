@@ -51,18 +51,26 @@ const FALLBACK_PLANS = [
   },
 ];
 
-function priceLabel(plan, period) {
-  const price = period === "yearly" ? plan.yearlyPrice : plan.monthlyPrice;
-  if (!price) return "Contact us";
-  return `₹${price.toLocaleString("en-IN")}`;
+function isContactPlan(plan) {
+  return !plan.monthlyPrice && !plan.yearlyPrice;
+}
+
+// Returns { regular, discounted } — discounted is null when no discount is set.
+function getPrices(plan, period) {
+  if (period === "yearly") {
+    return {
+      regular: plan.yearlyPrice || 0,
+      discounted: plan.yearlyDiscountedPrice > 0 ? plan.yearlyDiscountedPrice : null,
+    };
+  }
+  return {
+    regular: plan.monthlyPrice || 0,
+    discounted: plan.monthlyDiscountedPrice > 0 ? plan.monthlyDiscountedPrice : null,
+  };
 }
 
 function pricePer(period) {
   return period === "yearly" ? "/ year" : "/ month";
-}
-
-function isContactPlan(plan) {
-  return !plan.monthlyPrice && !plan.yearlyPrice;
 }
 
 export default function PricingPage() {
@@ -162,11 +170,12 @@ export default function PricingPage() {
         <div className={`pr-grid pr-grid-${plans.length}`}>
           {plans.map((plan, i) => {
             const contact = isContactPlan(plan);
-            const showDiscount = period === "yearly" && plan.yearlyDiscountPct > 0;
+            const showYearlyDiscount = period === "yearly" && plan.yearlyDiscountPct > 0;
+            const { regular, discounted } = getPrices(plan, period);
 
             return (
               <motion.div
-                key={plan.id}
+                key={plan.id || plan.planId}
                 initial={{ opacity: 0, y: 18 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -184,15 +193,26 @@ export default function PricingPage() {
                 <div className="pr-price">
                   {contact ? (
                     <span className="pr-price-amt" style={{ fontSize: 30 }}>Contact us</span>
+                  ) : discounted ? (
+                    <div className="pr-price-discounted-wrap">
+                      <span className="pr-price-original">₹{regular.toLocaleString("en-IN")}</span>
+                      <span className="pr-price-amt pr-price-green">₹{discounted.toLocaleString("en-IN")}</span>
+                      <span className="pr-price-per">{pricePer(period)}</span>
+                    </div>
                   ) : (
                     <>
-                      <span className="pr-price-amt">{priceLabel(plan, period)}</span>
-                      <span className="pr-price-per">{pricePer(period)}</span>
+                      <span className="pr-price-amt">{regular ? `₹${regular.toLocaleString("en-IN")}` : "Contact us"}</span>
+                      {regular > 0 && <span className="pr-price-per">{pricePer(period)}</span>}
                     </>
                   )}
                 </div>
 
-                {showDiscount && (
+                {discounted && (
+                  <div className="pr-discount-badge">
+                    Special offer · Save ₹{(regular - discounted).toLocaleString("en-IN")}
+                  </div>
+                )}
+                {!discounted && showYearlyDiscount && (
                   <div className="pr-discount-badge">Save {plan.yearlyDiscountPct}% vs monthly</div>
                 )}
 
@@ -273,9 +293,12 @@ const PRICING_CSS = `
   .pr-badge { position: absolute; top: -12px; left: 28px; font-family: ${fonts.mono}; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #fff; background: ${gradients.brand}; padding: 5px 12px; border-radius: ${radius.pill}; box-shadow: 0 6px 18px rgba(16,185,129,0.4); }
   .pr-plan-name { font-family: ${fonts.display}; font-size: 20px; font-weight: 700; color: ${colors.text}; }
   .pr-trial-badge { display: inline-block; margin-top: 8px; font-size: 11px; font-weight: 600; color: var(--accent); background: var(--accent-soft); border: 1px solid rgba(16,185,129,.25); border-radius: 999px; padding: 3px 10px; }
-  .pr-price { display: flex; align-items: baseline; gap: 6px; margin: 14px 0 4px; }
+  .pr-price { display: flex; align-items: baseline; gap: 6px; margin: 14px 0 4px; flex-wrap: wrap; }
   .pr-price-amt { font-family: ${fonts.display}; font-size: 44px; font-weight: 700; letter-spacing: -0.02em; color: ${colors.text}; }
+  .pr-price-green { color: #10B981 !important; }
   .pr-price-per { color: ${colors.textMuted}; font-size: 14px; }
+  .pr-price-discounted-wrap { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .pr-price-original { font-size: 22px; font-weight: 600; color: ${colors.textMuted}; text-decoration: line-through; }
   .pr-discount-badge { display: inline-block; font-size: 11px; font-weight: 600; color: #22C55E; background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.25); border-radius: 999px; padding: 3px 10px; margin-bottom: 4px; }
   .pr-tagline { color: ${colors.textSecondary}; font-size: 14px; line-height: 1.55; margin: 8px 0 22px; min-height: 42px; }
   .pr-features { list-style: none; margin: 0 0 26px; padding: 0; display: flex; flex-direction: column; gap: 13px; flex: 1; }

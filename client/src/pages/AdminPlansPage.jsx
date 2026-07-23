@@ -46,6 +46,7 @@ function Toggle({ checked, onChange }) {
 const EMPTY = {
   planId: "", name: "", tagline: "", features: "",
   monthlyPrice: 0, yearlyPrice: 0, yearlyDiscountPct: 0,
+  monthlyDiscountedPrice: 0, yearlyDiscountedPrice: 0,
   trialDays: 0, isActive: true, highlighted: false, cta: "Get started", order: 0,
 };
 
@@ -73,6 +74,8 @@ function PlanModal({ plan, onSave, onClose }) {
         monthlyPrice: Number(form.monthlyPrice) || 0,
         yearlyPrice: Number(form.yearlyPrice) || 0,
         yearlyDiscountPct: Number(form.yearlyDiscountPct) || 0,
+        monthlyDiscountedPrice: Number(form.monthlyDiscountedPrice) || 0,
+        yearlyDiscountedPrice: Number(form.yearlyDiscountedPrice) || 0,
         trialDays: Number(form.trialDays) || 0,
         order: Number(form.order) || 0,
       };
@@ -130,6 +133,26 @@ function PlanModal({ plan, onSave, onClose }) {
             {field("Monthly Price (₹)", "monthlyPrice", "number", { min: 0 })}
             {field("Yearly Price (₹)", "yearlyPrice", "number", { min: 0 })}
             {field("Yearly Discount %", "yearlyDiscountPct", "number", { min: 0, max: 100 })}
+          </div>
+
+          <div className="apl-discount-section">
+            <div className="apl-discount-label">Discounted Prices (optional)</div>
+            <div className="apl-discount-sub">Set a discounted price greater than ₹0 to show a strikethrough on the original price on the Pricing page. Leave at ₹0 to show the regular price.</div>
+            <div className="apl-grid-2" style={{ marginTop: 10 }}>
+              {field("Monthly Discounted Price (₹)", "monthlyDiscountedPrice", "number", { min: 0 })}
+              {field("Yearly Discounted Price (₹)", "yearlyDiscountedPrice", "number", { min: 0 })}
+            </div>
+            {(Number(form.monthlyDiscountedPrice) > 0 || Number(form.yearlyDiscountedPrice) > 0) && (
+              <div className="apl-discount-preview">
+                {Number(form.monthlyDiscountedPrice) > 0 && (
+                  <span>Monthly: <s>₹{Number(form.monthlyPrice).toLocaleString("en-IN")}</s> → <strong>₹{Number(form.monthlyDiscountedPrice).toLocaleString("en-IN")}</strong></span>
+                )}
+                {Number(form.monthlyDiscountedPrice) > 0 && Number(form.yearlyDiscountedPrice) > 0 && <span style={{ margin: "0 10px", opacity: .4 }}>·</span>}
+                {Number(form.yearlyDiscountedPrice) > 0 && (
+                  <span>Yearly: <s>₹{Number(form.yearlyPrice).toLocaleString("en-IN")}</s> → <strong>₹{Number(form.yearlyDiscountedPrice).toLocaleString("en-IN")}</strong></span>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="apl-grid-3">
@@ -222,11 +245,23 @@ function PlanCard({ plan, onEdit, onDelete }) {
 
       <div className="apl-price-row">
         <div className="apl-price-cell">
-          <div className="apl-price-val">{fmt(plan.monthlyPrice)}</div>
+          {plan.monthlyDiscountedPrice > 0 ? (
+            <>
+              <div className="apl-price-val"><s style={{ color: "var(--text-muted)", fontSize: 12 }}>₹{plan.monthlyPrice?.toLocaleString("en-IN")}</s> <span style={{ color: "#10B981" }}>₹{plan.monthlyDiscountedPrice.toLocaleString("en-IN")}</span></div>
+            </>
+          ) : (
+            <div className="apl-price-val">{fmt(plan.monthlyPrice)}</div>
+          )}
           <div className="apl-price-label">/ month</div>
         </div>
         <div className="apl-price-cell">
-          <div className="apl-price-val">{fmt(plan.yearlyPrice)}</div>
+          {plan.yearlyDiscountedPrice > 0 ? (
+            <>
+              <div className="apl-price-val"><s style={{ color: "var(--text-muted)", fontSize: 12 }}>₹{plan.yearlyPrice?.toLocaleString("en-IN")}</s> <span style={{ color: "#10B981" }}>₹{plan.yearlyDiscountedPrice.toLocaleString("en-IN")}</span></div>
+            </>
+          ) : (
+            <div className="apl-price-val">{fmt(plan.yearlyPrice)}</div>
+          )}
           <div className="apl-price-label">/ year</div>
         </div>
         {plan.yearlyDiscountPct > 0 && (
@@ -415,6 +450,13 @@ const CSS = `
   .apl-toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
   .apl-toggle-label { font-size: 13px; font-weight: 600; color: ${colors.text}; }
   .apl-toggle-sub { font-size: 11px; color: ${colors.textMuted}; }
+
+  .apl-discount-section { background: rgba(16,185,129,.04); border: 1px solid rgba(16,185,129,.2); border-radius: 10px; padding: 14px; }
+  .apl-discount-label { font-size: 11px; font-weight: 700; color: #10B981; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+  .apl-discount-sub { font-size: 11px; color: ${colors.textMuted}; line-height: 1.5; }
+  .apl-discount-preview { margin-top: 10px; padding: 8px 12px; background: rgba(16,185,129,.08); border-radius: 6px; font-size: 12px; color: ${colors.text}; display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
+  .apl-discount-preview s { color: ${colors.textMuted}; }
+  .apl-discount-preview strong { color: #10B981; }
 
   .apl-err { font-size: 12px; color: #EF4444; background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.25); border-radius: 6px; padding: 8px 12px; }
 

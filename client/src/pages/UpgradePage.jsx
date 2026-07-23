@@ -95,15 +95,27 @@ export default function UpgradePage() {
                 period="monthly"
                 user={user}
                 label="Pay Monthly"
-                priceLabel={plan.monthlyPrice ? `₹${plan.monthlyPrice.toLocaleString("en-IN")} / month` : ""}
+                priceLabel={
+                  plan.monthlyDiscountedPrice > 0 ? (
+                    <><s>₹{plan.monthlyPrice?.toLocaleString("en-IN")} / month</s>{" "}<span style={{ color: "#10B981", fontWeight: 700 }}>₹{plan.monthlyDiscountedPrice.toLocaleString("en-IN")} / month</span></>
+                  ) : plan.monthlyPrice ? `₹${plan.monthlyPrice.toLocaleString("en-IN")} / month` : ""
+                }
                 onSuccess={() => navigate("/app")}
               />
               <PaymentButton
                 period="yearly"
                 user={user}
                 label="Pay Yearly"
-                priceLabel={plan.yearlyPrice ? `₹${plan.yearlyPrice.toLocaleString("en-IN")} / year` : ""}
-                discountLabel={plan.yearlyDiscountPct ? `Save ${plan.yearlyDiscountPct}%` : ""}
+                priceLabel={
+                  plan.yearlyDiscountedPrice > 0 ? (
+                    <><s>₹{plan.yearlyPrice?.toLocaleString("en-IN")} / year</s>{" "}<span style={{ color: "#10B981", fontWeight: 700 }}>₹{plan.yearlyDiscountedPrice.toLocaleString("en-IN")} / year</span></>
+                  ) : plan.yearlyPrice ? `₹${plan.yearlyPrice.toLocaleString("en-IN")} / year` : ""
+                }
+                discountLabel={
+                  plan.yearlyDiscountedPrice > 0
+                    ? `Save ₹${(plan.yearlyPrice - plan.yearlyDiscountedPrice).toLocaleString("en-IN")}`
+                    : plan.yearlyDiscountPct ? `Save ${plan.yearlyDiscountPct}%` : ""
+                }
                 onSuccess={() => navigate("/app")}
               />
             </div>
