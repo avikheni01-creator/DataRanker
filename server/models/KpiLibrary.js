@@ -1,4 +1,4 @@
-// models/KpiLibrary.js — per-user Tier 1 KPI library (replaces the uploaded
+// models/KpiLibrary.js - per-user Tier 1 KPI library (replaces the uploaded
 // KPI Excel sheet). One document per user; seeded from core/kpiDefaults on first
 // access. The ranking pipeline reads these rows instead of parsing an xlsx.
 

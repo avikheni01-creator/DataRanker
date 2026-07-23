@@ -1,4 +1,4 @@
-// scripts/makeAdmin.js — one-time script to grant admin rights to an account.
+// scripts/makeAdmin.js - one-time script to grant admin rights to an account.
 // Usage: node scripts/makeAdmin.js <email>
 
 require("dotenv").config({ path: require("path").join(__dirname, "../.env") });

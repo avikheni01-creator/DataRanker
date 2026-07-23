@@ -1,4 +1,4 @@
-// lib/resultStore.js — persist the latest pipeline result (the ranked XLSX blob)
+// lib/resultStore.js - persist the latest pipeline result (the ranked XLSX blob)
 // in IndexedDB so the Results page survives a page refresh or deep-link. A blob
 // is too large/binary for localStorage, so we use IndexedDB and store the Blob
 // directly. All calls are best-effort: failures degrade to in-memory-only.
@@ -34,7 +34,7 @@ export async function saveResult(blob) {
       tx.onerror = () => reject(tx.error);
     });
   } catch {
-    /* best-effort — persistence is a convenience, not a requirement */
+    /* best-effort - persistence is a convenience, not a requirement */
   }
 }
 

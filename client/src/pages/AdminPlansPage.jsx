@@ -101,7 +101,7 @@ function PlanModal({ plan, onSave, onClose }) {
     <div className="apl-overlay" onClick={onClose}>
       <div className="apl-modal" onClick={(e) => e.stopPropagation()}>
         <div className="apl-modal-head">
-          <span className="apl-modal-title">{isEdit ? `Edit — ${plan.name}` : "New Plan"}</span>
+          <span className="apl-modal-title">{isEdit ? `Edit - ${plan.name}` : "New Plan"}</span>
           <button className="apl-modal-close" onClick={onClose}>✕</button>
         </div>
 
@@ -207,7 +207,7 @@ function PlanCard({ plan, onEdit, onDelete }) {
       </div>
 
       <div className="apl-plan-name">{plan.name}</div>
-      <div className="apl-plan-tagline">{plan.tagline || "—"}</div>
+      <div className="apl-plan-tagline">{plan.tagline || "-"}</div>
 
       <div className="apl-price-row">
         <div className="apl-price-cell">

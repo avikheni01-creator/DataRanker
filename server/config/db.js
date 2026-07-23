@@ -1,4 +1,4 @@
-// config/db.js — single MongoDB connection via mongoose.
+// config/db.js - single MongoDB connection via mongoose.
 
 const mongoose = require("mongoose");
 

@@ -33,7 +33,7 @@ function findNameCol(columns) {
   return columns[0];
 }
 
-// Columns that look numeric but are actually identifiers — exclude from all charts
+// Columns that look numeric but are actually identifiers - exclude from all charts
 const IDENTIFIER_COL_RE = /\b(code|isin|cin|cusip|sedol|figi|id|no\.?|number|serial)\b/i;
 
 function detectNumericCols(snapshot) {
@@ -51,7 +51,7 @@ function detectNumericCols(snapshot) {
   });
 }
 
-// Sort numeric cols by coefficient of variation across selected companies — most differentiating first
+// Sort numeric cols by coefficient of variation across selected companies - most differentiating first
 function sortByCV(numericCols, companies) {
   if (companies.length < 2) return numericCols;
   return [...numericCols]
@@ -71,12 +71,12 @@ function pickRadarMetrics(numericCols, companies) {
 }
 
 function shortName(name, max = 16) {
-  const s = String(name || "—");
+  const s = String(name || "-");
   return s.length > max ? s.slice(0, max - 1) + "…" : s;
 }
 
 function formatNum(val) {
-  if (val === null || val === undefined || val === "") return "—";
+  if (val === null || val === undefined || val === "") return "-";
   const n = Number(val);
   if (isNaN(n) || !isFinite(n)) return String(val);
   if (Math.abs(n) >= 1e9) return (n / 1e9).toFixed(2) + "B";
@@ -514,7 +514,7 @@ function MultiBarTooltip({ active, payload, label }) {
           <div key={i} style={{ color: p.fill, marginBottom: 3, display: "flex", justifyContent: "space-between", gap: 16 }}>
             <span style={{ color: "var(--text-muted)" }}>{p.name}</span>
             <span style={{ fontWeight: 600 }}>
-              {rawVal !== null && rawVal !== undefined ? formatNum(rawVal) : "—"}
+              {rawVal !== null && rawVal !== undefined ? formatNum(rawVal) : "-"}
             </span>
           </div>
         );
@@ -544,7 +544,7 @@ function RadarTooltip({ active, payload, label }) {
         return (
           <div key={i} style={{ color: p.stroke || p.fill, marginBottom: 3, display: "flex", justifyContent: "space-between", gap: 16 }}>
             <span style={{ color: "var(--text-muted)" }}>{p.name}</span>
-            <span style={{ fontWeight: 600 }}>{rawVal !== null && rawVal !== undefined ? formatNum(rawVal) : "—"}</span>
+            <span style={{ fontWeight: 600 }}>{rawVal !== null && rawVal !== undefined ? formatNum(rawVal) : "-"}</span>
           </div>
         );
       })}
@@ -571,7 +571,7 @@ function PercentileTooltip({ active, payload, label }) {
           <div key={i} style={{ color: p.fill, marginBottom: 3, display: "flex", justifyContent: "space-between", gap: 16 }}>
             <span style={{ color: "var(--text-muted)" }}>{p.name}</span>
             <span style={{ fontWeight: 600 }}>
-              {actual !== null && actual !== undefined ? `${actual}th %ile` : "—"}
+              {actual !== null && actual !== undefined ? `${actual}th %ile` : "-"}
             </span>
           </div>
         );
@@ -624,7 +624,7 @@ function CompanyPicker({ snapshot, selected, onAdd, onRemove, nameCol }) {
               {matches.length === 0
                 ? <div className="cmp-dd-empty">No companies match "{query}"</div>
                 : matches.map((row, i) => {
-                    const name = String(row[nameCol] || "—");
+                    const name = String(row[nameCol] || "-");
                     const already = selectedSet.has(name);
                     return (
                       <div key={i} className={`cmp-dd-item${already ? " already" : ""}`}
@@ -683,7 +683,7 @@ function RadarSection({ companies, metrics, nameCol }) {
           background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.3)",
           color: "var(--text-secondary)", lineHeight: 1.5,
         }}>
-          <strong style={{ color: "#F59E0B" }}>Partial data —</strong>{" "}
+          <strong style={{ color: "#F59E0B" }}>Partial data -</strong>{" "}
           {partial.map((c, i) => (
             <span key={i}>
               <span style={{ color: PALETTE[c.idx] }}>{c.name}</span>{" "}
@@ -818,7 +818,7 @@ function SingleBarSection({ companies, numericCols, activeMetric, onMetricChange
     <div className="cmp-card">
       <div className="cmp-card-head">
         <span className="cmp-card-title">Metric vs Sector Average</span>
-        <span className="cmp-card-sub">{activeMetric || "—"} · actual values</span>
+        <span className="cmp-card-sub">{activeMetric || "-"} · actual values</span>
       </div>
 
       {/* Metric dropdown */}
@@ -1227,7 +1227,7 @@ function ComparisonTable({ companies, numericCols, nameCol }) {
   return (
     <div className="cmp-card">
       <div className="cmp-card-head">
-        <span className="cmp-card-title">All Metrics — Raw Values</span>
+        <span className="cmp-card-title">All Metrics - Raw Values</span>
         <span className="cmp-note">▲ = highest in row</span>
       </div>
       <div className="cmp-table-wrap">
@@ -1251,7 +1251,7 @@ function ComparisonTable({ companies, numericCols, nameCol }) {
                   const isWorst = !allSame && v !== null && v === minVal && vals.filter(x => x !== null).length > 1;
                   return (
                     <td key={i} className={isBest ? "best" : isWorst ? "worst" : ""}>
-                      {v === null ? "—" : formatNum(v)}{isBest ? " ▲" : ""}
+                      {v === null ? "-" : formatNum(v)}{isBest ? " ▲" : ""}
                     </td>
                   );
                 })}
@@ -1339,11 +1339,11 @@ export default function ComparisonPage() {
           </strong>
           {selected.length === 0
             ? "Use the search box above to pick companies from the screener dataset."
-            : "You have 1 company selected — add another to unlock the comparison dashboard."}
+            : "You have 1 company selected - add another to unlock the comparison dashboard."}
         </div>
       )}
 
-      {/* Dashboard — visible when ≥ 2 companies selected */}
+      {/* Dashboard - visible when ≥ 2 companies selected */}
       {ready && (
         <>
           {/* ── Stats strip ── */}

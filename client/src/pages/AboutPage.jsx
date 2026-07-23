@@ -5,10 +5,10 @@ import MarketingFooter from "../components/MarketingFooter";
 import Seo from "../seo";
 import { colors, gradients, fonts, radius, glassCss } from "../theme";
 
-// Dummy About page — placeholder copy, fully themed.
+// Dummy About page - placeholder copy, fully themed.
 const VALUES = [
   { title: "Defensible by design", desc: "Every score traces back to a KPI, a weight and a direction you control. No black boxes." },
-  { title: "Analyst-first", desc: "Built around the real workflow of equity research — export, map, rank, export again." },
+  { title: "Analyst-first", desc: "Built around the real workflow of equity research - export, map, rank, export again." },
   { title: "Your methodology", desc: "ThinkVest runs your templates. The edge stays yours; we just make it fast and repeatable." },
 ];
 
@@ -24,7 +24,7 @@ export default function AboutPage() {
       <Seo
         title="About"
         path="/about"
-        description="ThinkVest turns fundamentals into defensible equity rankings — built around the real research workflow: think, research, analyse, invest. Your methodology, made fast and repeatable."
+        description="ThinkVest turns fundamentals into defensible equity rankings - built around the real research workflow: think, research, analyse, invest. Your methodology, made fast and repeatable."
       />
       <style>{ABOUT_CSS}</style>
       <MarketingNav />
@@ -35,7 +35,7 @@ export default function AboutPage() {
           <h1 className="ab-title">We turn fundamentals into<br /><span className="ab-grad">defensible rankings.</span></h1>
           <p className="ab-sub">
             ThinkVest is a proprietary equity-ranking engine. It maps company fundamentals
-            to your sectors and scores them against your KPI templates — so your team
+            to your sectors and scores them against your KPI templates - so your team
             spends time on judgement, not spreadsheets.
           </p>
         </motion.div>

@@ -1,4 +1,4 @@
-// models/AdminLog.js — records every admin action on users.
+// models/AdminLog.js - records every admin action on users.
 
 const mongoose = require("mongoose");
 

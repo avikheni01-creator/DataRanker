@@ -1,4 +1,4 @@
-// models/ScreenerSnapshot.js — daily admin-uploaded screener dataset.
+// models/ScreenerSnapshot.js - daily admin-uploaded screener dataset.
 // Only one snapshot exists at a time; the admin replaces it on each upload.
 
 const mongoose = require("mongoose");

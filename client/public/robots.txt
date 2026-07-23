@@ -1,7 +1,7 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
 Allow: /
-# Signed-in app routes are auth-gated — no crawlable content behind /app
+# Signed-in app routes are auth-gated - no crawlable content behind /app
 Disallow: /app/
 
 Sitemap: https://thinkvest.in/sitemap.xml

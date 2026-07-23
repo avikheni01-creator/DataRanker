@@ -1,4 +1,4 @@
-// services/mapper.js — Stage 2: map industries via the reference workbook.
+// services/mapper.js - Stage 2: map industries via the reference workbook.
 //
 // Port of mapper.py.
 

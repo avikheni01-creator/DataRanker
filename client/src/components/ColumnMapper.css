@@ -1,4 +1,4 @@
-/* ColumnMapper — ThinkVest premium fintech dark design system.
+/* ColumnMapper - ThinkVest premium fintech dark design system.
    Class names match ColumnMapper.jsx exactly; only styling changed. */
 
 .column-mapper {
@@ -17,7 +17,7 @@
   line-height: 1.5;
 }
 
-/* Section cards — sit inside the pl-card wrapper */
+/* Section cards - sit inside the pl-card wrapper */
 .mapper-section {
   background: var(--inset);
   border: 1px solid var(--border);

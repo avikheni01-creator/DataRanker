@@ -1,4 +1,4 @@
-// PaymentButton — Razorpay payment trigger.
+// PaymentButton - Razorpay payment trigger.
 //
 // Lazy-loads checkout.js on first click so it doesn't block page load.
 // Creates a server-side order via POST /payment/create-order, opens the
@@ -27,7 +27,7 @@ export default function PaymentButton({
   label,         // button text e.g. "Pay Monthly"
   priceLabel,    // shown below button e.g. "₹499 / month"
   discountLabel, // optional badge e.g. "Save 17%"
-  onSuccess,     // (updatedUser) => void — called after verify succeeds
+  onSuccess,     // (updatedUser) => void - called after verify succeeds
   buttonStyle,   // optional style overrides for the <button>
 }) {
   const [busy,  setBusy]  = useState(false);
@@ -54,7 +54,7 @@ export default function PaymentButton({
           currency,
           order_id:    orderId,
           name:        "ThinkVest",
-          description: `Standard Plan — ${period === "yearly" ? "Yearly" : "Monthly"}`,
+          description: `Standard Plan - ${period === "yearly" ? "Yearly" : "Monthly"}`,
           theme:       { color: "#10B981" },
           prefill:     { name: user.name || "", email: user.email || "" },
 
@@ -75,7 +75,7 @@ export default function PaymentButton({
 
           modal: {
             // ondismiss fires when the user closes the modal without paying.
-            // If payment was already attempted (handler ran), do nothing —
+            // If payment was already attempted (handler ran), do nothing -
             // the handler already resolved or rejected the promise.
             ondismiss: () => { if (!paymentAttempted) resolve(); },
           },

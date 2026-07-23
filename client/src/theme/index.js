@@ -26,7 +26,7 @@ export const colors = {
   textSecondary: "var(--text-secondary)",
   textMuted: "var(--text-muted)",
 
-  // Brand — emerald → navy (shared across modes)
+  // Brand - emerald → navy (shared across modes)
   accent: "var(--accent)",
   accentDeep: "var(--accent-deep)",
   accentHover: "var(--accent-hover)",
@@ -73,7 +73,7 @@ export const shadow = {
   glowGreen: "0 8px 30px rgba(16,185,129,0.28)",
 };
 
-// Reusable glass-card CSS (string) — translucent fill, blur, lit top edge.
+// Reusable glass-card CSS (string) - translucent fill, blur, lit top edge.
 export const glassCss = `
   background: linear-gradient(180deg, ${colors.glassStrong}, ${colors.glass});
   border: 1px solid ${colors.glassBorder};
@@ -83,7 +83,7 @@ export const glassCss = `
   box-shadow: ${shadow.card};
 `;
 
-// Framer Motion presets — keep micro-interactions ≤120ms, page fades 250ms.
+// Framer Motion presets - keep micro-interactions ≤120ms, page fades 250ms.
 export const motion = {
   pageFade: {
     initial: { opacity: 0 },

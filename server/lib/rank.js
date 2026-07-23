@@ -1,4 +1,4 @@
-// lib/rank.js — faithful port of pandas Series.rank()
+// lib/rank.js - faithful port of pandas Series.rank()
 //
 // rank(values, { ascending = true, method = "average", pct = false }) => array
 //

@@ -41,7 +41,7 @@ const INITIAL_TIER1 = [
   { template: "Utility Template", kpi: "Revenue Growth", category: "Growth", weight: 10, direction: "Higher" },
 ];
 
-// Tier 2 rows (read-only for now — not in column mapping)
+// Tier 2 rows (read-only for now - not in column mapping)
 const TIER2_ROWS = [
   { template: "Banking", kpi: "ROA", category: "Profitability", weight: 15, direction: "Higher" },
   { template: "Banking", kpi: "ROE", category: "Profitability", weight: 15, direction: "Higher" },
@@ -107,7 +107,7 @@ function downloadAsXlsx(tier1Rows, tier2Rows, columnMapping) {
   // redoing manual mapping. Do NOT edit this sheet manually.
   const mappingData = [
     [],
-    ["Column Mapping — re-upload this file to restore your configuration"],
+    ["Column Mapping - re-upload this file to restore your configuration"],
     [],
     ["KPI Name", "Source Column"],
     ...Object.entries(columnMapping).map(([kpi, col]) => [
@@ -268,7 +268,7 @@ export default function KPILibraryEditor() {
         setCOLUMN_MAPPING(data);
       })
       .catch(() => {
-        setToast({ msg: "Backend not reachable — mapped columns unavailable", type: "error" });
+        setToast({ msg: "Backend not reachable - mapped columns unavailable", type: "error" });
         setTimeout(() => setToast(null), 4000);
       });
   }, []);
@@ -283,7 +283,7 @@ export default function KPILibraryEditor() {
         }
       })
       .catch(() => {
-        setToast({ msg: "Could not load your KPI library — showing defaults", type: "error" });
+        setToast({ msg: "Could not load your KPI library - showing defaults", type: "error" });
         setTimeout(() => setToast(null), 4000);
       });
   }, []);
@@ -320,7 +320,7 @@ export default function KPILibraryEditor() {
           const serverKeys = Object.keys(COLUMN_MAPPING).sort().join(",");
           const fileKeys = Object.keys(restoredMapping).sort().join(",");
           if (serverKeys && serverKeys !== fileKeys) {
-            showToast("⚠ Uploaded mapping differs from server — using file version", "error");
+            showToast("⚠ Uploaded mapping differs from server - using file version", "error");
           } else {
             showToast("Column mapping restored from file ✓");
           }
@@ -515,8 +515,8 @@ export default function KPILibraryEditor() {
             {/* Tier tabs */}
             <div style={{ display: "flex", borderBottom: "1px solid var(--border)", background: "var(--card)", padding: "0 24px", flexShrink: 0 }}>
               {[
-                { id: "tier1", label: "Tier 1 — Screening" },
-                { id: "tier2", label: "Tier 2 — Deep Research" },
+                { id: "tier1", label: "Tier 1 - Screening" },
+                { id: "tier2", label: "Tier 2 - Deep Research" },
               ].map((t) => (
                 <button key={t.id} onClick={() => setActiveTab(t.id)} style={{
                   padding: "12px 18px", border: "none", cursor: "pointer", background: "transparent",
@@ -527,7 +527,7 @@ export default function KPILibraryEditor() {
               ))}
             </div>
 
-            {/* Mapped columns strip — single scrollable line */}
+            {/* Mapped columns strip - single scrollable line */}
             {activeTab === "tier1" && AVAILABLE_KPI_KEYS.length > 0 && (
               <div style={{
                 background: "var(--accent-soft)", borderBottom: "1px solid var(--border)",
@@ -564,12 +564,12 @@ export default function KPILibraryEditor() {
 
                   {activeTotalWeight > 100 && (
                     <div style={{ marginBottom: 10, padding: "8px 14px", borderRadius: 8, background: "var(--negative-soft)", border: "1px solid var(--negative-soft)", fontSize: 13, color: "var(--negative)", fontWeight: 500 }}>
-                      ⚠ Total weight is {activeTotalWeight}% — reduce by {activeTotalWeight - 100}% before saving.
+                      ⚠ Total weight is {activeTotalWeight}% - reduce by {activeTotalWeight - 100}% before saving.
                     </div>
                   )}
                   {activeTotalWeight > 0 && activeTotalWeight < 100 && (
                     <div style={{ marginBottom: 10, padding: "8px 14px", borderRadius: 8, background: "var(--warning-soft)", border: "1px solid var(--warning-soft)", fontSize: 13, color: "var(--warning)", fontWeight: 500 }}>
-                      Total is {activeTotalWeight}% — needs {100 - activeTotalWeight}% more.
+                      Total is {activeTotalWeight}% - needs {100 - activeTotalWeight}% more.
                     </div>
                   )}
 

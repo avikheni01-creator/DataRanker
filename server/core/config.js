@@ -1,7 +1,7 @@
-// core/config.js — App-wide constants and column mappings (port of config.py)
+// core/config.js - App-wide constants and column mappings (port of config.py)
 
 // Column mapping from query CSV → output Excel (Stage 1).
-// Insertion order matters — it defines Stage 1 output column order.
+// Insertion order matters - it defines Stage 1 output column order.
 //
 // Each value is an ARRAY of accepted source-column names (aliases). A column
 // auto-maps if the uploaded file contains ANY of the listed names. List the

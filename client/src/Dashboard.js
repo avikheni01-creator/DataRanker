@@ -14,7 +14,7 @@ const PIPELINE_STEPS = [
     { label: "Rank & Score",   description: "Scores & ranks companies by KPI template weights" },
 ];
 
-const STATUS_ICON = { idle: "—", running: "⟳", done: "✓", error: "✗" };
+const STATUS_ICON = { idle: "-", running: "⟳", done: "✓", error: "✗" };
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
@@ -258,7 +258,7 @@ function StepBadge({ step, index, status }) {
 function ErrorBox({ message }) {
     if (!message) return null;
     const hint = /failed to fetch/i.test(message)
-        ? " — backend isn't reachable. Start it on localhost:8000."
+        ? " - backend isn't reachable. Start it on localhost:8000."
         : "";
     return <div className="error-box">⚠ {message}{hint}</div>;
 }
@@ -300,7 +300,7 @@ function usePipeline(columnMapping = {}) {
         setRunning(true);
         setDownloadUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return null; });
         setLog([]);
-        // All three stages run server-side in one request — show them all in-progress.
+        // All three stages run server-side in one request - show them all in-progress.
         setSteps(["running", "running", "running"]);
 
         const formData = new FormData();
@@ -380,7 +380,7 @@ export default function Dashboard({ setOutputFile, backendConfig, queryFile, set
                     <h1 className="pl-title">Ranking Pipeline</h1>
                     <p className="pl-sub">
                         Upload your Screener.in export to generate a fully scored,
-                        ranked Excel report — industry mapping and KPI weights applied automatically.
+                        ranked Excel report - industry mapping and KPI weights applied automatically.
                     </p>
                 </div>
 
@@ -405,13 +405,13 @@ export default function Dashboard({ setOutputFile, backendConfig, queryFile, set
                                 />
                                 <div className="pl-kpi-note">
                                     Industry mapping and your <strong>KPI Library</strong> are managed
-                                    on the backend — only the Screener.in export is needed here.
+                                    on the backend - only the Screener.in export is needed here.
                                     Edit KPIs anytime in the <strong>KPI Editor</strong>.
                                 </div>
                             </div>
                         </div>
 
-                        {/* Column mapper — appears after file upload */}
+                        {/* Column mapper - appears after file upload */}
                         {queryFile && (
                             <div className="pl-card">
                                 <div className="pl-card-head">

@@ -1,4 +1,4 @@
-// components/ThemeToggle.jsx — light/dark switch button.
+// components/ThemeToggle.jsx - light/dark switch button.
 
 import { useThemeMode } from "../theme/ThemeContext";
 import { colors, radius } from "../theme";

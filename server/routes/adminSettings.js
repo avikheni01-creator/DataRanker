@@ -1,4 +1,4 @@
-// routes/adminSettings.js — app-wide settings (admin write, auth read).
+// routes/adminSettings.js - app-wide settings (admin write, auth read).
 
 const express = require("express");
 const AppSettings = require("../models/AppSettings");
@@ -33,7 +33,7 @@ router.get("/app-config", requireAuth, async (req, res) => {
   }
 });
 
-// Admin read — returns full document (includes timestamps).
+// Admin read - returns full document (includes timestamps).
 router.get("/admin/settings", requireAuth, requireAdmin, async (req, res) => {
   try {
     res.json(await AppSettings.getOrCreate());
@@ -42,7 +42,7 @@ router.get("/admin/settings", requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
-// Admin write — partial update, only allowed keys.
+// Admin write - partial update, only allowed keys.
 router.put("/admin/settings", requireAuth, requireAdmin, async (req, res) => {
   try {
     const settings = await AppSettings.getOrCreate();

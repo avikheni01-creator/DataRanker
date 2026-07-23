@@ -1,4 +1,4 @@
-// routes/adminPlans.js — CRUD for subscription plans (admin only).
+// routes/adminPlans.js - CRUD for subscription plans (admin only).
 
 const express = require("express");
 const Plan = require("../models/Plan");
@@ -11,7 +11,7 @@ const ALLOWED_KEYS = [
   "yearlyDiscountPct", "trialDays", "isActive", "highlighted", "cta", "order",
 ];
 
-// GET /admin/plans — list all plans sorted by order
+// GET /admin/plans - list all plans sorted by order
 router.get("/admin/plans", requireAuth, requireAdmin, async (req, res) => {
   try {
     const plans = await Plan.find().sort({ order: 1, createdAt: 1 });
@@ -21,7 +21,7 @@ router.get("/admin/plans", requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
-// POST /admin/plans — create a new plan
+// POST /admin/plans - create a new plan
 router.post("/admin/plans", requireAuth, requireAdmin, async (req, res) => {
   try {
     const { planId } = req.body;
@@ -41,7 +41,7 @@ router.post("/admin/plans", requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
-// PUT /admin/plans/:planId — update a plan
+// PUT /admin/plans/:planId - update a plan
 router.put("/admin/plans/:planId", requireAuth, requireAdmin, async (req, res) => {
   try {
     const plan = await Plan.findOne({ planId: req.params.planId });
@@ -55,7 +55,7 @@ router.put("/admin/plans/:planId", requireAuth, requireAdmin, async (req, res) =
   }
 });
 
-// DELETE /admin/plans/:planId — delete a plan
+// DELETE /admin/plans/:planId - delete a plan
 router.delete("/admin/plans/:planId", requireAuth, requireAdmin, async (req, res) => {
   try {
     const plan = await Plan.findOne({ planId: req.params.planId });

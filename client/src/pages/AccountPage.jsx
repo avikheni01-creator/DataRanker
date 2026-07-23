@@ -98,7 +98,7 @@ function ProfileSection({ user, onUpdate }) {
   const initial = (user.name || user.email || "?").trim().charAt(0).toUpperCase();
   const joined = user.createdAt
     ? new Date(user.createdAt).toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" })
-    : "—";
+    : "-";
 
   const handleSave = async () => {
     if (!name.trim()) return;
@@ -124,7 +124,7 @@ function ProfileSection({ user, onUpdate }) {
           boxShadow: "0 0 18px rgba(16,185,129,.35)",
         }}>{initial}</div>
         <div>
-          <div style={{ fontSize: 16, fontWeight: 700, color: colors.text }}>{user.name || "—"}</div>
+          <div style={{ fontSize: 16, fontWeight: 700, color: colors.text }}>{user.name || "-"}</div>
           <div style={{ fontSize: 12, color: colors.textMuted }}>{user.email}</div>
           {user.isAdmin && (
             <span style={{
@@ -155,7 +155,7 @@ function ProfileSection({ user, onUpdate }) {
           </div>
         ) : (
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ color: colors.text, fontSize: 14 }}>{user.name || "—"}</span>
+            <span style={{ color: colors.text, fontSize: 14 }}>{user.name || "-"}</span>
             <button style={BTN_GHOST} onClick={() => setEditing(true)}>Edit</button>
           </div>
         )}
@@ -243,7 +243,7 @@ function MembershipSection({ user, onUpdate }) {
               fontSize: 11, fontWeight: 600, color: "#22C55E",
               background: "rgba(34,197,94,.1)", border: "1px solid rgba(34,197,94,.3)",
               borderRadius: 999, padding: "2px 8px",
-            }}>Free access — admin granted</span>
+            }}>Free access - admin granted</span>
           )}
         </div>
 
@@ -285,7 +285,7 @@ function MembershipSection({ user, onUpdate }) {
                     ? `Paid plan active until ${paidUntilLabel}`
                     : trialExpired
                     ? `Free trial ended on ${trialEndLabel}`
-                    : `Free trial — ${trialDaysLeft} day${trialDaysLeft === 1 ? "" : "s"} remaining`}
+                    : `Free trial - ${trialDaysLeft} day${trialDaysLeft === 1 ? "" : "s"} remaining`}
                 </div>
                 <div style={{ fontSize: 11, color: colors.textMuted, marginTop: 1 }}>
                   {paidActive && !trialExpired
@@ -404,7 +404,7 @@ function MembershipSection({ user, onUpdate }) {
           </a>
         )}
 
-        {/* Payment section — shown for standard-plan users who haven't been granted free access */}
+        {/* Payment section - shown for standard-plan users who haven't been granted free access */}
         {user.plan === "standard" && !user.planOverrideFree && (
           <div style={{
             marginTop: 20, paddingTop: 18,
@@ -423,7 +423,7 @@ function MembershipSection({ user, onUpdate }) {
 
             {paySuccess && (
               <Banner type="success">
-                Payment successful — your access is extended to{" "}
+                Payment successful - your access is extended to{" "}
                 <strong>
                   {new Date(paySuccess.trialEndsAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
                 </strong>.
@@ -435,7 +435,7 @@ function MembershipSection({ user, onUpdate }) {
                 period="monthly"
                 user={user}
                 label="Pay Monthly"
-                priceLabel={`₹${monthlyPrice || 5} / month`}
+                priceLabel={`₹${monthlyPrice || 499} / month`}
                 onSuccess={(updated) => { setPaySuccess(updated); onUpdate(updated); }}
               />
               <PaymentButton

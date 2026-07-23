@@ -11,7 +11,7 @@ export default function MarketingFooter() {
         <div className="mkt-footer-brand">
           <Logo size={20} />
           <p className="mkt-footer-tag">
-            Proprietary equity ranking — fundamentals mapped to your sectors and
+            Proprietary equity ranking - fundamentals mapped to your sectors and
             scored against your KPI templates.
           </p>
         </div>

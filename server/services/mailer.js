@@ -1,4 +1,4 @@
-// services/mailer.js — Gmail SMTP via nodemailer.
+// services/mailer.js - Gmail SMTP via nodemailer.
 // Requires GMAIL_APP_PASSWORD in server .env (Google App Password, not the account password).
 // To generate one: Google Account → Security → 2-Step Verification → App passwords.
 

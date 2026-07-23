@@ -1,4 +1,4 @@
-// middleware/rateLimit.js — tiny dependency-free fixed-window rate limiter.
+// middleware/rateLimit.js - tiny dependency-free fixed-window rate limiter.
 //
 // NOTE: state is held in an in-process Map, so it is per-process only. This is
 // fine for a single-instance prototype. When scaling to multiple instances,

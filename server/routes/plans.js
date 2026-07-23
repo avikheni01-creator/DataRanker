@@ -1,4 +1,4 @@
-// routes/plans.js — public subscription tiers for the Pricing page.
+// routes/plans.js - public subscription tiers for the Pricing page.
 // Serves from MongoDB if plans exist, falls back to hardcoded defaults.
 
 const express = require("express");

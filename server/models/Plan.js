@@ -1,4 +1,4 @@
-// models/Plan.js — admin-managed subscription plans stored in MongoDB.
+// models/Plan.js - admin-managed subscription plans stored in MongoDB.
 
 const mongoose = require("mongoose");
 

@@ -1,4 +1,4 @@
-// services/ranker.js — Stage 3: score and rank companies by KPI template.
+// services/ranker.js - Stage 3: score and rank companies by KPI template.
 //
 // Port of ranker.py.
 

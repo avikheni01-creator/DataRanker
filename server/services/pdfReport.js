@@ -1,4 +1,4 @@
-// services/pdfReport.js — generate a styled rankings-summary PDF using pdfkit.
+// services/pdfReport.js - generate a styled rankings-summary PDF using pdfkit.
 // Input: [{ template, companies: [{ rank, symbol, name, sector, score }] }]
 // Output: a Buffer containing a PDF document.
 
@@ -27,11 +27,13 @@ const COL = {
 
 function drawFooter(doc, pageNum, totalPages, date) {
   // Draw footer rect and text using absolute coordinates.
-  // We draw above the pdfkit bottom-margin threshold to avoid triggering auto page-break.
   const footerY = PAGE_H - 36;
   doc.rect(0, footerY, PAGE_W, 36).fill("#F9FAFB");
-  // Temporarily move cursor inside the page so pdfkit does not auto-add a page
-  doc.y = footerY - 1;
+  // Writing text below the bottom margin makes pdfkit auto-insert a fresh
+  // (blank) page. Temporarily drop the bottom margin to 0 so the footer text
+  // stays on the current page and no trailing blank page is created.
+  const savedBottom = doc.page.margins.bottom;
+  doc.page.margins.bottom = 0;
   doc
     .font("Helvetica").fontSize(8).fillColor(LIGHT)
     .text(
@@ -39,6 +41,7 @@ function drawFooter(doc, pageNum, totalPages, date) {
       MARGIN, PAGE_H - 22,
       { align: "center", width: COL_W, lineBreak: false }
     );
+  doc.page.margins.bottom = savedBottom;
 }
 
 function generateRankingsPDF(templateData) {
@@ -49,7 +52,7 @@ function generateRankingsPDF(templateData) {
       margin: MARGIN,
       size: "A4",
       autoFirstPage: true,
-      // No bufferPages — footers are drawn inline so we don't need switchToPage
+      // No bufferPages - footers are drawn inline so we don't need switchToPage
     });
 
     const buffers = [];

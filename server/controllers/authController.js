@@ -1,4 +1,4 @@
-// controllers/authController.js — signup / login / me / logout / google OAuth / OTP flows.
+// controllers/authController.js - signup / login / me / logout / google OAuth / OTP flows.
 
 const User = require("../models/User");
 const OtpToken = require("../models/OtpToken");
@@ -32,9 +32,10 @@ async function signup(req, res) {
 
     const userId = user._id.toString();
     setAuthCookie(res, userId);
-    // Send verification email non-blocking — don't fail signup if mail fails.
-    OtpToken.generate(email, "verify")
-      .then((otp) => sendOtpEmail(email, otp, "verify"))
+    // Send verification email non-blocking - don't fail signup if mail fails.
+    // Use the stored (normalized) email so the token matches at verify time.
+    OtpToken.generate(user.email, "verify")
+      .then((otp) => sendOtpEmail(user.email, otp, "verify"))
       .catch((err) => console.error("Verification email failed:", err));
     return res.status(201).json({ user: user.toSafeJSON(), token: signToken(userId) });
   } catch (err) {

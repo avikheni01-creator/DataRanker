@@ -1,4 +1,4 @@
-// routes/kpiLibrary.js — per-user KPI library CRUD.
+// routes/kpiLibrary.js - per-user KPI library CRUD.
 //   GET /kpi-library  → user's Tier 1 rows (seeded from defaults on first call)
 //   PUT /kpi-library  → replace the user's Tier 1 rows
 

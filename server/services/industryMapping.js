@@ -1,4 +1,4 @@
-// services/industryMapping.js — provides the canonical industry-mapping workbook
+// services/industryMapping.js - provides the canonical industry-mapping workbook
 // that Stage 2 (mapper) reads. This file used to be uploaded per run from the
 // frontend; it is now bundled with the backend (server/data/industry-mapping.xlsx)
 // so the proprietary 190→130 mapping never leaves the server and callers only

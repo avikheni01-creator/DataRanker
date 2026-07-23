@@ -1,4 +1,4 @@
-// lib/io.js — read CSV/XLSX into arrays-of-objects with numeric coercion,
+// lib/io.js - read CSV/XLSX into arrays-of-objects with numeric coercion,
 // and write XLSX (via exceljs, so cell fills can be applied).
 
 const XLSX = require("xlsx");
@@ -65,7 +65,7 @@ function readXlsxWithHeader(buffer, sheet, headerRow) {
   const ws = wb.Sheets[name];
   // pandas read_excel(header=N) counts PHYSICAL rows from row 1 (index 0),
   // including blanks. SheetJS, by contrast, reads from the sheet's used range
-  // (!ref), which here is "A2:..." because physical row 1 is empty — that would
+  // (!ref), which here is "A2:..." because physical row 1 is empty - that would
   // shift every index up by one and pick a data row as the header. So we (a)
   // force the range origin to A1 and (b) keep blankrows:true, so aoa[headerRow]
   // lands on the exact same physical row pandas would use.

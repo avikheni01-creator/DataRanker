@@ -1,4 +1,4 @@
-// FilterInput — autocomplete for the Screener filter DSL.
+// FilterInput - autocomplete for the Screener filter DSL.
 // Three-stage suggestions: column names → operators → column values.
 
 import { useState, useRef, useEffect } from "react";
@@ -23,7 +23,7 @@ function getLastClause(expr) {
 function computeSuggestions(clause, columns, snapshot) {
   const trimmed = clause.trimStart();
 
-  // Stage 3 — FIELD OP<space>PARTIAL_VALUE
+  // Stage 3 - FIELD OP<space>PARTIAL_VALUE
   const opMatch = trimmed.match(/^(.+?)\s+(>=|<=|!=|contains|>|<|=)\s(.*)$/i);
   if (opMatch) {
     const [, fieldRaw, , partial] = opMatch;
@@ -42,7 +42,7 @@ function computeSuggestions(clause, columns, snapshot) {
     return unique.map((v) => ({ kind: "value", label: String(v) }));
   }
 
-  // Stage 2 — FIELD<space>PARTIAL_OP
+  // Stage 2 - FIELD<space>PARTIAL_OP
   const fieldSpace = trimmed.match(/^(\S.*?)\s+(\S*)$/);
   if (fieldSpace) {
     const partial = fieldSpace[2].toLowerCase();
@@ -52,7 +52,7 @@ function computeSuggestions(clause, columns, snapshot) {
     }));
   }
 
-  // Stage 1 — typing field name
+  // Stage 1 - typing field name
   const partial = trimmed.toLowerCase();
   const list = partial
     ? columns.filter((c) => c.toLowerCase().includes(partial))
@@ -64,7 +64,7 @@ function buildNewExpr(prefix, clause, suggestion) {
   const trimmed = clause.trimStart();
   const leading = clause.slice(0, clause.length - trimmed.length);
 
-  // Stage 3 — replace value
+  // Stage 3 - replace value
   const opMatch = trimmed.match(/^(.+?)\s+(>=|<=|!=|contains|>|<|=)\s(.*)$/i);
   if (opMatch) {
     return (
@@ -72,13 +72,13 @@ function buildNewExpr(prefix, clause, suggestion) {
     );
   }
 
-  // Stage 2 — replace operator
+  // Stage 2 - replace operator
   const fieldSpace = trimmed.match(/^(\S.*?)\s+\S*$/);
   if (fieldSpace && suggestion.kind === "operator") {
     return prefix + leading + fieldSpace[1] + " " + suggestion.label + " ";
   }
 
-  // Stage 1 — replace field
+  // Stage 1 - replace field
   return prefix + leading + suggestion.label + " ";
 }
 

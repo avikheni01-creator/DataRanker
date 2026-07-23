@@ -72,7 +72,7 @@
   --accent-soft: rgba(16,185,129,0.10);
 }
 
-/* Brand + semantic — shared by both modes */
+/* Brand + semantic - shared by both modes */
 :root {
   --accent: #10B981;
   --accent-deep: #1E3A8A;
@@ -104,7 +104,7 @@ body {
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-/* Ambient backdrop — soft violet glow + faint engineering grid, fixed behind
+/* Ambient backdrop - soft violet glow + faint engineering grid, fixed behind
    every page so glass surfaces have something to refract. */
 body::before {
   content: "";

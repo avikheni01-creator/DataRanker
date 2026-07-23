@@ -7,25 +7,25 @@ import Seo from "../seo";
 import { colors, gradients, fonts, radius, glassCss } from "../theme";
 
 const WORKFLOW = [
-  { n: "01", title: "Upload Screener Data", desc: "Drop in your Screener.in CSV export. KPI library and sector mapping are managed server-side — nothing else to configure." },
+  { n: "01", title: "Upload Screener Data", desc: "Drop in your Screener.in CSV export. KPI library and sector mapping are managed server-side - nothing else to configure." },
   { n: "02", title: "Filter Your Universe", desc: "Use the live screener to slice by any metric with a formula DSL, then run on exactly the companies you want." },
   { n: "03", title: "Run Pipeline", desc: "One click formats, sector-maps and scores your universe in a single pass against your KPI templates." },
-  { n: "04", title: "Download Rankings", desc: "A colour-coded, multi-sheet ranked Excel report — ready to open, audit and share immediately." },
+  { n: "04", title: "Download Rankings", desc: "A colour-coded, multi-sheet ranked Excel report - ready to open, audit and share immediately." },
 ];
 
 const FEATURES = [
   { icon: ["M4 6h16", "M4 12h10", "M4 18h7", "M16 15l4 3-4 3"], title: "Smart column mapping", desc: "Auto-matches your CSV headers to the canonical schema. No manual mapping required for standard Screener.in exports." },
   { icon: ["M3 3v18h18", "M7 14l4-4 3 3 5-6"], title: "Direction-aware scoring", desc: "Every KPI is ranked by its own higher/lower-is-better rule and weighted into one defensible, auditable score." },
-  { icon: ["M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"], title: "190 → 130 sector mapping", desc: "Industries are mapped to your SCS sectors and KPI templates automatically before ranking — no manual join required." },
+  { icon: ["M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"], title: "190 → 130 sector mapping", desc: "Industries are mapped to your SCS sectors and KPI templates automatically before ranking - no manual join required." },
   { icon: ["M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z", "M22 6l-10 7L2 6"], title: "Live screener", desc: "Filter your daily universe with a formula DSL (ROE > 15 AND Sector = Banks), compare companies, then pipeline the results." },
-  { icon: ["M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z", "M14 2v6h6", "M8 13h8", "M8 17h5"], title: "Excel-native output", desc: "A colour-coded, multi-sheet ranked report you can open, audit and share immediately — no post-processing needed." },
-  { icon: ["M12 20h9", "M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"], title: "Editable KPI library", desc: "Tune templates, weights and directions in-app. Changes apply on the next pipeline run — no spreadsheets to wrangle." },
+  { icon: ["M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z", "M14 2v6h6", "M8 13h8", "M8 17h5"], title: "Excel-native output", desc: "A colour-coded, multi-sheet ranked report you can open, audit and share immediately - no post-processing needed." },
+  { icon: ["M12 20h9", "M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"], title: "Editable KPI library", desc: "Tune templates, weights and directions in-app. Changes apply on the next pipeline run - no spreadsheets to wrangle." },
 ];
 
 const FAQ = [
-  { q: "What do I need to get started?", a: "Just your Screener.in CSV export. Industry mapping and your KPI library are managed server-side — ThinkVest handles everything else." },
+  { q: "What do I need to get started?", a: "Just your Screener.in CSV export. Industry mapping and your KPI library are managed server-side - ThinkVest handles everything else." },
   { q: "Is my methodology safe?", a: "Your KPI weights and ranking logic stay in your workspace. The pipeline runs your templates exactly as you define them." },
-  { q: "What does the Free plan include?", a: "The full ranking pipeline, column mapper, KPI editor, results dashboard and Excel export — everything you need to rank your first universe." },
+  { q: "What does the Free plan include?", a: "The full ranking pipeline, column mapper, KPI editor, results dashboard and Excel export - everything you need to rank your first universe." },
   { q: "Can I change the scoring later?", a: "Yes. Edit templates, weights and directions in the KPI editor and re-run the pipeline any time." },
 ];
 
@@ -61,7 +61,7 @@ export default function LandingPage() {
     <div style={{ color: colors.text, fontFamily: fonts.sans, minHeight: "100vh", overflowX: "hidden" }}>
       <Seo
         path="/"
-        description="ThinkVest turns raw equity fundamentals into a defensible, weighted ranking — mapped to your sectors and scored against your KPI templates. Think. Research. Analyse. Invest."
+        description="ThinkVest turns raw equity fundamentals into a defensible, weighted ranking - mapped to your sectors and scored against your KPI templates. Think. Research. Analyse. Invest."
       />
       <style>{LANDING_CSS}</style>
 
@@ -80,7 +80,7 @@ export default function LandingPage() {
           <span className="lp-grad">With precision.</span>
         </motion.h1>
         <motion.p {...fadeUp(0.12)} className="lp-sub">
-          ThinkVest turns raw fundamentals into a defensible, weighted ranking —
+          ThinkVest turns raw fundamentals into a defensible, weighted ranking -
           mapped to your sectors and scored against your KPI templates.
         </motion.p>
         <motion.div {...fadeUp(0.18)} className="lp-cta">
@@ -90,7 +90,7 @@ export default function LandingPage() {
           <Link to="/pricing" className="lp-btn lp-btn-ghost lp-btn-lg">See pricing</Link>
         </motion.div>
 
-        {/* Hero glass panel — abstract ranking preview, no real data */}
+        {/* Hero glass panel - abstract ranking preview, no real data */}
         <motion.div {...fadeUp(0.28)} className="lp-panel" aria-hidden="true">
           <div className="lp-panel-head">
             <span className="lp-panel-dot" /><span className="lp-panel-dot" /><span className="lp-panel-dot" />
@@ -110,8 +110,8 @@ export default function LandingPage() {
       {/* Live stats strip */}
       <section className="lp-stats-strip">
         {[
-          { n: stats.analysts != null ? stats.analysts : "—", label: "Analysts signed up" },
-          { n: stats.companies != null && stats.companies > 0 ? stats.companies.toLocaleString("en-IN") : "—", label: "Companies in screener" },
+          { n: stats.analysts != null ? stats.analysts : "-", label: "Analysts signed up" },
+          { n: stats.companies != null && stats.companies > 0 ? stats.companies.toLocaleString("en-IN") : "-", label: "Companies in screener" },
           { n: stats.templates, label: "KPI templates" },
         ].map(({ n, label }) => (
           <div key={label} className="lp-stat-item">

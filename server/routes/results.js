@@ -1,4 +1,4 @@
-// routes/results.js — POST /results/email-summary
+// routes/results.js - POST /results/email-summary
 // Accepts top-10 company data for all templates as JSON,
 // generates a styled PDF via pdfkit, and emails it to the logged-in user.
 

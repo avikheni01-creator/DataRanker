@@ -1,4 +1,4 @@
-// routes/auth.js — mounted at /auth.
+// routes/auth.js - mounted at /auth.
 
 const express = require("express");
 const {

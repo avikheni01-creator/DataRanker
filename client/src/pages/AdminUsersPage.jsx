@@ -152,7 +152,7 @@ function PaidUntilEditor({ user, isSelf, busy, onPatch }) {
   if (!user.paidUntil) {
     return (
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-        <span style={{ color: colors.textMuted }}>—</span>
+        <span style={{ color: colors.textMuted }}>-</span>
         {!isSelf && !busy && (
           <button onClick={() => setEditing(true)} title="Set paid until" style={iconBtn(colors.textMuted)}>✎</button>
         )}
@@ -210,7 +210,7 @@ function UserRow({ user, isSelf, onUpdate, onDelete }) {
   const initial = (user.name || user.email || "?").trim().charAt(0).toUpperCase();
   const joined = user.createdAt
     ? new Date(user.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
-    : "—";
+    : "-";
 
   return (
     <tr style={{ borderBottom: "1px solid var(--border)", opacity: busy ? .6 : 1, transition: "opacity .15s" }}>
@@ -224,7 +224,7 @@ function UserRow({ user, isSelf, onUpdate, onDelete }) {
             fontSize: 13, fontWeight: 700,
           }}>{initial}</div>
           <div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: colors.text }}>{user.name || "—"}</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: colors.text }}>{user.name || "-"}</div>
             <div style={{ fontSize: 11, color: colors.textMuted }}>{user.email}</div>
           </div>
         </div>
@@ -270,12 +270,12 @@ function UserRow({ user, isSelf, onUpdate, onDelete }) {
         />
       </td>
 
-      {/* Trial ends — editable by admin */}
+      {/* Trial ends - editable by admin */}
       <td style={{ padding: "14px 16px", fontSize: 12, whiteSpace: "nowrap" }}>
         <TrialDateEditor user={user} isSelf={isSelf} busy={busy} onPatch={patch} />
       </td>
 
-      {/* Valid until — subscription expiry for paid users, editable */}
+      {/* Valid until - subscription expiry for paid users, editable */}
       <td style={{ padding: "14px 16px", fontSize: 12, whiteSpace: "nowrap" }}>
         <PaidUntilEditor user={user} isSelf={isSelf} busy={busy} onPatch={patch} />
       </td>

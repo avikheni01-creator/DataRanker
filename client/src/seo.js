@@ -10,7 +10,7 @@ export const SITE_NAME = "ThinkVest";
 const OG_IMAGE = `${SITE_URL}/logo512.png`;
 
 export default function Seo({ title, description, path = "/", noindex = false, image = OG_IMAGE }) {
-  const fullTitle = title ? `${title} — ${SITE_NAME}` : `${SITE_NAME} — Equity Ranking & Scoring`;
+  const fullTitle = title ? `${title} - ${SITE_NAME}` : `${SITE_NAME} - Equity Ranking & Scoring`;
   const url = `${SITE_URL}${path}`;
 
   return (

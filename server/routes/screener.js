@@ -1,9 +1,9 @@
-// routes/screener.js — admin snapshot upload + user screener endpoints.
+// routes/screener.js - admin snapshot upload + user screener endpoints.
 //
-// POST /admin/screener       — admin replaces the daily snapshot
-// GET  /screener             — fetch current snapshot (columns + rows)
-// GET  /screener/download    — stream the original uploaded file
-// POST /screener/run-pipeline — run ranking on a provided row subset
+// POST /admin/screener       - admin replaces the daily snapshot
+// GET  /screener             - fetch current snapshot (columns + rows)
+// GET  /screener/download    - stream the original uploaded file
+// POST /screener/run-pipeline - run ranking on a provided row subset
 
 const express = require("express");
 const multer = require("multer");
@@ -86,7 +86,7 @@ function autoMap(columns) {
 
 // Serialise a row array back to a CSV buffer so runFormat can consume it.
 // SheetJS adds a UTF-8 BOM (EF BB BF) to CSV output which corrupts the first
-// column name when read back — strip it so "Name" stays "Name".
+// column name when read back - strip it so "Name" stays "Name".
 function rowsToBuffer(columns, rows) {
   const aoa = [columns, ...rows.map((r) => columns.map((c) => r[c] ?? null))];
   const ws = XLSX.utils.aoa_to_sheet(aoa);

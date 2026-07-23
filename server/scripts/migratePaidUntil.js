@@ -39,7 +39,7 @@ async function run() {
     const user = await User.findById(userId);
     if (!user) { skipped++; continue; }
 
-    // Already migrated — skip
+    // Already migrated - skip
     if (user.paidUntil) { skipped++; continue; }
 
     // Reconstruct paidUntil by stacking payments in chronological order.

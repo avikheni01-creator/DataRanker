@@ -1,4 +1,4 @@
-// server.js — Express app entry.
+// server.js - Express app entry.
 // Loads env, connects to MongoDB, configures credentialed CORS (httpOnly-cookie
 // auth), and mounts the auth, plans, and pipeline routers.
 
@@ -18,7 +18,7 @@ if (!process.env.JWT_SECRET) {
 if (process.env.NODE_ENV !== "production") {
   console.warn(
     "WARNING: NODE_ENV is not 'production'. Auth cookies are NOT Secure / " +
-      "SameSite=None — cross-site login will only work over http/localhost."
+      "SameSite=None - cross-site login will only work over http/localhost."
   );
 }
 
@@ -65,7 +65,7 @@ app.use(
 
 app.use(express.json({ limit: "10mb" }));
 app.use(cookieParser());
-app.use(helmet({ contentSecurityPolicy: false })); // CSP disabled — API-only server, no HTML served
+app.use(helmet({ contentSecurityPolicy: false })); // CSP disabled - API-only server, no HTML served
 
 app.get("/health", (req, res) => res.json({ ok: true }));
 

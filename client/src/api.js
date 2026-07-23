@@ -1,4 +1,4 @@
-// api.js — central backend base URL + fetch helper.
+// api.js - central backend base URL + fetch helper.
 // Base comes from REACT_APP_API_URL (see client/.env), defaulting to local dev.
 // Sends the JWT as an Authorization: Bearer header (works cross-domain) and also
 // includes credentials so the httpOnly cookie travels on same-domain setups.

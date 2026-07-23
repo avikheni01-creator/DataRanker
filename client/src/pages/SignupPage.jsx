@@ -62,7 +62,7 @@ export default function SignupPage() {
       subtitle="Start ranking in under a minute."
       footer={<>Already have an account? <Link to="/login">Sign in</Link></>}
     >
-      <Seo title="Sign up" path="/signup" description="Create a free ThinkVest account and rank your first equity universe with industry-specific KPI templates — no credit card required." />
+      <Seo title="Sign up" path="/signup" description="Create a free ThinkVest account and rank your first equity universe with industry-specific KPI templates - no credit card required." />
       {error && <div className="auth-error">{error}</div>}
       <GoogleButton onClick={handleGoogle} disabled={busy} label="Sign up with Google" />
       <AuthDivider />

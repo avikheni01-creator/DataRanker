@@ -1,4 +1,4 @@
-// core/kpiDefaults.js — default Tier 1 KPI library seeded for every new user.
+// core/kpiDefaults.js - default Tier 1 KPI library seeded for every new user.
 // Single source of truth for the starter set; users edit their own copy (stored
 // in MongoDB via models/KpiLibrary). Shape: { template, kpi, category, weight,
 // direction } where direction is "Higher" | "Lower".

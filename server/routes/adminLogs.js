@@ -1,5 +1,5 @@
-// routes/adminLogs.js — admin-only unified logs endpoint.
-// GET /admin/logs — returns Payment records + AdminLog records merged, newest first.
+// routes/adminLogs.js - admin-only unified logs endpoint.
+// GET /admin/logs - returns Payment records + AdminLog records merged, newest first.
 
 const express  = require("express");
 const Payment  = require("../models/Payment");
@@ -29,8 +29,8 @@ router.get("/admin/logs", requireAuth, requireAdmin, async (req, res) => {
         id:               p._id.toString(),
         type:             "payment",
         actorEmail:       null,
-        targetEmail:      u.email || "—",
-        targetName:       u.name  || "—",
+        targetEmail:      u.email || "-",
+        targetName:       u.name  || "-",
         action:           p.period === "yearly" ? "payment_yearly" : "payment_monthly",
         detail:           `₹${(p.amount / 100).toLocaleString("en-IN")} · ${p.period} · ${p.razorpayPaymentId}`,
         razorpayPaymentId: p.razorpayPaymentId,
@@ -45,8 +45,8 @@ router.get("/admin/logs", requireAuth, requireAdmin, async (req, res) => {
       id:          l._id.toString(),
       type:        "admin_action",
       actorEmail:  l.actorEmail,
-      targetEmail: l.targetEmail || "—",
-      targetName:  l.targetName  || "—",
+      targetEmail: l.targetEmail || "-",
+      targetName:  l.targetName  || "-",
       action:      l.action,
       detail:      formatChange(l.action, l.changes),
       changes:     l.changes,
@@ -73,10 +73,10 @@ function formatChange(action, changes) {
   if (!changes) return "";
   const { field, from, to } = changes;
   const fmt = (v) => {
-    if (v === null || v === undefined) return "—";
+    if (v === null || v === undefined) return "-";
     if (typeof v === "boolean") return v ? "Yes" : "No";
     if (field === "trialEndsAt" || field === "paidUntil") {
-      return v ? new Date(v).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "—";
+      return v ? new Date(v).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "-";
     }
     return String(v);
   };

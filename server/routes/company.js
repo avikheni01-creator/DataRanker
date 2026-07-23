@@ -1,9 +1,9 @@
 // routes/company.js
 //
-// GET /company/isin/:isin     — lookup by ISIN (most reliable; no symbol needed)
-// GET /company/:symbol        — real-time quote (price, market cap, P/E, etc.)
-// GET /company/:symbol/summary — fundamentals (financials, key stats, profile)
-// GET /company/:symbol/history — OHLCV history (?from=YYYY-MM-DD&to=YYYY-MM-DD)
+// GET /company/isin/:isin     - lookup by ISIN (most reliable; no symbol needed)
+// GET /company/:symbol        - real-time quote (price, market cap, P/E, etc.)
+// GET /company/:symbol/summary - fundamentals (financials, key stats, profile)
+// GET /company/:symbol/history - OHLCV history (?from=YYYY-MM-DD&to=YYYY-MM-DD)
 
 const express = require("express");
 const YahooFinance = require("yahoo-finance2").default;
@@ -85,7 +85,7 @@ function buildQuotePayload(q) {
 
 // GET /company/isin/:isin
 // Looks up the Yahoo Finance symbol via ISIN search, then returns a real-time quote.
-// More reliable than symbol-based lookup — works even when the NSE ticker is unknown.
+// More reliable than symbol-based lookup - works even when the NSE ticker is unknown.
 router.get("/company/isin/:isin", requireAuth, async (req, res) => {
   try {
     const symbol = await symbolFromIsin(req.params.isin);

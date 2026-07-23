@@ -6,7 +6,7 @@ const FEATURES = [
   {
     icon: "📊",
     title: "Detailed Stock Analysis",
-    desc: "Deep-dive fundamental analysis per company — margins, ratios, valuations, and score breakdowns pulled directly from screener data.",
+    desc: "Deep-dive fundamental analysis per company - margins, ratios, valuations, and score breakdowns pulled directly from screener data.",
   },
   {
     icon: "🧭",
@@ -16,7 +16,7 @@ const FEATURES = [
   {
     icon: "🔔",
     title: "Alerts for Critical News",
-    desc: "Real-time notifications on material events — earnings, downgrades, regulatory filings, and macro signals affecting your tracked stocks.",
+    desc: "Real-time notifications on material events - earnings, downgrades, regulatory filings, and macro signals affecting your tracked stocks.",
   },
   {
     icon: "⭐",
@@ -36,7 +36,7 @@ const FEATURES = [
   {
     icon: "🤖",
     title: "AI Interpretation Engine",
-    desc: "Run a large language model directly on your ranked dataset. Get accurate, reliable interpretation of scores, outliers, and sector trends — plain-language insights grounded in your own data.",
+    desc: "Run a large language model directly on your ranked dataset. Get accurate, reliable interpretation of scores, outliers, and sector trends - plain-language insights grounded in your own data.",
     highlight: true,
   },
 ];

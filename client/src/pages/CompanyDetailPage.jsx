@@ -10,13 +10,13 @@ import {
 // ── Formatting helpers ────────────────────────────────────────────────────────
 
 function fmtPrice(val, currency = "INR") {
-  if (val == null) return "—";
+  if (val == null) return "-";
   const sym = currency === "INR" ? "₹" : currency + " ";
   return `${sym}${Number(val).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 function fmtLarge(val, currency = "INR") {
-  if (val == null) return "—";
+  if (val == null) return "-";
   const sym = currency === "INR" ? "₹" : currency + " ";
   const abs = Math.abs(val);
   const sign = val < 0 ? "-" : "";
@@ -28,17 +28,17 @@ function fmtLarge(val, currency = "INR") {
 }
 
 function fmtPct(val, decimals = 1) {
-  if (val == null) return "—";
+  if (val == null) return "-";
   return `${(val * 100).toFixed(decimals)}%`;
 }
 
 function fmtX(val, decimals = 2) {
-  if (val == null) return "—";
+  if (val == null) return "-";
   return `${Number(val).toFixed(decimals)}x`;
 }
 
 function fmtQDate(d) {
-  if (!d) return "—";
+  if (!d) return "-";
   return new Date(d).toLocaleDateString("en-IN", { month: "short", year: "2-digit" });
 }
 
@@ -288,7 +288,7 @@ function EarningsSection({ earnings }) {
   }));
 
   return (
-    <SectionCard title="EARNINGS HISTORY — EPS">
+    <SectionCard title="EARNINGS HISTORY - EPS">
       {nextDate && (
         <div style={{ fontSize: 11, color: "var(--text-muted)", fontFamily: MONO, marginBottom: 12 }}>
           Next earnings: {new Date(nextDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
@@ -302,7 +302,7 @@ function EarningsSection({ earnings }) {
           <Tooltip
             {...tooltipStyle()}
             formatter={(v, name) => [
-              v?.toFixed(2) ?? "—",
+              v?.toFixed(2) ?? "-",
               name === "actual" ? "Actual EPS" : "Est. EPS",
             ]}
           />
@@ -427,7 +427,7 @@ function TopInstitutionsSection({ institutions }) {
                   fontSize: 12, fontWeight: 700, color: "var(--text-secondary)",
                   whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
                   maxWidth: 170,
-                }}>{inst.name || "—"}</div>
+                }}>{inst.name || "-"}</div>
                 {inst.reportDate && (
                   <div style={{ fontSize: 9, color: "var(--text-muted)", fontFamily: MONO, marginTop: 2 }}>
                     {new Date(inst.reportDate).toLocaleDateString("en-IN", { month: "short", year: "numeric" })}
@@ -470,7 +470,7 @@ function InsiderTransactionsSection({ transactions }) {
             }}>
               <div style={{ minWidth: 0, flex: 1 }}>
                 <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-secondary)" }}>
-                  {t.name || "—"}
+                  {t.name || "-"}
                 </div>
                 <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 2 }}>
                   {t.relation || ""}
@@ -534,7 +534,7 @@ function AnalystActionsSection({ actions }) {
             }}>
               <div style={{ minWidth: 0, flex: 1 }}>
                 <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-secondary)" }}>
-                  {a.firm || "—"}
+                  {a.firm || "-"}
                 </div>
                 {(a.fromGrade || a.toGrade) && (
                   <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 2, fontFamily: MONO }}>
@@ -573,7 +573,7 @@ function KeyMetricsSection({ valuation, profitability, financials, currency }) {
     { label: "Fwd P/E",        value: fmtX(valuation?.forwardPE) },
     { label: "P/B Ratio",      value: fmtX(valuation?.pbRatio) },
     { label: "EV/EBITDA",      value: fmtX(valuation?.evToEbitda) },
-    { label: "Beta",           value: valuation?.beta != null ? Number(valuation.beta).toFixed(2) : "—" },
+    { label: "Beta",           value: valuation?.beta != null ? Number(valuation.beta).toFixed(2) : "-" },
     { label: "Market Cap",     value: fmtLarge(valuation?.marketCap, currency) },
     { label: "Ent. Value",     value: fmtLarge(valuation?.enterpriseValue, currency) },
     { label: "Gross Margin",   value: fmtPct(profitability?.grossMargin) },
@@ -650,7 +650,7 @@ function DividendSection({ dividends, currency }) {
         <StatTile label="Payout Ratio" value={fmtPct(payoutRatio)} />
         <StatTile label="Ex-Date"      value={exDate
           ? new Date(exDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
-          : "—"}
+          : "-"}
         />
       </div>
     </SectionCard>
@@ -808,7 +808,7 @@ export default function CompanyDetailPage() {
               { label: "High",       value: fmtPrice(q.high, currency) },
               { label: "Low",        value: fmtPrice(q.low, currency) },
               { label: "Prev Close", value: fmtPrice(q.previousClose, currency) },
-              { label: "Volume",     value: q.volume?.toLocaleString("en-IN") ?? "—" },
+              { label: "Volume",     value: q.volume?.toLocaleString("en-IN") ?? "-" },
               { label: "52W High",   value: fmtPrice(q.week52High, currency) },
               { label: "52W Low",    value: fmtPrice(q.week52Low, currency) },
               { label: "50D Avg",    value: fmtPrice(q.fiftyDayAvg, currency) },

@@ -1,4 +1,4 @@
-// services/formatter.js — Stage 1: reformat raw query CSV.
+// services/formatter.js - Stage 1: reformat raw query CSV.
 //
 // Port of formatter.py. For each [outputCol, sourceCol] of dynamic_mapping IN
 // INSERTION ORDER: if sourceCol exists in the CSV columns → output[outputCol] =

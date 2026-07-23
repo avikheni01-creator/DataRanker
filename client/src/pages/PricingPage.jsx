@@ -13,7 +13,7 @@ const FALLBACK_PLANS = [
   {
     id: "standard",
     name: "Standard",
-    tagline: "Everything you need to rank, analyse, and compare stocks — free for 3 months.",
+    tagline: "Everything you need to rank, analyse, and compare stocks - free for 3 months.",
     monthlyPrice: 499,
     yearlyPrice: 4999,
     yearlyDiscountPct: 17,
@@ -25,7 +25,7 @@ const FALLBACK_PLANS = [
       "Smart composite scoring across multiple KPIs",
       "Filter stocks with simple expressions before ranking",
       "Compare 2–6 companies head-to-head with charts",
-      "Company deep dive — live price, fundamentals & charts",
+      "Company deep dive - live price, fundamentals & charts",
       "Customise KPI weights to match your investment style",
       "Email PDF summary of top-ranked companies",
     ],
@@ -46,7 +46,7 @@ const FALLBACK_PLANS = [
       "Custom stock watchlist",
       "Daily BSE/NSE company announcements feed",
       "Multi-year historical data & KPI time-series",
-      "AI Interpretation Engine — plain-language insights",
+      "AI Interpretation Engine - plain-language insights",
     ],
   },
 ];

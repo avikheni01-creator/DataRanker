@@ -1,6 +1,6 @@
 import { fonts, colors } from "../theme";
 
-// ThinkVest logo mark — renders only the brain icon from logo.png.
+// ThinkVest logo mark - renders only the brain icon from logo.png.
 //
 // Technique: background-image cropped via backgroundSize + backgroundPosition so
 // only the brain portion (top ~55% of the square PNG) fills the container.
@@ -28,7 +28,7 @@ export default function Logo({ size = 22, showText = true, color = colors.text }
           backgroundSize: "185% auto",
           backgroundPosition: "50% 12%",
           // multiply blend: white PNG pixels × #ECFDF5 = #ECFDF5 (invisible).
-          // Navy/teal pixels are preserved — multiply barely changes them.
+          // Navy/teal pixels are preserved - multiply barely changes them.
           backgroundColor: "#ECFDF5",
           backgroundBlendMode: "multiply",
           boxShadow: "0 0 0 1.5px rgba(16,185,129,0.35)",

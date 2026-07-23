@@ -1,4 +1,4 @@
-// models/User.js — application user with subscription plan.
+// models/User.js - application user with subscription plan.
 
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
@@ -35,7 +35,7 @@ userSchema.methods.comparePassword = function comparePassword(plain) {
   return bcrypt.compare(plain, this.passwordHash);
 };
 
-// Shape returned to the client — never leak the hash.
+// Shape returned to the client - never leak the hash.
 userSchema.methods.toSafeJSON = function toSafeJSON() {
   return {
     id: this._id.toString(),

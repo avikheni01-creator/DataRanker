@@ -6,7 +6,7 @@ const AppSettingsSchema = new mongoose.Schema(
     // When false, the upload zone is hidden and users must use the Screener page.
     allowCustomUpload: { type: Boolean, default: true },
 
-    // Feature visibility — hide pages from nav (and redirect direct visits).
+    // Feature visibility - hide pages from nav (and redirect direct visits).
     screenerEnabled:   { type: Boolean, default: true },
     comparisonEnabled: { type: Boolean, default: true },
 
@@ -22,7 +22,7 @@ const AppSettingsSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Singleton helper — always returns the one document, creating it if missing.
+// Singleton helper - always returns the one document, creating it if missing.
 AppSettingsSchema.statics.getOrCreate = async function () {
   let doc = await this.findOne();
   if (!doc) doc = await this.create({});

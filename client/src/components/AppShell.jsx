@@ -13,7 +13,7 @@ const CHANGELOG = [
     items: [
       "DSL filter autocomplete with suggestion history",
       "Pipeline stage progress overlay",
-      "Filter presets — save named filters with one click",
+      "Filter presets - save named filters with one click",
       "Sector breakdown chart in Results",
       "Email results to your inbox",
       "Live stats on landing page",
@@ -24,7 +24,7 @@ const CHANGELOG = [
     v: "v1.2", date: "Jun 2026",
     items: [
       "Company comparison dashboard (radar, leaderboard, scatter)",
-      "Results column ordering — Identifiers → KPIs → Other",
+      "Results column ordering - Identifiers → KPIs → Other",
       "Results pagination (25 / 50 / 100 / 200 per page)",
       "Admin screener snapshot upload",
     ],
@@ -34,7 +34,7 @@ const CHANGELOG = [
     items: [
       "Live screener with formula DSL filter",
       "Column picker with three-section grouping",
-      "MERN migration — pipeline now runs server-side",
+      "MERN migration - pipeline now runs server-side",
       "Light / dark theme toggle",
     ],
   },
@@ -73,8 +73,18 @@ export default function AppShell() {
     user && user.emailVerified === false
   );
   const [verifyOtp, setVerifyOtp] = useState("");
-  const [verifyStep, setVerifyStep] = useState("prompt"); // "prompt" | "otp" | "busy"
+  // If signup already emailed a code, open directly on the code-entry step.
+  // Read-only here (safe under StrictMode double-invoke); the flag is cleared in an effect below.
+  const [verifyStep, setVerifyStep] = useState(() => {
+    try {
+      return localStorage.getItem("thinkvest_verify_sent") === "1" ? "otp" : "prompt";
+    } catch { return "prompt"; } // "prompt" | "otp" | "busy"
+  });
   const [verifyError, setVerifyError] = useState("");
+  // Consume the one-shot "code already sent on signup" flag after mount.
+  useEffect(() => {
+    try { localStorage.removeItem("thinkvest_verify_sent"); } catch { /* ignore */ }
+  }, []);
 
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [showChangelog, setShowChangelog] = useState(false);
@@ -143,7 +153,7 @@ export default function AppShell() {
 
   return (
     <div className={`shell${topNav ? " topbar" : ""}`}>
-      <Seo title="Workspace" noindex description="ThinkVest workspace — the signed-in ranking pipeline, column mapper, results dashboard and KPI editor." />
+      <Seo title="Workspace" noindex description="ThinkVest workspace - the signed-in ranking pipeline, column mapper, results dashboard and KPI editor." />
       <style>{SHELL_CSS}</style>
 
       <aside className="shell-side">
@@ -214,6 +224,7 @@ export default function AppShell() {
                   autoFocus
                 />
                 <button className="shell-verify-btn" onClick={handleVerifyEmail} disabled={verifyOtp.length < 6}>Verify</button>
+                <button className="shell-verify-resend" onClick={handleResendVerification}>Resend</button>
                 {verifyError && <span className="shell-verify-error">{verifyError}</span>}
               </>
             )}
@@ -369,6 +380,11 @@ const SHELL_CSS = `
     color: #E2E8F0; letter-spacing: .15em; text-align: center;
     outline: none;
   }
+  .shell-verify-resend {
+    background: transparent; border: none; color: #93C5FD; cursor: pointer;
+    font-size: 12px; text-decoration: underline; padding: 4px 4px;
+  }
+  .shell-verify-resend:hover { color: #BFDBFE; }
   .shell-verify-dismiss {
     margin-left: auto; background: transparent; border: none; color: inherit;
     font-size: 18px; cursor: pointer; opacity: .6; line-height: 1; padding: 0 4px;
@@ -383,7 +399,7 @@ const SHELL_CSS = `
     border-bottom: 1px solid rgba(245,158,11,.25);
   }
 
-  /* What's New button — same styles as a NavLink */
+  /* What's New button - same styles as a NavLink */
   .shell-whatsnew { background: none; border: none; cursor: pointer; font-family: ${fonts.sans}; font-size: 14px; font-weight: 500; width: 100%; display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: ${radius.sm}; color: ${colors.textSecondary}; transition: all .15s ease; }
   .shell-whatsnew:hover { color: ${colors.text}; background: rgba(255,255,255,0.05) !important; }
   .shell-whatsnew.active { color: ${colors.text}; background: linear-gradient(90deg, rgba(16,185,129,0.18), rgba(16,185,129,0.05)); box-shadow: inset 0 0 0 1px rgba(16,185,129,0.28); }
@@ -423,7 +439,7 @@ const SHELL_CSS = `
   .shell.topbar .shell-user { border-top: none; margin-top: 0; padding: 0; }
   .shell.topbar .shell-user-meta { display: none; }
 
-  /* Hamburger — hidden on desktop, shown on mobile */
+  /* Hamburger - hidden on desktop, shown on mobile */
   .shell-hamburger { display: none; }
 
   @media (max-width: 760px) {

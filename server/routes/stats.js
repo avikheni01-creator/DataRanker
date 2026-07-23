@@ -1,4 +1,4 @@
-// routes/stats.js — public GET /stats for the landing page social-proof strip.
+// routes/stats.js - public GET /stats for the landing page social-proof strip.
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");

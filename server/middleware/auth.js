@@ -1,4 +1,4 @@
-// middleware/auth.js — JWT helpers + route guard.
+// middleware/auth.js - JWT helpers + route guard.
 // Accepts the JWT as either an httpOnly cookie OR an Authorization: Bearer header.
 // The header approach is required for cross-domain deployments (separate frontend/
 // backend origins) where browsers block third-party cookies.

@@ -36,16 +36,16 @@ function extractKpiKeys(rows) {
   return allKeys.filter(k => !isSystemCol(k));
 }
 
-// Columns treated as company identifiers — shown right after the fixed columns,
+// Columns treated as company identifiers - shown right after the fixed columns,
 // before any KPI columns. Matched by output column name after COLUMN_MAPPING.
 const IDENTIFIER_COLS = new Set(["BSE Code", "ISIN Code", "NSE Code"]);
 const DEFAULT_HIDDEN_COLS = new Set(["BSE Code", "ISIN Code"]);
 
 /**
  * Split non-system keys into three ordered groups:
- *   identifiers — BSE Code, ISIN Code, NSE Code (shown first, before KPIs)
- *   scored      — columns with a _Metric_Score sibling (template KPIs)
- *   other       — all remaining pass-through data columns
+ *   identifiers - BSE Code, ISIN Code, NSE Code (shown first, before KPIs)
+ *   scored      - columns with a _Metric_Score sibling (template KPIs)
+ *   other       - all remaining pass-through data columns
  * Returns { identifiers: [], scored: [], other: [] }
  */
 function partitionKpiKeys(rows) {
@@ -90,20 +90,20 @@ function scoreColor(pct) {
 
 function fmt(val, key) {
   const v = parseFloat(val);
-  if (isNaN(v)) return "—";
+  if (isNaN(v)) return "-";
   const pctKeys = ["Growth", "Margin", "ROE", "ROCE", "Return", "Yield"];
   const addPct = pctKeys.some(p => key.includes(p));
   return v.toFixed(2) + (addPct ? "%" : "");
 }
 
 function fmtPrice(val, currency) {
-  if (val == null) return "—";
+  if (val == null) return "-";
   const sym = currency === "INR" ? "₹" : (currency ? `${currency} ` : "");
   return `${sym}${Number(val).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 function fmtMarketCap(val, currency) {
-  if (val == null) return "—";
+  if (val == null) return "-";
   const sym = currency === "INR" ? "₹" : (currency ? `${currency} ` : "");
   if (val >= 1e12) return `${sym}${(val / 1e12).toFixed(2)}T`;
   if (val >= 1e7)  return `${sym}${(val / 1e7).toFixed(2)} Cr`;
@@ -145,7 +145,7 @@ function ColumnPicker({ allKpiKeys, visibleKpiKeys, onChange, identifierKeys = [
         onClick={() => setOpen(o => !o)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        aria-label={`Column picker — ${visibleKpiKeys.length} of ${allKpiKeys.length} visible`}
+        aria-label={`Column picker - ${visibleKpiKeys.length} of ${allKpiKeys.length} visible`}
         style={{
           display: "flex", alignItems: "center", gap: 6,
           background: open ? "var(--elevated)" : "var(--card)",
@@ -182,7 +182,7 @@ function ColumnPicker({ allKpiKeys, visibleKpiKeys, onChange, identifierKeys = [
             <button onClick={clearAll} style={quickBtnStyle("var(--negative)")}>None</button>
           </div>
 
-          {/* Grouped checkboxes — identifiers → scored KPIs → other data */}
+          {/* Grouped checkboxes - identifiers → scored KPIs → other data */}
           {(() => {
             const identifiers = allKpiKeys.filter(k => identifierSet.has(k));
             const scored = allKpiKeys.filter(k => scoredSet.has(k));
@@ -265,7 +265,7 @@ function CompanyDrawer({ company, allCompanies, onClose }) {
   const [liveLoading, setLiveLoading] = useState(false);
   const [liveError, setLiveError] = useState(null);
 
-  // Use ISIN as the trigger key — it's always unique even when two companies share
+  // Use ISIN as the trigger key - it's always unique even when two companies share
   // the same rank or have an empty Symbol field.
   const companyKey = company?.["ISIN Code"] || company?.Symbol || company?.Description;
 
@@ -279,7 +279,7 @@ function CompanyDrawer({ company, allCompanies, onClose }) {
     const symbol = company?.Symbol;
     if (!isin && !symbol) return;
 
-    // Prefer ISIN — it's always unique and doesn't depend on exchange suffix guessing.
+    // Prefer ISIN - it's always unique and doesn't depend on exchange suffix guessing.
     const path = isin
       ? `/company/isin/${encodeURIComponent(isin)}`
       : `/company/${encodeURIComponent(symbol)}`;
@@ -388,11 +388,11 @@ function CompanyDrawer({ company, allCompanies, onClose }) {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                 {[
                   { label: "Market Cap", value: fmtMarketCap(liveQuote.marketCap, liveQuote.currency) },
-                  { label: "P/E Ratio",  value: liveQuote.peRatio != null ? liveQuote.peRatio.toFixed(2) : "—" },
+                  { label: "P/E Ratio",  value: liveQuote.peRatio != null ? liveQuote.peRatio.toFixed(2) : "-" },
                   { label: "52W High",   value: fmtPrice(liveQuote.week52High, liveQuote.currency) },
                   { label: "52W Low",    value: fmtPrice(liveQuote.week52Low, liveQuote.currency) },
-                  { label: "Volume",     value: liveQuote.volume != null ? liveQuote.volume.toLocaleString("en-IN") : "—" },
-                  { label: "Div Yield",  value: liveQuote.dividendYield != null ? `${(liveQuote.dividendYield * 100).toFixed(2)}%` : "—" },
+                  { label: "Volume",     value: liveQuote.volume != null ? liveQuote.volume.toLocaleString("en-IN") : "-" },
+                  { label: "Div Yield",  value: liveQuote.dividendYield != null ? `${(liveQuote.dividendYield * 100).toFixed(2)}%` : "-" },
                 ].map(({ label, value }) => (
                   <div key={label} style={{ background: "var(--card)", borderRadius: 8, padding: "8px 10px", border: "1px solid var(--border)" }}>
                     <div style={{ fontSize: 9, fontFamily: "'JetBrains Mono',monospace", color: "var(--text-muted)", marginBottom: 3 }}>{label}</div>
@@ -502,7 +502,7 @@ function CompanyDrawer({ company, allCompanies, onClose }) {
           </div>
         )}
 
-        {/* All raw KPI financials — dynamic */}
+        {/* All raw KPI financials - dynamic */}
         {kpiKeys.length > 0 && (
           <div>
             <div style={{ fontSize: 10, fontFamily: "'JetBrains Mono',monospace", color: "var(--text-muted)", letterSpacing: ".1em", marginBottom: 10 }}>FINANCIALS</div>
@@ -566,9 +566,9 @@ export default function StockDashboard({ resultFile }) {
 
   // visibleKpiKeys: per-template map { templateName: [key, ...] }
   const [visibleKpiMap, setVisibleKpiMap] = useState({});
-  // kpiOrderMap: { templateName: { scored: [], other: [] } } — set once at parse time, never mutated
+  // kpiOrderMap: { templateName: { scored: [], other: [] } } - set once at parse time, never mutated
   const [kpiOrderMap, setKpiOrderMap] = useState({});
-  // kpiDirectionMap: { kpiName: "higher" | "lower" } — fetched from KPI library
+  // kpiDirectionMap: { kpiName: "higher" | "lower" } - fetched from KPI library
   const [kpiDirectionMap, setKpiDirectionMap] = useState({});
 
   useEffect(() => {
@@ -657,7 +657,7 @@ export default function StockDashboard({ resultFile }) {
   const templateSummary = templates.map(t => ({
     name: t,
     count: sheets[t].length,
-    top: sheets[t].find(r => r.Company_Rank === 1)?.Symbol || "—",
+    top: sheets[t].find(r => r.Company_Rank === 1)?.Symbol || "-",
   }));
 
   // Sector distribution for the active template
@@ -686,7 +686,7 @@ export default function StockDashboard({ resultFile }) {
             rank: Math.round(c.Company_Rank || 0),
             symbol: c.Symbol || "",
             name: c.Description || c.Name || c.Symbol || "",
-            sector: c.Sector || c.SCS_Sector || "—",
+            sector: c.Sector || c.SCS_Sector || "-",
             score: parseFloat(c.Total_Final_Score || 0).toFixed(1),
           })),
       }));
@@ -715,11 +715,11 @@ export default function StockDashboard({ resultFile }) {
       <tr>
         <td class="rank">#${Math.round(r.Company_Rank)}</td>
         <td class="company"><strong>${r.Description || r.Name || r.Symbol || ""}</strong><br/><span class="sym">${r.Symbol || ""}</span></td>
-        <td class="sector">${r.Sector || r.SCS_Sector || "—"}</td>
+        <td class="sector">${r.Sector || r.SCS_Sector || "-"}</td>
         <td class="score">${parseFloat(r.Total_Final_Score || 0).toFixed(1)}</td>
       </tr>`).join("");
     const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/>
-      <title>ThinkVest — ${activeTemplate} Rankings</title>
+      <title>ThinkVest - ${activeTemplate} Rankings</title>
       <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; color:#0f1117; background:#fff; padding:40px 48px; }
@@ -807,7 +807,7 @@ export default function StockDashboard({ resultFile }) {
     );
   }
 
-  // Empty state — no pipeline output yet (all hooks already declared above).
+  // Empty state - no pipeline output yet (all hooks already declared above).
   if (!effectiveFile) {
     return (
       <div style={{
@@ -892,7 +892,7 @@ export default function StockDashboard({ resultFile }) {
           .sd-stats  { overflow-x: auto; -webkit-overflow-scrolling: touch; }
           .sd-stat-cell { padding: 8px 12px !important; min-width: 80px; }
 
-          /* Compact table — halve horizontal padding to fit more columns */
+          /* Compact table - halve horizontal padding to fit more columns */
           .sd-table-wrap td { padding: 7px 8px !important; font-size: 10.5px; }
           .sd-table-wrap th { padding: 7px 8px !important; font-size: 8px !important; }
         }
@@ -1053,12 +1053,12 @@ export default function StockDashboard({ resultFile }) {
           <div className="sd-stats" style={{ display: "flex", gap: 0, borderBottom: "1px solid var(--border)", flexShrink: 0 }}>
             {[
               { label: "Companies", value: allInTemplate.length },
-              { label: "Top Ranked", value: allInTemplate.find(r => r.Company_Rank === 1)?.Symbol || "—" },
+              { label: "Top Ranked", value: allInTemplate.find(r => r.Company_Rank === 1)?.Symbol || "-" },
               {
                 label: "Avg Score",
                 value: allInTemplate.length
                   ? (allInTemplate.reduce((s, r) => s + (parseFloat(r.Total_Final_Score) || 0), 0) / allInTemplate.length).toFixed(1)
-                  : "—",
+                  : "-",
               },
               { label: "Max Score", value: maxScore.toFixed(1) },
               { label: "KPI Cols", value: `${visibleKpiKeys.length} / ${allKpiKeys.length}` },
@@ -1076,7 +1076,7 @@ export default function StockDashboard({ resultFile }) {
               padding: "14px 20px", borderBottom: "1px solid var(--border)",
               background: "var(--card)", flexShrink: 0,
             }}>
-              <div className="mono" style={{ fontSize: 9, letterSpacing: ".14em", color: "var(--text-muted)", marginBottom: 10 }}>SECTOR BREAKDOWN — {activeTemplate}</div>
+              <div className="mono" style={{ fontSize: 9, letterSpacing: ".14em", color: "var(--text-muted)", marginBottom: 10 }}>SECTOR BREAKDOWN - {activeTemplate}</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {sectorData.map(({ name, count, pct }, i) => (
                   <div key={name} style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -1163,7 +1163,7 @@ export default function StockDashboard({ resultFile }) {
                           fontSize: 9, fontFamily: "'JetBrains Mono',monospace", padding: "2px 7px",
                           background: "var(--accent-soft)", color: "var(--accent-hover)", borderRadius: 4, whiteSpace: "nowrap",
                         }}>
-                          {r.Sector || r.SCS_Sector || "—"}
+                          {r.Sector || r.SCS_Sector || "-"}
                         </span>
                       </td>
 
@@ -1200,7 +1200,7 @@ export default function StockDashboard({ resultFile }) {
                         return (
                           <td key={key} style={tdStyle}>
                             <span className="mono" style={{ fontSize: 11, color }}>
-                              {isNaN(v) ? (raw || "—") : fmt(v, key)}
+                              {isNaN(v) ? (raw || "-") : fmt(v, key)}
                             </span>
                           </td>
                         );

@@ -40,7 +40,7 @@ export default function App() {
   const notify = useCallback((msg) => setToast(msg), []);
 
   // Fetch backend config on mount. Retries a few times (backend may still be
-  // starting) and surfaces a toast instead of failing silently — an empty
+  // starting) and surfaces a toast instead of failing silently - an empty
   // config leaves the Column Mapper dropdowns blank.
   useEffect(() => {
     let cancelled = false;
@@ -54,7 +54,7 @@ export default function App() {
           if (attempt < 4) {
             setTimeout(() => load(attempt + 1), 2500);
           } else {
-            notify("Backend not reachable — start the server, then reload this page.");
+            notify("Backend not reachable - start the server, then reload this page.");
           }
         });
     };
@@ -121,7 +121,7 @@ export default function App() {
           <Route path="admin/logs" element={<AdminLogsPage />} />
         </Route>
 
-        {/* 404 — must be last */}
+        {/* 404 - must be last */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
 

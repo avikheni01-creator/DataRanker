@@ -1,4 +1,4 @@
-// routes/adminUsers.js — admin-only user management endpoints.
+// routes/adminUsers.js - admin-only user management endpoints.
 
 const express   = require("express");
 const mongoose  = require("mongoose");
@@ -16,7 +16,7 @@ const ACTION_LABELS = {
   paidUntil:       "paid_until_edit",
 };
 
-// GET /admin/users — list all users, newest first
+// GET /admin/users - list all users, newest first
 router.get("/admin/users", requireAuth, requireAdmin, async (req, res) => {
   try {
     const users = await User.find({}, "-passwordHash -googleId").sort({ createdAt: -1 });
@@ -26,7 +26,7 @@ router.get("/admin/users", requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
-// PATCH /admin/users/:id — update plan / isAdmin / dates (cannot modify yourself)
+// PATCH /admin/users/:id - update plan / isAdmin / dates (cannot modify yourself)
 router.patch("/admin/users/:id", requireAuth, requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
@@ -70,7 +70,7 @@ router.patch("/admin/users/:id", requireAuth, requireAdmin, async (req, res) => 
   }
 });
 
-// DELETE /admin/users/:id — delete a user (cannot delete yourself)
+// DELETE /admin/users/:id - delete a user (cannot delete yourself)
 router.delete("/admin/users/:id", requireAuth, requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;

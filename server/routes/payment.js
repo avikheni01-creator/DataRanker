@@ -1,4 +1,4 @@
-// routes/payment.js — Razorpay order creation and payment verification.
+// routes/payment.js - Razorpay order creation and payment verification.
 //
 // POST /payment/create-order  (requireAuth)
 //   Creates a Razorpay order for the requested period (monthly|yearly).
@@ -24,7 +24,7 @@ const { requireAuth } = require("../middleware/auth");
 const router = express.Router();
 
 // Fallback prices in paise when no Plan document exists (₹499/mo, ₹4,999/yr)
-const FALLBACK_PAISE = { monthly: 500, yearly: 499900 };
+const FALLBACK_PAISE = { monthly: 49900, yearly: 499900 };
 
 function getRazorpay() {
   const key_id     = process.env.RAZORPAY_KEY_ID;
@@ -103,7 +103,7 @@ router.post("/payment/verify", requireAuth, async (req, res) => {
   try {
     const daysToAdd = period === "yearly" ? 365 : 30;
 
-    // Record payment first — unique index on razorpayPaymentId guards against replay.
+    // Record payment first - unique index on razorpayPaymentId guards against replay.
     // isNew = false means this payment was already processed; skip trialEndsAt extension.
     let isNew = true;
     try {
@@ -117,7 +117,7 @@ router.post("/payment/verify", requireAuth, async (req, res) => {
         currency:          "INR",
       });
     } catch (dupErr) {
-      isNew = false; // duplicate payment_id — already handled
+      isNew = false; // duplicate payment_id - already handled
     }
 
     const user = await User.findById(req.user._id);

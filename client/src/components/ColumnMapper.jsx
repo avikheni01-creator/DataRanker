@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import './ColumnMapper.css';
 
 /**
- * ColumnMapper — embedded mapping step of the pipeline page.
+ * ColumnMapper - embedded mapping step of the pipeline page.
  *
  * It does NOT own the file upload (the pipeline page does); it reads columns
  * from the already-chosen `queryFile`, auto-maps them against the backend
@@ -79,7 +79,7 @@ const ColumnMapper = ({ backendConfig = {}, queryFile = null, onMappingChange = 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [backendConfig, performAutoMapping]);
 
-  // Process whatever file the pipeline page has chosen — on mount and whenever
+  // Process whatever file the pipeline page has chosen - on mount and whenever
   // that shared file changes.
   useEffect(() => {
     if (queryFile) processFile(queryFile);
@@ -211,7 +211,7 @@ const ColumnMapper = ({ backendConfig = {}, queryFile = null, onMappingChange = 
   const buildFinalMapping = useCallback(() => {
     const finalMapping = {};
 
-    // Auto-mapped is stored as { backendMetric: csvColumn } — reverse it.
+    // Auto-mapped is stored as { backendMetric: csvColumn } - reverse it.
     Object.entries(autoMappedColumns).forEach(([csvColumn, backendMetric]) => {
       finalMapping[csvColumn] = backendMetric;
     });
@@ -229,7 +229,7 @@ const ColumnMapper = ({ backendConfig = {}, queryFile = null, onMappingChange = 
     unmappedColumns.every(col => manualMappings[col]);
 
   // Report the mapping + readiness up to the pipeline page whenever it changes.
-  // Ready requires at least one column to be mapped — prevents sending an empty
+  // Ready requires at least one column to be mapped - prevents sending an empty
   // mapping that would silently produce a zero-row output.
   useEffect(() => {
     const finalMapping = buildFinalMapping();
@@ -289,7 +289,7 @@ const ColumnMapper = ({ backendConfig = {}, queryFile = null, onMappingChange = 
         </div>
       )}
 
-      {/* Auto-Mapped Columns — collapsed by default (informational). */}
+      {/* Auto-Mapped Columns - collapsed by default (informational). */}
       {hasAutoMappings && (
         <details className="mapper-section mapper-collapse auto-mapped-section">
           <summary className="mapper-collapse-head">
@@ -313,7 +313,7 @@ const ColumnMapper = ({ backendConfig = {}, queryFile = null, onMappingChange = 
         </details>
       )}
 
-      {/* Manual Mapping for Unmapped Columns — open by default (needs action). */}
+      {/* Manual Mapping for Unmapped Columns - open by default (needs action). */}
       {unmappedColumns.length > 0 && (
         <details className="mapper-section mapper-collapse manual-mapping-section" open>
           <summary className="mapper-collapse-head">
@@ -321,7 +321,7 @@ const ColumnMapper = ({ backendConfig = {}, queryFile = null, onMappingChange = 
             <span className="mapper-collapse-chevron" aria-hidden="true">▸</span>
           </summary>
           <div className="mapper-collapse-body">
-            <p className="instruction">Optionally map any of these to a metric — leftover columns are ignored.</p>
+            <p className="instruction">Optionally map any of these to a metric - leftover columns are ignored.</p>
             <div className="manual-mapping-grid">
               {unmappedColumns.map(csvColumn => (
                 <div key={csvColumn} className="manual-mapping-row">

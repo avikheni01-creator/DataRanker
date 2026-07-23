@@ -541,7 +541,7 @@ export default function ScreenerPage() {
           )}
         </div>
 
-        {/* Admin upload — with drag-and-drop */}
+        {/* Admin upload - with drag-and-drop */}
         {isAdmin && (
           <div
             className={`sp-admin${dragOver ? " sp-admin-drag-over" : ""}`}
@@ -841,7 +841,7 @@ export default function ScreenerPage() {
             <div className="sp-table-section">
               {visibleCols.length === 0 ? (
                 <div className="sp-empty">
-                  No columns selected — use the Columns picker to show data.
+                  No columns selected - use the Columns picker to show data.
                 </div>
               ) : (
                 <div className="sp-table-wrap">
@@ -881,7 +881,7 @@ export default function ScreenerPage() {
                                 key={col}
                                 style={isNum ? { textAlign: "right" } : undefined}
                               >
-                                {val === null || val === undefined ? "—" : String(val)}
+                                {val === null || val === undefined ? "-" : String(val)}
                               </td>
                             );
                           })}
@@ -1341,7 +1341,7 @@ const CSS = `
     .sp-empty-state { margin: 16px; padding: 40px 20px; }
     .sp-filter-toggle span { display: none; }
 
-    /* Compact table on mobile — tighter cells fit more columns */
+    /* Compact table on mobile - tighter cells fit more columns */
     .sp-table { font-size: 11px; }
     .sp-th-sortable { padding: 7px 8px; font-size: 9.5px; }
     .sp-table td { padding: 7px 8px; }

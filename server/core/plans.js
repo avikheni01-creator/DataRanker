@@ -1,4 +1,4 @@
-// core/plans.js — hardcoded fallback subscription tiers (used when DB has no plans).
+// core/plans.js - hardcoded fallback subscription tiers (used when DB has no plans).
 // Admin can override all of these via the Plan Management page (/app/admin/plans).
 
 const PLANS = [

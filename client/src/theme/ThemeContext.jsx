@@ -1,4 +1,4 @@
-// theme/ThemeContext.jsx — app-wide light/dark mode.
+// theme/ThemeContext.jsx - app-wide light/dark mode.
 // Persists the choice to localStorage and reflects it on <html data-theme>,
 // which drives all the CSS variables in index.css.
 

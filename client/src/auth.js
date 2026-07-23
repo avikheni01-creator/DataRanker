@@ -1,4 +1,4 @@
-// auth.js — real auth against the Express backend.
+// auth.js - real auth against the Express backend.
 // The JWT is returned in the response body and stored in localStorage so it can
 // be sent as an Authorization: Bearer header on every request. This works
 // reliably across cross-domain deployments (Vercel frontend + EC2 backend) where
@@ -25,6 +25,12 @@ export async function signUp({ name, email, password }) {
     method: "POST",
     body: JSON.stringify({ name, email, password }),
   });
+  // The backend auto-emails a verification code on signup. Flag it so the
+  // verification banner opens directly on the code-entry step (rather than
+  // making the user click "Send Code" again and invalidating the emailed one).
+  if (user && user.emailVerified === false) {
+    try { localStorage.setItem("thinkvest_verify_sent", "1"); } catch { /* ignore */ }
+  }
   return cacheUser(user, token);
 }
 
@@ -71,7 +77,7 @@ export function isAuthed() {
   return Boolean(localStorage.getItem(USER_KEY));
 }
 
-// Update the cached user without touching the token — used after payment to
+// Update the cached user without touching the token - used after payment to
 // refresh trialEndsAt so AppShell's trial check re-evaluates on next render.
 export function saveUser(user) {
   if (user) localStorage.setItem(USER_KEY, JSON.stringify(user));

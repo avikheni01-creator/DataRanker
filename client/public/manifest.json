@@ -1,7 +1,7 @@
 {
   "short_name": "ThinkVest",
-  "name": "ThinkVest — Equity Ranking & Scoring",
-  "description": "Turn raw equity fundamentals into a defensible, weighted ranking — mapped to your sectors and scored against your KPI templates.",
+  "name": "ThinkVest - Equity Ranking & Scoring",
+  "description": "Turn raw equity fundamentals into a defensible, weighted ranking - mapped to your sectors and scored against your KPI templates.",
   "icons": [
     {
       "src": "logo.png",

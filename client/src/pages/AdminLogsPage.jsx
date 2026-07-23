@@ -177,14 +177,14 @@ function LogRow({ log }) {
 
       {/* Admin who did it */}
       <td style={{ padding: "12px 16px", fontSize: 12, color: colors.textMuted }}>
-        {log.actorEmail || <span style={{ color: "var(--border)" }}>—</span>}
+        {log.actorEmail || <span style={{ color: "var(--border)" }}>-</span>}
       </td>
 
       {/* Detail */}
       <td style={{ padding: "12px 16px", fontSize: 12, color: colors.textSecondary, maxWidth: 280 }}>
         {log.razorpayPaymentId
           ? <code style={{ fontSize: 11, background: "var(--inset)", padding: "2px 6px", borderRadius: 4 }}>{log.razorpayPaymentId}</code>
-          : log.detail || "—"
+          : log.detail || "-"
         }
       </td>
 
