@@ -40,7 +40,7 @@
 :root[data-theme="light"] {
   --canvas: #F5F7FC;
   --card: #FFFFFF;
-  --elevated: #FFFFFF;
+  --elevated: #EDF1F9;
   --inset: #EEF2F9;
   --border: #DCE3F0;
   --border-subtle: #E8EDF6;
@@ -52,7 +52,7 @@
 
   --text: #0B1430;
   --text-secondary: #45506E;
-  --text-muted: #7B8499;
+  --text-muted: #5C6785;
 
   --shadow-card: 0 1px 2px rgba(16,24,64,0.06), 0 8px 24px rgba(16,24,64,0.08);
   --shadow-elevated: 0 16px 48px rgba(16,24,64,0.16);
@@ -70,6 +70,13 @@
      dark-mode teal (#34D399). Buttons keep the shared --accent/--accent-deep. */
   --accent-hover: #059669;
   --accent-soft: rgba(16,185,129,0.10);
+
+  /* Semantic colors used as TEXT on a light canvas need to be desaturated so
+     they clear the AA contrast bar; the vivid --positive/--negative are kept
+     for bar/pill fills. */
+  --positive-text: #15803D;
+  --negative-text: #DC2626;
+  --accent-text: #047857;
 }
 
 /* Brand + semantic - shared by both modes */
@@ -88,6 +95,11 @@
   --warning-soft: rgba(245,158,11,0.12);
   --info: #22D3EE;
   --info-soft: rgba(34,211,238,0.12);
+
+  /* Text-safe semantic colors (dark defaults; overridden in the light block) */
+  --positive-text: #22C55E;
+  --negative-text: #EF4444;
+  --accent-text: #34D399;
 }
 
 *, *::before, *::after { box-sizing: border-box; }

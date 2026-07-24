@@ -396,7 +396,7 @@ function CompanyDrawer({ company, allCompanies, onClose }) {
                 ].map(({ label, value }) => (
                   <div key={label} style={{ background: "var(--card)", borderRadius: 8, padding: "8px 10px", border: "1px solid var(--border)" }}>
                     <div style={{ fontSize: 9, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: "var(--text-muted)", marginBottom: 3 }}>{label}</div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-secondary)" }}>{value}</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text)" }}>{value}</div>
                   </div>
                 ))}
               </div>
@@ -512,7 +512,7 @@ function CompanyDrawer({ company, allCompanies, onClose }) {
                 .map(k => (
                   <div key={k} style={{ background: "var(--elevated)", borderRadius: 8, padding: "10px 12px", border: "1px solid var(--border)" }}>
                     <div style={{ fontSize: 9, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: "var(--text-muted)", marginBottom: 4 }}>{k.toUpperCase()}</div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-secondary)" }}>{fmt(company[k], k)}</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text)" }}>{fmt(company[k], k)}</div>
                   </div>
                 ))}
             </div>
@@ -530,7 +530,7 @@ function CompanyDrawer({ company, allCompanies, onClose }) {
                 marginBottom: 6, border: "1px solid var(--border)",
               }}>
                 <div>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: "var(--text-secondary)" }}>{p.Symbol}</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: "var(--text)" }}>{p.Symbol}</span>
                   <span style={{ fontSize: 10, color: "var(--text-muted)", marginLeft: 8, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
                     {(p.Description || p.Name || "").slice(0, 22)}
                   </span>
@@ -1163,7 +1163,7 @@ export default function StockDashboard({ resultFile }) {
                       <td style={tdStyle}>
                         <span style={{
                           fontSize: 9, fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", padding: "2px 7px",
-                          background: "var(--accent-soft)", color: "var(--accent-hover)", borderRadius: 4, whiteSpace: "nowrap",
+                          background: "var(--accent-soft)", color: "var(--accent-text)", borderRadius: 4, whiteSpace: "nowrap",
                         }}>
                           {r.Sector || r.SCS_Sector || "-"}
                         </span>
@@ -1195,7 +1195,7 @@ export default function StockDashboard({ resultFile }) {
                         } else if (isKpi) {
                           const lowerIsBetter = kpiDirectionMap[key] === "lower";
                           const bad = lowerIsBetter ? v > 0 : v < 0;
-                          color = bad ? "var(--negative)" : "var(--positive)";
+                          color = bad ? "var(--negative-text)" : "var(--positive-text)";
                         } else {
                           color = "var(--text-secondary)";
                         }
